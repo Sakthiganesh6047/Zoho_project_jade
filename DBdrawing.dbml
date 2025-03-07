@@ -1,0 +1,12 @@
+Table Transaction {
+  transaction_id bigint
+  account_id bigint [ref: > Account.account_id] // The account affected by the transaction
+  transaction_type enum
+  amount decimal(15,2) [not null]
+  transaction_date timestamp
+  sender_account_id bigint [ref: > Account.account_id] // Null for deposits
+  receiver_account_id bigint [ref: > Account.account_id] // Null for withdrawals
+  done_by bigint [ref: > User.user_id] // The user who performed the transaction
+  reference_transaction_id bigint [ref: > Transaction.transaction_id] // Links the credit-debit pair
+}
+
