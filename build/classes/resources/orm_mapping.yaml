@@ -1,5 +1,5 @@
 Branch:
-  table: branch
+  table: Branch
   fields:
     branchId: branch_id
     branchName: branch_name
@@ -12,7 +12,7 @@ Branch:
     modifiedOn: modified_on
 
 User:
-  table: user
+  table: User
   fields:
     userId: user_id
     fullName: full_name
@@ -28,8 +28,23 @@ User:
     modifiedBy: modified_by
     modifiedOn: modified_on
 
+Customer:
+  table: Customer
+  fields:
+    customerId: customer_id
+    aadharNumber: aadhar_number
+    panId: pan_id
+    address: address
+
+Employee:
+  table: Employee
+  fields:
+    employeeId: employee_id
+    role: role
+    branch: branch
+
 Account:
-  table: account
+  table: Account
   fields:
     accountId: account_id
     customerId: customer_id
@@ -43,7 +58,7 @@ Account:
     modifiedOn: modified_on
 
 Transaction:
-  table: transaction
+  table: Transaction
   fields:
     transactionId: transaction_id
     accountId: account_id
@@ -58,7 +73,7 @@ Transaction:
     createdBy: created_by
 
 Loan:
-  table: loan
+  table: Loan
   fields:
     loanId: loan_id
     accountId: account_id
@@ -70,4 +85,29 @@ Loan:
     approvedBy: approved_by
     createdOn: created_on
     modifiedBy: modified_by
+    modifiedOn: modified_on
+
+Nominee:
+  table: Nominee
+  fields:
+    nomineeId: nominee_id
+    name: name
+    phoneNumber: phoneNumber
+    accountId: account_id
+    createdBy: created_by
+    modifiedBy: modified_by
+    modifiedOn: modified_on
+    nomineeCustomerId: nominee_customer_id
+
+Beneficiary:
+  table: Beneficiary
+  fields:
+    beneficiaryId: beneficiary_id
+    beneficiaryName: beneficiar_name
+    bankName: bank_name
+    beneficiaryAccountNumber: account_number
+    ifsc_code: ifscCode
+    accountId: account_id
+    createdBy: created_by
+    modifiedBy: modified_on
     modifiedOn: modified_on
