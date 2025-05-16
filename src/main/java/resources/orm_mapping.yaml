@@ -1,0 +1,113 @@
+Branch:
+  table: Branch
+  fields:
+    branchId: branch_id
+    branchName: branch_name
+    branchDistrict: branch_district
+    address: address
+    ifscCode: ifsc_code
+    createdBy: created_by
+    createdOn: created_on
+    modifiedBy: modified_by
+    modifiedOn: modified_on
+
+User:
+  table: User
+  fields:
+    userId: user_id
+    fullName: full_name
+    email: email
+    passwordHash: password_hash
+    phone: phone
+    dob: dob
+    age: age
+    gender: gender
+    userType: user_type
+    status: status
+    createdBy: created_by
+    modifiedBy: modified_by
+    modifiedOn: modified_on
+
+Customer:
+  table: Customer
+  fields:
+    customerId: customer_id
+    aadharNumber: aadhar_number
+    panId: pan_id
+    address: address
+
+Employee:
+  table: Employee
+  fields:
+    employeeId: employee_id
+    role: role
+    branch: branch
+
+Account:
+  table: Account
+  fields:
+    accountId: account_id
+    customerId: customer_id
+    branchId: branch_id
+    accountType: account_type
+    balance: balance
+    accountStatus: account_status
+    createdBy: created_by
+    createdAt: created_at
+    modifiedBy: modified_by
+    modifiedOn: modified_on
+
+Transaction:
+  table: Transaction
+  fields:
+    transactionId: transaction_id
+    accountId: account_id
+    customerId: customer_id
+    amount: amount
+    closingBalance: closing_balance
+    transactionType: transaction_type
+    transactionDate: transaction_date
+    description: description
+    transferReference: transfer_reference
+    transactionStatus: transaction_status
+    createdBy: created_by
+
+Loan:
+  table: Loan
+  fields:
+    loanId: loan_id
+    accountId: account_id
+    loanType: loan_type
+    loanAmount: loan_amount
+    balanceAmount: balance_amount
+    loanStatus: loan_status
+    branchId: branch_id
+    approvedBy: approved_by
+    createdOn: created_on
+    modifiedBy: modified_by
+    modifiedOn: modified_on
+
+Nominee:
+  table: Nominee
+  fields:
+    nomineeId: nominee_id
+    name: name
+    phoneNumber: phoneNumber
+    accountId: account_id
+    createdBy: created_by
+    modifiedBy: modified_by
+    modifiedOn: modified_on
+    nomineeCustomerId: nominee_customer_id
+
+Beneficiary:
+  table: Beneficiary
+  fields:
+    beneficiaryId: beneficiary_id
+    beneficiaryName: beneficiar_name
+    bankName: bank_name
+    beneficiaryAccountNumber: account_number
+    ifsc_code: ifscCode
+    accountId: account_id
+    createdBy: created_by
+    modifiedBy: modified_on
+    modifiedOn: modified_on

@@ -1,0 +1,117 @@
+
+#role based authorization -- yaml file
+# 0 - Customer // 1 - Clerk // 2 - Manager // 3 -- GM
+
+user:
+  create:
+    - 3
+  getAll:
+    - 1
+    - 2
+    - 3
+  update:
+    - 0
+    - 1
+    - 2
+    - 3
+  getByEmail:
+    - 0
+    - 1
+    - 2
+    - 3
+  signup:
+    - 0
+    - 1
+    - 2
+    - 3
+
+transaction:
+  getAll:
+    - 1
+    - 2
+    - 3
+
+branch:
+  create:
+    - 3
+  modify:
+    - 2
+    - 3
+  getAll:
+    - 1
+    - 2
+    - 3
+  getByIfsc:
+    - 1
+    - 2
+    - 3
+    - 0
+  getById:
+    - 1
+    - 2
+    - 3
+    - 0
+
+account:
+  create:
+    - 0
+    - 1
+    - 2
+    - 3
+  accounts:
+    - 0
+    - 1
+    - 2
+    - 3
+  getList:
+    - 1
+    - 2
+    - 3
+  detail:
+    - 0
+    - 1
+    - 2
+    - 3
+  update:
+    - 1
+    - 2
+    - 3
+  activate:
+    - 1
+    - 2
+    - 3
+  aprlWaiting:
+    - 1
+    - 2
+    - 3
+  close:
+    - 2
+    - 3
+    - 1
+  delete:
+    - 3
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+    
+
