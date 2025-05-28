@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.Map;
 import DAO.UserDAO;
 import annotations.FromBody;
+import annotations.FromPath;
 import annotations.FromQuery;
 import annotations.FromSession;
 import annotations.Route;
@@ -42,7 +43,7 @@ public class UserHandler {
         return Results.respondJson(Map.of("status", "created", "userId", result));
     }
     
-    @Route(path = "signup", method = "POST")
+    @Route(path = "user/new", method = "POST")
     public String createUser(@FromBody UserProfile profile, @FromSession("userId") long creatorId, @FromSession("role") int creatorRole) throws Exception {
 		
     	Connection connection = null;
@@ -81,6 +82,39 @@ public class UserHandler {
 		} finally {
 			if (connection != null) connection.close();
 		}
+    }
+    
+    @Route(path = "user/signup", method = "POST")
+    public String publicCreateCustomer(@FromBody UserProfile profile) throws Exception {
+        Connection connection = null;
+
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
+
+            User user = profile.getUser();
+            user.setUserType(1);
+            user.setCreatedBy(0L); // Optional: 0 or -1 for public created
+            user.setModifiedOn(Instant.now().toEpochMilli());
+
+            long generatedUserId = userDAO.insertUser(user, connection);
+            user.setUserId(generatedUserId);
+
+            Customer customer = profile.getCustomerDetails();
+            customer.setCustomerId(generatedUserId);
+
+            customerHandler.insertCustomer(customer, connection);
+
+            connection.commit();
+            return Results.respondJson(Map.of("status", "created", "userId", generatedUserId));
+
+        } catch (Exception e) {
+            if (connection != null) connection.rollback();
+            e.printStackTrace();
+            throw new CustomException("Public customer creation failed", e);
+        } finally {
+            if (connection != null) connection.close();
+        }
     }
     
     private void createCustomer(Customer customer, User user, Connection connection) throws Exception {
@@ -135,8 +169,8 @@ public class UserHandler {
 //    	return Results.respondJson(user);
 //    }
     
-    @Route(path = "getByEmail", method = "GET")
-    public String getUserProfileByEmail(@FromQuery("email") String email) throws CustomException {
+    @Route(path = "user/{email}", method = "GET")
+    public String getUserProfileByEmail(@FromPath("email") String email) throws CustomException {
         User user = userDAO.getUserByEmail(email);
         if (user == null) {
         	return null;
@@ -150,6 +184,27 @@ public class UserHandler {
                 break;
             case 1:
                 Customer customer = customerHandler.getCustomerDetails(user.getUserId());
+                profile.setCustomerDetails(customer);
+                break;
+        }
+        return Results.respondJson(profile);
+    }
+    
+    @Route(path = "user/{id}", method = "POST")
+    public String getUserProfileById(@FromBody User user) throws CustomException {
+        User fetchedUser = userDAO.getUserById(user.getUserId());
+        if (fetchedUser == null) {
+        	return null;
+        }
+
+        UserProfile profile = new UserProfile(fetchedUser);
+        switch (fetchedUser.getUserType()) {
+            case 2:
+                Employee employee = employeeHandler.getEmployeeDetails(fetchedUser.getUserId());
+                profile.setEmployeeDetails(employee);
+                break;
+            case 1:
+                Customer customer = customerHandler.getCustomerDetails(fetchedUser.getUserId());
                 profile.setCustomerDetails(customer);
                 break;
         }

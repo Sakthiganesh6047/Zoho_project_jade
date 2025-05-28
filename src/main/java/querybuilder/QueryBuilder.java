@@ -1,10 +1,7 @@
 package querybuilder;
 
 import org.yaml.snakeyaml.Yaml;
-
 import util.CustomException;
-
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -12,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class QueryBuilder {
 	
-    private static final Map<String, Object> yamlMappings = new HashMap<>();
+    private static final Map<String, Object> YAMLMAPPINGS = new HashMap<>();
     private String tableName;
     private Map<String, String> fieldMappings;
     private List<String> conditions = new ArrayList<>();
@@ -25,9 +22,9 @@ public class QueryBuilder {
     private Integer limit = null, offset = null;
 
     static {
-        try (InputStream inputStream = new FileInputStream("/home/sakthi-pt7767/eclipse-workspace/zoho_jade_bank/src/main/java/resources/orm_mapping.yaml")) {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/orm_mapping.yaml")) {
             Yaml yaml = new Yaml();
-            yamlMappings.putAll(yaml.load(inputStream));
+            YAMLMAPPINGS.putAll(yaml.load(inputStream));
         } catch (Exception e) {
             throw new RuntimeException("Error loading YAML: " + e.getMessage());
         }
@@ -39,7 +36,7 @@ public class QueryBuilder {
 
     @SuppressWarnings("unchecked")
     private void loadYamlMapping(Class<?> clazz) throws CustomException {
-        Map<String, Object> classMapping = (Map<String, Object>) yamlMappings.get(clazz.getSimpleName());
+        Map<String, Object> classMapping = (Map<String, Object>) YAMLMAPPINGS.get(clazz.getSimpleName());
         if (classMapping != null) {
             this.tableName = (String) classMapping.get("table");
             this.fieldMappings = (Map<String, String>) classMapping.get("fields");

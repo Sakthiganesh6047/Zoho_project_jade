@@ -1,4 +1,4 @@
-package DAO;
+ package DAO;
 
 import java.sql.Connection;
 import java.util.List;
@@ -75,6 +75,23 @@ public class UserDAO {
         	return user;
         } else {
         	throw new CustomException("No users found for this email");
+        }
+    }
+    
+    public User getUserById(long userId) throws CustomException {
+        QueryBuilder queryBuilder = new QueryBuilder(User.class);
+        QueryResult getQuery = queryBuilder.select("fullName", "email", "userType", "status", "passwordHash")
+                         .where("user_id", "=", userId)
+                         .build();
+        System.out.println("Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        @SuppressWarnings("unchecked")
+		List<User> resultList = (List<User>) executor.executeQuery(getQuery, User.class);
+        User user = Results.getSingleResult(resultList);
+        if (user != null) {
+        	return user;
+        } else {
+        	throw new CustomException("No users found for this userId");
         }
     }
 

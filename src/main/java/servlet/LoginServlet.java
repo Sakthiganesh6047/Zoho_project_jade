@@ -6,9 +6,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import DAO.EmployeeDAO;
 import DAO.UserDAO;
+import pojos.Credential;
 import pojos.Employee;
 import pojos.User;
 import util.Password;
@@ -19,12 +20,16 @@ public class LoginServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
     
+    Credential credential;
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
-
+    	ObjectMapper mapper = new ObjectMapper();
+    	Credential login = mapper.readValue(request.getReader(), Credential.class);
+    	String email = login.getEmail();
+    	String password = login.getPassword();
+        
         try {
             UserDAO userDAO = UserDAO.getUserDAOInstance();
             User user = userDAO.getUserByEmail(email);

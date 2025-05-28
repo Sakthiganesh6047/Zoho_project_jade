@@ -1,6 +1,5 @@
 package querybuilder;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.sql.Connection;
@@ -110,7 +109,7 @@ public class QueryExecutor {
     }
     
     private void loadYamlMappings() {
-        try (InputStream inputStream = new FileInputStream("/home/sakthi-pt7767/eclipse-workspace/zoho_jade_bank/src/main/java/resources/orm_mapping.yaml")) {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/orm_mapping.yaml")) {
             Yaml yaml = new Yaml();
             Map<String, Object> rawMap = yaml.load(inputStream);
 

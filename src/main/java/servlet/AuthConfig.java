@@ -1,7 +1,7 @@
 package servlet;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -13,20 +13,34 @@ public class AuthConfig {
 
     public AuthConfig(String yamlFile) {
         Yaml yaml = new Yaml();
-        try (InputStream inputStream = new FileInputStream(yamlFile)) {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(yamlFile)) {
             permissions = yaml.load(inputStream);
         } catch (Exception e) {
             throw new RuntimeException("Failed to load permissions.yaml", e);
         }
     }
 
-    public boolean isAuthorized(String handlerKey, String action, int role) {
-        if (role <  0 || role > 3) {
-        	return false;
+    /**
+     * Checks if the given role is authorized to invoke the given method on the handler.
+     *
+     * @param handler the handler object
+     * @param method the method being invoked
+     * @param role the user role
+     * @return true if authorized, false otherwise
+     */
+    public boolean isAuthorized(Object handler, Method method, int role) {
+        if (role < 0 || role > 3) {
+            return false;
         }
+
+        String handlerName = handler.getClass().getSimpleName(); // e.g., UserHandler
+        String methodName = method.getName(); // e.g., getUser
+
         List<Integer> allowedRoles = permissions
-                .getOrDefault(handlerKey, Collections.emptyMap())
-                .getOrDefault(action, Collections.emptyList());
-        return allowedRoles.stream().anyMatch(r -> r.equals(role));
+                .getOrDefault(handlerName, Collections.emptyMap())
+                .getOrDefault(methodName, Collections.emptyList());
+
+        return allowedRoles.contains(role);
     }
-} 
+}
+

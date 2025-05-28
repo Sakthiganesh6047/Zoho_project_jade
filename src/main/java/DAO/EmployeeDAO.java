@@ -2,12 +2,12 @@ package DAO;
 
 import java.sql.Connection;
 import java.util.List;
-import pojos.Customer;
 import pojos.Employee;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.Results;
 
 public class EmployeeDAO {
 	
@@ -41,13 +41,15 @@ public class EmployeeDAO {
         return (long) executor.executeInsertWithConn(insertQuery, conn, false);
 	}
 	
-	public Employee getEmployeeById(Long employeeId) throws CustomException {
+	@SuppressWarnings("unchecked")
+	public <T> Employee getEmployeeById(Long employeeId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Employee.class);
         QueryResult query = queryBuilder.select("*")
                 .where("employee_id", "=", employeeId)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (Employee) executor.executeQuery(query, Customer.class);
+        Employee employee = (Employee) Results.getSingleResult((List<T>) executor.executeQuery(query, Employee.class));
+        return employee ;
     }
 	
 	public int updateEmployee(Employee employee, Long employeeId) throws Exception {

@@ -32,10 +32,11 @@ public class AuthenticationFilter implements Filter {
         boolean isLoginRequest = uri.endsWith("/login");
         boolean isPublicResource = uri.startsWith("/public/") || uri.endsWith(".css") || uri.endsWith(".js");
         boolean isLogoutRequest = uri.endsWith("/logout");
+        boolean isSignUpRequest = uri.endsWith("/signup");
 
-        boolean isLoggedIn = session != null && session.getAttribute("user") != null;
+        boolean isLoggedIn = session != null && session.getAttribute("userId") != null;
 
-        if (isLoggedIn || isLoginRequest || isPublicResource || isLogoutRequest) {
+        if (isLoggedIn || isLoginRequest || isPublicResource || isLogoutRequest || isSignUpRequest) {
             chain.doFilter(request, response);
         } else {
             httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
