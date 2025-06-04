@@ -5,8 +5,6 @@ import java.time.Instant;
 import java.util.Map;
 import DAO.UserDAO;
 import annotations.FromBody;
-import annotations.FromPath;
-import annotations.FromQuery;
 import annotations.FromSession;
 import annotations.Route;
 import pojos.Customer;
@@ -30,13 +28,13 @@ public class UserHandler {
         this.employeeHandler = employeeHandler;
     }
 
-    @Route(path = "getAll", method = "GET")
-    public String getAllUsers() throws CustomException {
-        return Results.respondJson(userDAO.getAllUsers(5, 5));
+    @Route(path = "user/list", method = "GET")
+    public String getAllUsers(int limit, int offset) throws CustomException {
+        return Results.respondJson(userDAO.getAllUsers(limit, offset));
     }
 
-    @Route(path = "create", method = "POST")
-    public String createUser(@FromBody User user) throws CustomException {
+    @Route(path = "user/new/admin", method = "POST")
+    public String createAdminUser(@FromBody User user) throws CustomException {
     	user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
     	user.setModifiedOn(Instant.now().toEpochMilli());
         long result = userDAO.insertUser(user);
@@ -151,12 +149,12 @@ public class UserHandler {
         employeeHandler.insertEmployeeDetails(employee, connection);
     }
     
-    @Route(path = "update", method = "PUT")
-    public String updateUser(@FromBody User user, @FromQuery("userid") long userId, @FromSession("user") User modifier) throws CustomException {
+    @Route(path = "user/update", method = "PUT")
+    public String updateUser(@FromBody User user, @FromSession("user") User modifier) throws CustomException {
     	try {
     		user.setModifiedBy(modifier.getUserId());
     		user.setModifiedOn(Instant.now().toEpochMilli());
-            int result = userDAO.updateUser(user, userId);
+            int result = userDAO.updateUser(user, user.getUserId());
             return Results.respondJson(Map.of("status", result > 0 ? "updated" : "not found", "rowsAffected", result));
         } catch (Exception e) {
             return Results.respondJson(Map.of("error", "Invalid input or update failed"));
@@ -169,28 +167,28 @@ public class UserHandler {
 //    	return Results.respondJson(user);
 //    }
     
-    @Route(path = "user/{email}", method = "GET")
-    public String getUserProfileByEmail(@FromPath("email") String email) throws CustomException {
-        User user = userDAO.getUserByEmail(email);
-        if (user == null) {
+    @Route(path = "user/email", method = "POST")
+    public String getUserProfileByEmail(@FromBody User user) throws CustomException {
+        User fetchedUser = userDAO.getUserByEmail(user.getEmail());
+        if (fetchedUser == null) {
         	return null;
         }
 
-        UserProfile profile = new UserProfile(user);
-        switch (user.getUserType()) {
+        UserProfile profile = new UserProfile(fetchedUser);
+        switch (fetchedUser.getUserType()) {
             case 2:
-                Employee employee = employeeHandler.getEmployeeDetails(user.getUserId());
+                Employee employee = employeeHandler.getEmployeeDetails(fetchedUser.getUserId());
                 profile.setEmployeeDetails(employee);
                 break;
             case 1:
-                Customer customer = customerHandler.getCustomerDetails(user.getUserId());
+                Customer customer = customerHandler.getCustomerDetails(fetchedUser.getUserId());
                 profile.setCustomerDetails(customer);
                 break;
         }
         return Results.respondJson(profile);
     }
     
-    @Route(path = "user/{id}", method = "POST")
+    @Route(path = "user/id", method = "POST")
     public String getUserProfileById(@FromBody User user) throws CustomException {
         User fetchedUser = userDAO.getUserById(user.getUserId());
         if (fetchedUser == null) {
@@ -211,10 +209,10 @@ public class UserHandler {
         return Results.respondJson(profile);
     }
 
-    @Route(path = "delete", method = "DELETE")
-    public String deleteUser(@FromQuery("userId") Long userId) throws CustomException {
+    @Route(path = "user/delete", method = "POST")
+    public String deleteUser(@FromBody User user) throws CustomException {
         try {
-            int result = userDAO.deleteUser(userId);
+            int result = userDAO.deleteUser(user.getUserId());
             return Results.respondJson(Map.of("status", result > 0 ? "deleted" : "not found", "rowsAffected", result));
         } catch (Exception e) {
             //resp.setStatus(400);

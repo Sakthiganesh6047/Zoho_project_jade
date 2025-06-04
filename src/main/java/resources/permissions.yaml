@@ -3,6 +3,42 @@
 # 0 - Customer // 1 - Clerk // 2 - Manager // 3 -- GM
 
 UserHandler:
-  getUser: [1, 2]
-  createUser: [2, 3]
+  getAllUsers: [3]
+  createAdminUser: [3]
+  createUser: [0, 1, 2, 3]
+  publicCreateCustomer: [0, 1, 2, 3]
+  updateUser: [1, 2, 3]
   getUserProfileByEmail: [0, 1, 2, 3]
+  getUserProfileById: [0, 1, 2, 3]
+  deleteUser: [3]
+  
+BranchHandler:
+  createBranch: [3]
+  modifyBranch: [2, 3]
+  branchList: [1, 2, 3]
+  getBranchByIFSC: [1, 2, 3]
+  getBranchById: [1, 2, 3]
+  
+TransactionHandler:
+  fetchTransactionsofAccount: [0, 1, 2, 3]
+  fetchTransactionsOfCustomer: [0, 3]
+  fetchTransactionbyTransactionId: [0, 1, 2, 3]
+  fetchTransactionsByDate: [0, 1, 2, 3]
+  newTransfer: [0, 1, 2, 3]
+  
+AccountHandler:
+  createAccount: [0, 1, 2, 3]
+  getCustomerAccounts: [0, 1, 2, 3]
+  getAccountsList: [1, 2, 3]
+  getAccountDetails: [0, 1, 2, 3]
+  updateAccount: [0, 1, 2, 3]
+  activateAccount: [1, 2, 3]
+  getNewAccounts: [1, 2, 3]
+  closeAccount: [1, 2, 3]
+  deleteAccount: [3]
+  
+BeneficiaryHandler:
+  addBeneficiary: [0, 3]
+  updateBeneficiary: [0, 3]
+  getBeneficiaries: [0, 3]
+  deleteBeneficiary: [0, 3]

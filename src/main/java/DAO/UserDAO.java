@@ -80,7 +80,7 @@ public class UserDAO {
     
     public User getUserById(long userId) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(User.class);
-        QueryResult getQuery = queryBuilder.select("fullName", "email", "userType", "status", "passwordHash")
+        QueryResult getQuery = queryBuilder.select("user_id", "fullName", "email", "userType", "status", "passwordHash")
                          .where("user_id", "=", userId)
                          .build();
         System.out.println("Select Query: " + getQuery);

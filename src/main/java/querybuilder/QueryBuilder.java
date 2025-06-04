@@ -20,6 +20,7 @@ public class QueryBuilder {
     private boolean isUpdate = false, isDelete = false, isSelect = false, isInsert = false;
     private Object entity;
     private Integer limit = null, offset = null;
+    private boolean forUpdate = false;
 
     static {
         try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("resources/orm_mapping.yaml")) {
@@ -154,6 +155,11 @@ public class QueryBuilder {
         this.offset = offset;
         return this;
     }
+    
+    public QueryBuilder forUpdate() {
+        this.forUpdate = true;
+        return this;
+    }
 
     public QueryBuilder orderBy(String field, String order) {
         String column = fieldMappings.getOrDefault(field, field);
@@ -243,8 +249,13 @@ public class QueryBuilder {
 	            if (limit != null) {
 	                query.append(" LIMIT ").append(limit);
 	            }
+	            
 	            if (offset != null) {
 	                query.append(" OFFSET ").append(offset);
+	            }
+	            
+	            if (forUpdate) {
+	                query.append(" FOR UPDATE");
 	            }
 	        }
 	

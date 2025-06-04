@@ -3,6 +3,7 @@ package util;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,12 +11,14 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import DAO.AccountDAO;
 import DAO.EmployeeDAO;
 import annotations.FromBody;
 import annotations.FromHeader;
 import annotations.FromPath;
 import annotations.FromQuery;
 import annotations.FromSession;
+import pojos.Account;
 import pojos.Employee;
 
 public class AuthorizeUtil {
@@ -24,6 +27,31 @@ public class AuthorizeUtil {
     	EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();
     	return employeeDAO.getEmployeeById(employeeId);
     }
+	
+	public static Account getAccountDetails(long accountId) throws CustomException {
+		AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
+		return accountDAO.getAccountById(accountId);
+	}
+	
+	public static boolean isSameBranch(long userId, long accountId) throws CustomException {
+		Employee employee = getEmployeeDetails(userId);
+		Account account1 = getAccountDetails(accountId);
+		if (!(employee.getBranch() == account1.getBranchId())) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean isAuthorizedOwner(long customerId, long accountId) throws CustomException {
+		AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
+	    List<Account> accounts = accountDAO.getAccNosByCustomerId(customerId);
+	    for (Account account : accounts) {
+	        if (account.getAccountId() == accountId) {
+	            return true;
+	        }
+	    }
+	    return false;
+	}
 	
 	public static Object[] resolveParameters(HttpServletRequest request, Method method, Map<String, String> pathParams) throws IOException {
         Parameter[] parameters = method.getParameters();

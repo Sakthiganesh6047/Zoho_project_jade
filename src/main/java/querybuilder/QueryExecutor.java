@@ -75,6 +75,48 @@ public class QueryExecutor {
             throw new CustomException("Failed in query execution", e);
         }
     }
+    
+    public <T> Object executeQuery(QueryResult queryResult, Connection connection, Class<T> pojoClass) throws CustomException {
+        String sql = queryResult.getQuery().trim().toUpperCase();
+        boolean isSelect = sql.startsWith("SELECT");
+        boolean isInsert = sql.startsWith("INSERT");
+
+        try (PreparedStatement stmt = isInsert
+                ? connection.prepareStatement(queryResult.getQuery(), Statement.RETURN_GENERATED_KEYS)
+                : connection.prepareStatement(queryResult.getQuery())) {
+
+            List<Object> params = queryResult.getParameters();
+            if (params != null) {
+                for (int i = 0; i < params.size(); i++) {
+                    stmt.setObject(i + 1, params.get(i));
+                }
+            }
+
+            System.out.println(stmt);
+
+            if (isSelect) {
+                ResultSet rs = stmt.executeQuery();
+                loadYamlMappings();
+                return mapResultSetToPojo(rs, pojoClass, yamlMappings);
+            } else {
+                int affectedRows = stmt.executeUpdate();
+
+                if (isInsert) {
+                    try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                        if (generatedKeys.next()) {
+                            return generatedKeys.getLong(1);
+                        }
+                    }
+                }
+
+                return affectedRows;
+            }
+
+        } catch (Exception e) {
+            throw new CustomException("Failed in query execution", e);
+        }
+    }
+
 
     public long executeInsertWithConn(QueryResult queryResult, Connection conn, boolean returnGeneratedKeys) throws CustomException {
         try (PreparedStatement stmt = conn.prepareStatement(

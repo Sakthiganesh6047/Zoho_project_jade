@@ -7,12 +7,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import DAO.AccountDAO;
+import DAO.BeneficiaryDAO;
 import DAO.BranchDAO;
 import DAO.CustomerDAO;
 import DAO.EmployeeDAO;
 import DAO.TransactionDAO;
 import DAO.UserDAO;
 import handlers.AccountHandler;
+import handlers.BeneficiaryHandler;
 import handlers.BranchHandler;
 import handlers.CustomerHandler;
 import handlers.EmployeeHandler;
@@ -36,6 +38,7 @@ public class JadeServlet extends HttpServlet {
             BranchDAO branchDAO = new BranchDAO();
             EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();
             CustomerDAO customerDAO = new CustomerDAO();
+            BeneficiaryDAO beneficiaryDAO = BeneficiaryDAO.getBeneficiaryDAOInstance();
             
             AccountHandler accountHandler = new AccountHandler(accountDAO);
             TransactionHandler transactionHandler = new TransactionHandler(transactionDAO);
@@ -43,12 +46,14 @@ public class JadeServlet extends HttpServlet {
             EmployeeHandler employeeHandler = new EmployeeHandler(employeeDAO);
             CustomerHandler customerHandler = new CustomerHandler(customerDAO);
             UserHandler userHandler = new UserHandler(userDAO, employeeHandler, customerHandler);
-
+            BeneficiaryHandler beneficiaryHandler = new BeneficiaryHandler(beneficiaryDAO);
+            
             registry = new HandlersRegistry();
             registry.register("user", userHandler);
             registry.register("account", accountHandler);
             registry.register("transaction", transactionHandler);
             registry.register("branch", branchHandler);
+            registry.register("beneficiary", beneficiaryHandler);
 
         } catch (Exception e) {
             throw new ServletException("Initialization failed", e);

@@ -1,5 +1,6 @@
 package DAO;
 
+import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,6 +26,13 @@ public class TransactionDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (int) executor.executeQuery(query, null);
     }
+    
+    public int createTransaction(Transaction transaction, Connection connection) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
+        QueryResult query = queryBuilder.insert(transaction).build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (int) executor.executeQuery(query, connection, null);
+    }
 
     public Transaction getTransactionById(Long transactionId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
@@ -35,19 +43,38 @@ public class TransactionDAO {
         return (Transaction) executor.executeQuery(query, Transaction.class);
     }
 
-    public List<Transaction> getTransactionsByAccountId(Long accountId) throws CustomException {
+    public List<Transaction> getTransactionsByAccountId(Long accountId, int limit, int offset) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
         QueryResult query = queryBuilder.select("*")
                 .where("account_id", "=", accountId)
+                .limit(limit)
+                .offset(offset)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Transaction.class));
     }
 
-    public List<Transaction> getTransactionsByCustomerId(Long customerId) throws CustomException {
+    public List<Transaction> getTransactionsByCustomerId(Long customerId, int limit, int offset) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
         QueryResult query = queryBuilder.select("*")
                 .where("customer_id", "=", customerId)
+                .limit(limit)
+                .offset(offset)
+                .orderBy("transaction_date", "DSC")
+                .build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return castResult(executor.executeQuery(query, Transaction.class));
+    }
+    
+    public List<Transaction> getTransactionsBasedOnTime(Long accountId, Long fromDate, Long toDate, int limit, int offset) throws CustomException {
+    	List<Long> dateList = List.of(fromDate, toDate);
+    	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
+        QueryResult query = queryBuilder.select("*")
+                .where("account_id", "=", accountId)
+                .where("transaction_date", "BETWEEN", dateList)
+                .limit(limit)
+                .offset(offset)
+                .orderBy("transaction_date", "DSC")
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Transaction.class));

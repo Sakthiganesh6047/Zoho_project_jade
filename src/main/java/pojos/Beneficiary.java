@@ -2,22 +2,22 @@ package pojos;
 
 public class Beneficiary {
 
-	private int beneficiaryId;
+	private long beneficiaryId;
 	private String beneficiaryName;
 	private String bankName;
-	private int beneficiaryAccountNumber;
+	private long beneficiaryAccountNumber;
 	private String ifscCode;
-	private int accountId;
-	private int createdBy;
-	private int modifiedBy;
+	private long accountId;
+	private long createdBy;
+	private long modifiedBy;
 	private long modifiedOn;
 	
 	//getters and setters
 	
-	public int getBeneficiaryId() {
+	public long getBeneficiaryId() {
 		return beneficiaryId;
 	}
-	public void setBeneficiaryId(int beneficiaryId) {
+	public void setBeneficiaryId(long beneficiaryId) {
 		this.beneficiaryId = beneficiaryId;
 	}
 	
@@ -35,10 +35,10 @@ public class Beneficiary {
 		this.bankName = bankName;
 	}
 	
-	public int getBeneficiaryAccountNumber() {
+	public long getBeneficiaryAccountNumber() {
 		return beneficiaryAccountNumber;
 	}
-	public void setBeneficiaryAccountNumber(int beneficiaryAccountNumber) {
+	public void setBeneficiaryAccountNumber(long beneficiaryAccountNumber) {
 		this.beneficiaryAccountNumber = beneficiaryAccountNumber;
 	}
 	
@@ -49,24 +49,24 @@ public class Beneficiary {
 		this.ifscCode = ifscCode;
 	}
 	
-	public int getAccountId() {
+	public long getAccountId() {
 		return accountId;
 	}
-	public void setAccountId(int accountId) {
+	public void setAccountId(long accountId) {
 		this.accountId = accountId;
 	}
 	
-	public int getCreatedBy() {
+	public long getCreatedBy() {
 		return createdBy;
 	}
-	public void setCreatedBy(int createdBy) {
+	public void setCreatedBy(long createdBy) {
 		this.createdBy = createdBy;
 	}
 	
-	public int getModifiedBy() {
+	public long getModifiedBy() {
 		return modifiedBy;
 	}
-	public void setModifiedBy(int modifiedBy) {
+	public void setModifiedBy(long modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
 	

@@ -35,9 +35,12 @@ public class BranchDAO {
         return (Branch) executor.executeQuery(query, Branch.class);
     }
 
-    public List<Branch> getAllBranches() throws CustomException {
+    public List<Branch> getAllBranches(int limit, int offset) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
-        QueryResult query = queryBuilder.select("*").build();
+        QueryResult query = queryBuilder.select("*")
+        								.limit(limit)
+        								.offset(offset)
+        								.build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Branch.class));
     }

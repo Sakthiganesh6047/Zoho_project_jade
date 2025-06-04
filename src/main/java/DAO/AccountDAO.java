@@ -1,5 +1,6 @@
 package DAO;
 
+import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,10 +41,38 @@ public class AccountDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (Account) executor.executeQuery(query, Account.class);
     }
+    
+//    public Account getAccountById(long accountId, Connection connection) throws CustomException {
+//    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
+//        QueryResult query = queryBuilder.select("*")
+//						                .where("account_id", "=", accountId)
+//						                .build();
+//        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+//        return (Account) executor.executeQuery(query, connection, Account.class);
+//    }
+    
+    public Account getAccountForUpdate(long accountId, Connection connection) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
+        QueryResult query = queryBuilder.select("*")
+						                .where("account_id", "=", accountId)
+						                .forUpdate()
+						                .build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (Account) executor.executeQuery(query, connection, Account.class);
+    }
 
     public List<Account> getAccountsByCustomerId(long customerId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
+                .where("customer_id", "=", customerId)
+                .build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return castResult(executor.executeQuery(query, Account.class));
+    }
+    
+    public List<Account> getAccNosByCustomerId(long customerId) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
+        QueryResult query = queryBuilder.select("account_id")
                 .where("customer_id", "=", customerId)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
@@ -59,20 +88,24 @@ public class AccountDAO {
         return castResult(executor.executeQuery(query, Account.class));
     }
 
-    public List<Account> getAccountsByStatus(int status) throws CustomException {
+    public List<Account> getAccountsByStatus(int status, int limit, int offset) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
                 .where("account_status", "=", status) //1 - active, 2 - new, 0 - closed
+                .limit(limit)
+                .offset(offset)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Account.class));
     }
     
-    public List<Account> getAccountByStatus(int status, long branchId) throws CustomException{
+    public List<Account> getAccountByStatus(int status, long branchId, int limit, int offset) throws CustomException{
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
     	QueryResult query = queryBuilder.select("*")
     			.where("account_status", "=", status)
     			.where("branch_id", "=", branchId)
+    			.limit(limit)
+    			.offset(offset)
     			.build();
     	QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
     	return castResult(executor.executeQuery(query, Account.class));
