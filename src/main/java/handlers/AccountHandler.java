@@ -13,6 +13,7 @@ import pojos.User;
 import util.AuthorizeUtil;
 import util.CustomException;
 import util.Results;
+import util.ValidationsUtil;
 
 public class AccountHandler {
 	
@@ -23,8 +24,14 @@ public class AccountHandler {
     }
     
     @Route(path = "account/new", method = "POST")
-    public String createAccount(@FromBody Account account, @FromSession("userId") long creatorId, 
-    							@FromSession("role") int creatorRole) throws CustomException {
+    public String createAccount(@FromBody Account account, @FromSession("userId") Long creatorId, 
+    							@FromSession("role") Integer creatorRole) throws CustomException {
+    	
+    	ValidationsUtil.ValidateAccount(account);
+    	ValidationsUtil.isNull(creatorId, "UserId");
+    	ValidationsUtil.isNull(creatorRole, "User Role");
+    	ValidationsUtil.checkUserRole(creatorRole);
+    	
     	account.setCreatedBy(creatorId);
     	account.setCreatedAt(Instant.now().toEpochMilli());
     	if (creatorRole == 0) {
@@ -37,8 +44,14 @@ public class AccountHandler {
     }
     
     @Route(path = "account/id", method = "GET")
-    public String getCustomerAccounts(@FromBody User user, @FromSession("userId") long sessionId, 
-    									@FromSession("role") int role) throws CustomException {
+    public String getCustomerAccounts(@FromBody User user, @FromSession("userId") Long sessionId, 
+    									@FromSession("role") Integer role) throws CustomException {
+    	
+    	ValidationsUtil.isNull(user.getUserId(), "CustomerId");;
+    	ValidationsUtil.isNull(sessionId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
     	if(role == 0) {
     		return Results.respondJson(accountDAO.getAccountsByCustomerId(sessionId));
     	} else {
@@ -47,7 +60,12 @@ public class AccountHandler {
     }
     
     @Route(path = "accounts/list", method = "GET")
-    public String getAccountsList(@FromSession("userId")long userId, @FromSession("role") int role) throws CustomException {
+    public String getAccountsList(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
     	if (role <= 2) {
     		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
     		return Results.respondJson(accountDAO.getAccountsList(employee.getBranch()));
@@ -57,25 +75,39 @@ public class AccountHandler {
     }
     
     @Route(path = "account/details", method = "GET")
-    public String getAccountDetails(@FromBody Account account, @FromSession("userId") long sessionId, 
-    							@FromSession("role") int role) throws CustomException {
+    public String getAccountDetails(@FromBody Account account, @FromSession("userId") Long sessionId, 
+    							@FromSession("role") Integer role) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(accountId, "Account Number");
+    	ValidationsUtil.isNull(sessionId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	Account fetchedAccount = accountDAO.getAccountById(accountId);
+    	
     	if(role == 0) {
-    		Account fetchedAccount = accountDAO.getAccountById(account.getAccountId());
-    		if (fetchedAccount.getCustomerId() == sessionId) {
-    			return Results.respondJson(fetchedAccount);
-    		} else {
+    		if (!(fetchedAccount.getCustomerId() == sessionId)) {
     			throw new CustomException("Unauthorized access");
-    		}
-    	} else {
-    		return Results.respondJson(accountDAO.getAccountById(account.getAccountId()));
+    		} 
     	}
+    	return Results.respondJson(fetchedAccount);
     }
     
     @Route(path = "account/update", method = "POST")
-    public String updateAccount(@FromBody Account account, @FromSession("userId") long modifierId, 
-    							@FromSession("role") int role) throws CustomException {
+    public String updateAccount(@FromBody Account account, @FromSession("userId") Long modifierId, 
+    							@FromSession("role") Integer role) throws CustomException {
+    	
+    	Long customerId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(customerId, "CustomerId");
+    	ValidationsUtil.isNull(modifierId, "User Id");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
     	if (role == 0) {
-    		if(account.getCustomerId() != modifierId) {
+    		if(customerId != modifierId) {
     			throw new CustomException("Unauthorized Access, Check account Number");
     		}
     	}
@@ -85,32 +117,37 @@ public class AccountHandler {
     }
     
     @Route(path = "account/activate", method = "POST")
-    public String activateAccount(@FromBody Account account, @FromSession("userId") long modifierId, 
-    						@FromSession("role") int role) throws CustomException {
+    public String activateAccount(@FromBody Account account, @FromSession("userId") Long modifierId, 
+    						@FromSession("role") Integer role) throws CustomException {
     	
-    	Account fetchedAccount = accountDAO.getAccountById(account.getAccountId());
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(modifierId, "UserId");
+    	ValidationsUtil.isNull(modifierId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	Account fetchedAccount = accountDAO.getAccountById(accountId);
     	
     	if(role <= 2) {
     		Employee employee = AuthorizeUtil.getEmployeeDetails(modifierId);
-    		if(employee.getBranch() == account.getBranchId()) {
-    			fetchedAccount.setAccountStatus(1);
-    			fetchedAccount.setModifiedBy(modifierId);
-    			fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-    			return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
-    		} else {
+    		if(!(employee.getBranch() == account.getBranchId())) {
     			throw new CustomException("Unauthorized Access, Cannot activate account of different branch");
-    		}
-    	} else {
+    		} 
+    	}
     		fetchedAccount.setAccountStatus(1);
     		fetchedAccount.setModifiedBy(modifierId);
     		fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
 	    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
-    	}
     }
     
     @Route(path = "account/needapproval", method = "GET")
     public String getNewAccounts(@FromQuery("limit") int limit, @FromQuery("offset") int offset, 
-    						@FromSession("userId") long userId) throws CustomException {
+    						@FromSession("userId") Long userId) throws CustomException {
+    	
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+    	ValidationsUtil.isNull(userId, "UserId");
+    	
     	Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
     	if (employee.getRole() <= 2) {
     		return Results.respondJson(accountDAO.getAccountByStatus(2, employee.getBranch(), limit, offset));
@@ -120,10 +157,16 @@ public class AccountHandler {
     }
     
     @Route(path = "account/close", method = "PUT")
-    public String closeAccount(@FromBody Account account, @FromSession("userId") long modifierId, 
-    						@FromSession("role") int role) throws CustomException {
+    public String closeAccount(@FromBody Account account, @FromSession("userId") Long modifierId, 
+    						@FromSession("role") Integer role) throws CustomException {
     	
-    	Account fetchedAccount = accountDAO.getAccountById(account.getAccountId());
+    	Long accountId = account.getAccountId();
+    	ValidationsUtil.isNull(accountId, "Account Number");
+    	ValidationsUtil.isNull(modifierId, "User Id");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	Account fetchedAccount = accountDAO.getAccountById(accountId);
     	
     	if (role <= 2) {
     		Employee employee = AuthorizeUtil.getEmployeeDetails(modifierId);
@@ -145,7 +188,11 @@ public class AccountHandler {
     
     @Route(path = "account/delete", method = "DELETE")
     public String deleteAccount(@FromBody Account account) throws CustomException {
-    	return Results.respondJson(accountDAO.deleteAccount(account.getAccountId()));
+    	
+    	Long accountId = account.getAccountId();
+    	ValidationsUtil.isNull(accountId, "Account Number");
+    	
+    	return Results.respondJson(accountDAO.deleteAccount(accountId));
     }
     
 }

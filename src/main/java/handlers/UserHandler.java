@@ -15,6 +15,7 @@ import util.CustomException;
 import util.DBConnection;
 import util.Password;
 import util.Results;
+import util.ValidationsUtil;
 
 public class UserHandler {
 
@@ -30,11 +31,15 @@ public class UserHandler {
 
     @Route(path = "user/list", method = "GET")
     public String getAllUsers(int limit, int offset) throws CustomException {
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
         return Results.respondJson(userDAO.getAllUsers(limit, offset));
     }
 
     @Route(path = "user/new/admin", method = "POST")
     public String createAdminUser(@FromBody User user) throws CustomException {
+    	
+    	ValidationsUtil.validateUser(user);
+    	
     	user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
     	user.setModifiedOn(Instant.now().toEpochMilli());
         long result = userDAO.insertUser(user);
@@ -42,32 +47,42 @@ public class UserHandler {
     }
     
     @Route(path = "user/new", method = "POST")
-    public String createUser(@FromBody UserProfile profile, @FromSession("userId") long creatorId, @FromSession("role") int creatorRole) throws Exception {
+    public String createUser(@FromBody UserProfile profile, @FromSession("userId") Long creatorId, @FromSession("role") Integer creatorRole) throws Exception {
+    	
+    	ValidationsUtil.isNull(creatorId, "UserId");
+    	ValidationsUtil.isNull(creatorRole, "User Role");
+    	ValidationsUtil.checkUserRole(creatorRole);
+    	
+    	User user = profile.getUser();
+    	ValidationsUtil.validateUser(user);
+    	if(user.getUserType() == 1) {
+			ValidationsUtil.validateCustomer(profile.getCustomerDetails());
+    	}
 		
     	Connection connection = null;
 		
 		try {
 			connection = DBConnection.getConnection();
 			connection.setAutoCommit(false);
-		
-			User user = profile.getUser();
+			
 			user.setCreatedBy(creatorId);
 			user.setModifiedOn(Instant.now().toEpochMilli());
 		
-			long generatedUserId = userDAO.insertUser(user, connection); 
+			Long generatedUserId = userDAO.insertUser(user, connection); 
 			user.setUserId(generatedUserId);
 		
-			int userType = user.getUserType();
+			Integer userType = user.getUserType();
 			
 		switch (userType) {
 			case 2: // Employee
+				//ValidationUtil.validateEmployee(employee);
 				createEmployee(profile.getEmployeeDetails(), user, creatorId, creatorRole, connection);
 				break;
 			case 1: // Customer
 				createCustomer(profile.getCustomerDetails(), user, connection);
 				break;
 			default:
-				throw new IllegalArgumentException("Invalid user type: " + userType);
+				throw new CustomException("Invalid user type: " + userType);
 			}
 		
 		connection.commit();
@@ -85,20 +100,25 @@ public class UserHandler {
     @Route(path = "user/signup", method = "POST")
     public String publicCreateCustomer(@FromBody UserProfile profile) throws Exception {
         Connection connection = null;
+        
+        User user = profile.getUser();
+        Customer customer = profile.getCustomerDetails();
+        ValidationsUtil.validateUser(user);
+        ValidationsUtil.validateCustomer(customer);
 
         try {
             connection = DBConnection.getConnection();
             connection.setAutoCommit(false);
 
-            User user = profile.getUser();
+            
             user.setUserType(1);
             user.setCreatedBy(0L); // Optional: 0 or -1 for public created
             user.setModifiedOn(Instant.now().toEpochMilli());
 
-            long generatedUserId = userDAO.insertUser(user, connection);
+            Long generatedUserId = userDAO.insertUser(user, connection);
             user.setUserId(generatedUserId);
 
-            Customer customer = profile.getCustomerDetails();
+            
             customer.setCustomerId(generatedUserId);
 
             customerHandler.insertCustomer(customer, connection);
@@ -120,9 +140,9 @@ public class UserHandler {
         customerHandler.insertCustomer(customer, connection);
     }
 
-    private void createEmployee(Employee employee, User user, long creatorId, int creatorRole, Connection connection) throws CustomException {
+    private void createEmployee(Employee employee, User user, Long creatorId, Integer creatorRole, Connection connection) throws CustomException {
     	
-        int newEmployeeRole = employee.getRole(); // Role to be assigned to the new employee
+        Integer newEmployeeRole = employee.getRole(); // Role to be assigned to the new employee
 
         // Validate creator's authority
         switch (newEmployeeRole) {
@@ -150,14 +170,18 @@ public class UserHandler {
     }
     
     @Route(path = "user/update", method = "PUT")
-    public String updateUser(@FromBody User user, @FromSession("user") User modifier) throws CustomException {
+    public String updateUser(@FromBody User user, @FromSession("userId") Long userId) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.validateUser(user);
+    	
     	try {
-    		user.setModifiedBy(modifier.getUserId());
+    		user.setModifiedBy(userId);
     		user.setModifiedOn(Instant.now().toEpochMilli());
             int result = userDAO.updateUser(user, user.getUserId());
             return Results.respondJson(Map.of("status", result > 0 ? "updated" : "not found", "rowsAffected", result));
-        } catch (Exception e) {
-            return Results.respondJson(Map.of("error", "Invalid input or update failed"));
+        } catch (CustomException e) {
+            throw new CustomException("User updation failed");
         }
     }
     
@@ -169,7 +193,12 @@ public class UserHandler {
     
     @Route(path = "user/email", method = "POST")
     public String getUserProfileByEmail(@FromBody User user) throws CustomException {
-        User fetchedUser = userDAO.getUserByEmail(user.getEmail());
+    	
+    	String email = user.getEmail();
+    	ValidationsUtil.isNull(email, "Email");
+    	ValidationsUtil.isEmpty(email, "email");
+    	
+        User fetchedUser = userDAO.getUserByEmail(email);
         if (fetchedUser == null) {
         	return null;
         }
@@ -190,7 +219,11 @@ public class UserHandler {
     
     @Route(path = "user/id", method = "POST")
     public String getUserProfileById(@FromBody User user) throws CustomException {
-        User fetchedUser = userDAO.getUserById(user.getUserId());
+    	
+    	Long userId = user.getUserId();
+    	ValidationsUtil.isNull(userId, "UserId");
+    	
+        User fetchedUser = userDAO.getUserById(userId);
         if (fetchedUser == null) {
         	return null;
         }
@@ -211,12 +244,16 @@ public class UserHandler {
 
     @Route(path = "user/delete", method = "POST")
     public String deleteUser(@FromBody User user) throws CustomException {
+    	
+    	Long userId = user.getUserId();
+    	ValidationsUtil.isNull(userId, "UserId");
+    	
         try {
-            int result = userDAO.deleteUser(user.getUserId());
+            int result = userDAO.deleteUser(userId);
             return Results.respondJson(Map.of("status", result > 0 ? "deleted" : "not found", "rowsAffected", result));
-        } catch (Exception e) {
+        } catch (CustomException e) {
             //resp.setStatus(400);
-            return Results.respondJson(Map.of("error", "Invalid userId or deletion failed"));
+            throw new CustomException("User deletion failed");
         }
     }
 

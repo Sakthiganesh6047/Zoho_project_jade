@@ -2,22 +2,22 @@ package pojos;
 
 public class Beneficiary {
 
-	private long beneficiaryId;
+	private Long beneficiaryId;
 	private String beneficiaryName;
 	private String bankName;
-	private long beneficiaryAccountNumber;
+	private Long beneficiaryAccountNumber;
 	private String ifscCode;
-	private long accountId;
-	private long createdBy;
-	private long modifiedBy;
-	private long modifiedOn;
+	private Long accountId;
+	private Long createdBy;
+	private Long modifiedBy;
+	private Long modifiedOn;
 	
 	//getters and setters
 	
-	public long getBeneficiaryId() {
+	public Long getBeneficiaryId() {
 		return beneficiaryId;
 	}
-	public void setBeneficiaryId(long beneficiaryId) {
+	public void setBeneficiaryId(Long beneficiaryId) {
 		this.beneficiaryId = beneficiaryId;
 	}
 	
@@ -35,10 +35,10 @@ public class Beneficiary {
 		this.bankName = bankName;
 	}
 	
-	public long getBeneficiaryAccountNumber() {
+	public Long getBeneficiaryAccountNumber() {
 		return beneficiaryAccountNumber;
 	}
-	public void setBeneficiaryAccountNumber(long beneficiaryAccountNumber) {
+	public void setBeneficiaryAccountNumber(Long beneficiaryAccountNumber) {
 		this.beneficiaryAccountNumber = beneficiaryAccountNumber;
 	}
 	
@@ -49,31 +49,31 @@ public class Beneficiary {
 		this.ifscCode = ifscCode;
 	}
 	
-	public long getAccountId() {
+	public Long getAccountId() {
 		return accountId;
 	}
-	public void setAccountId(long accountId) {
+	public void setAccountId(Long accountId) {
 		this.accountId = accountId;
 	}
 	
-	public long getCreatedBy() {
+	public Long getCreatedBy() {
 		return createdBy;
 	}
-	public void setCreatedBy(long createdBy) {
+	public void setCreatedBy(Long createdBy) {
 		this.createdBy = createdBy;
 	}
 	
-	public long getModifiedBy() {
+	public Long getModifiedBy() {
 		return modifiedBy;
 	}
-	public void setModifiedBy(long modifiedBy) {
+	public void setModifiedBy(Long modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
 	
-	public long getModifiedOn() {
+	public Long getModifiedOn() {
 		return modifiedOn;
 	}
-	public void setModifiedOn(long modifiedOn) {
+	public void setModifiedOn(Long modifiedOn) {
 		this.modifiedOn = modifiedOn;
 	}
 }

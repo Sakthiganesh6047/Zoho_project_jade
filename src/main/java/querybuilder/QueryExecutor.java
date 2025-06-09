@@ -67,12 +67,11 @@ public class QueryExecutor {
                         }
                     }
                 }
-
                 return affectedRows;
             }
-
         } catch (Exception e) {
-            throw new CustomException("Failed in query execution", e);
+        	e.printStackTrace();
+            throw new CustomException(e.getMessage());
         }
     }
     
@@ -113,10 +112,10 @@ public class QueryExecutor {
             }
 
         } catch (Exception e) {
-            throw new CustomException("Failed in query execution", e);
+        	e.printStackTrace();
+            throw new CustomException(e.getMessage());
         }
     }
-
 
     public long executeInsertWithConn(QueryResult queryResult, Connection conn, boolean returnGeneratedKeys) throws CustomException {
         try (PreparedStatement stmt = conn.prepareStatement(
@@ -146,7 +145,8 @@ public class QueryExecutor {
             }
             
         } catch (SQLException e) {
-            throw new CustomException("Error in query execution", e);
+        	e.printStackTrace();
+            throw new CustomException(e.getMessage());
         }
     }
     

@@ -21,6 +21,7 @@ import util.AuthorizeUtil;
 import util.CustomException;
 import util.DBConnection;
 import util.Results;
+import util.ValidationsUtil;
 
 public class TransactionHandler {
 
@@ -32,8 +33,14 @@ public class TransactionHandler {
     
     @Route(path = "transactions/Account", method = "POST")
     public String fetchTransactionsofAccount(@FromBody Account account, @FromQuery("limit") int limit, @FromQuery("offset") int offset, 
-    									@FromSession("userid") long userId, @FromSession("role")int userRole) throws CustomException {
-    	long accountId = account.getAccountId();
+    									@FromSession("userid") Long userId, @FromSession("role") Integer userRole) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(userRole, "User Role");
+    	ValidationsUtil.checkUserRole(userRole);
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+    	
     	if (userRole == 0) {
     		if(!AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
     			throw new CustomException("Unauthorized Access, check account number");
@@ -49,8 +56,14 @@ public class TransactionHandler {
     
     @Route(path = "transactions/customer", method = "POST")
     public String fetchTransactionsOfCustomer(@FromBody Account account, @FromQuery("limit") int limit, @FromQuery("offset") int offset, 
-    									@FromSession("userId") long userId, @FromSession("role") int userRole) throws CustomException {
+    									@FromSession("userId") Long userId, @FromSession("role") Integer userRole) throws CustomException {
+    	
     	long customerId = account.getCustomerId();
+    	ValidationsUtil.isNull(customerId, "Customer Id");
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(userRole, "User Role");
+    	ValidationsUtil.checkUserRole(userRole);
+    	
     	if (userRole == 0) {
     		if(userId != customerId) {
     			throw new CustomException("Unauthoried Access, check customer Id");
@@ -60,8 +73,14 @@ public class TransactionHandler {
     }
     
     @Route(path = "transactions/{transactionId}", method = "GET")
-    public String fetchTransactionbyTransactionId(@FromPath("transactionId") long transactionId, @FromSession("userId") long userId, 
-    										@FromSession("role") int userRole) throws CustomException {
+    public String fetchTransactionbyTransactionId(@FromPath("transactionId") Long transactionId, @FromSession("userId") Long userId, 
+    										@FromSession("role") Integer userRole) throws CustomException {
+    	
+    	ValidationsUtil.isNull(transactionId, "Transaction Id");
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(userRole, "User Role");
+    	ValidationsUtil.checkUserRole(userRole);
+    	
     	Transaction transaction = transactionDAO.getTransactionById(transactionId);
     	if (userRole == 0) {
     		if(transaction.getCustomerId() != userId) {
@@ -77,10 +96,19 @@ public class TransactionHandler {
     }
     
     @Route(path = "transactions/period", method = "POST")
-    public String fetchTransactionsByDate(@FromBody Account account, @FromQuery("from") long fromDate, @FromQuery("to") long toDate, 
-    								@FromQuery("limit") int limit, @FromQuery("offset") int offset, @FromSession("userId") long userId, 
-    							@FromSession("role") int userRole) throws CustomException {
-    	long accountId = account.getAccountId();
+    public String fetchTransactionsByDate(@FromBody Account account, @FromQuery("from") Long fromDate, @FromQuery("to") Long toDate, 
+    								@FromQuery("limit") int limit, @FromQuery("offset") int offset, @FromSession("userId") Long userId, 
+    							@FromSession("role") Integer userRole) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	ValidationsUtil.isNull(accountId, "Account Number");
+    	ValidationsUtil.isNull(fromDate, "From date");
+    	ValidationsUtil.isNull(toDate, "To date");
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(userRole, "User Role");
+    	ValidationsUtil.checkUserRole(userRole);
+    	
     	if (userRole == 0) {
     		if(!AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
     			throw new CustomException("Unauthorized Access, check account number");
@@ -96,6 +124,11 @@ public class TransactionHandler {
     @Route(path = "transaction/transfer", method = "POST")
     public String newTransfer(@FromBody TransferWrapper transferWrapper, @FromSession("userId") long userId, 
     					@FromSession("role") int userRole) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(userRole, "User Role");
+    	ValidationsUtil.checkUserRole(userRole);
+    	
     	Connection connection = null;
 
         try {
@@ -104,6 +137,7 @@ public class TransactionHandler {
             
             Transaction transaction = transferWrapper.getTransaction();
             Beneficiary beneficiary = transferWrapper.getBeneficiary();
+            ValidationsUtil.ValidateTransactions(transaction);
 
             int type = transaction.getTransactionType(); // "1 - credit", "2 - debit", "3 - inside bank", "4 - outside bank"
             //double amount = transaction.getAmount();
@@ -116,6 +150,7 @@ public class TransactionHandler {
                     handleDebit(transaction, userId, userRole, connection);
                     break;
                 case 3:
+                	
                     handleTransferInside(transaction, beneficiary, userId, userRole, connection);
                     break;
                 case 4:
@@ -220,6 +255,7 @@ public class TransactionHandler {
     	
 	        long fromAccountId = transaction.getAccountId();
 	        toAccountId = beneficiary.getBeneficiaryAccountNumber(); //to account number
+	        ValidationsUtil.isNull(toAccountId, "Receiver Account Number");
 	        amount = transaction.getAmount();
 	        AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
 	

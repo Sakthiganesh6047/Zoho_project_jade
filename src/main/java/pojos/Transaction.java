@@ -6,11 +6,11 @@ public class Transaction {
     private Long customerId;
     private Double amount;
     private Double closingBalance;
-    private int transactionType;
+    private Integer transactionType;
     private Long transactionDate;
     private String description;
     private Long transferReference;
-    private int transactionStatus;
+    private Integer transactionStatus;
     private Long createdBy;
 
     // Getters and Setters
@@ -54,11 +54,11 @@ public class Transaction {
         this.closingBalance = closingBalance;
     }
 
-    public int getTransactionType() {
+    public Integer getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(int transactionType) {
+    public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
     }
 
@@ -86,11 +86,11 @@ public class Transaction {
         this.transferReference = transferReference;
     }
 
-    public int getTransactionStatus() {
+    public Integer getTransactionStatus() {
         return transactionStatus;
     }
 
-    public void setTransactionStatus(int transactionStatus) {
+    public void setTransactionStatus(Integer transactionStatus) {
         this.transactionStatus = transactionStatus;
     }
 

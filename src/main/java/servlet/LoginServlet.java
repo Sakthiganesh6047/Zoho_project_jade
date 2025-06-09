@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
             		response.getWriter().write("{\"error\":\"User Blocked\"}");
             	}
             	
-            	int role;
+            	Integer role;
             	
             	if(user.getUserType() == 2) {
             		EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();

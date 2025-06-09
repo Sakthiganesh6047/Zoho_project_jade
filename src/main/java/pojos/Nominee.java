@@ -2,21 +2,21 @@ package pojos;
 
 public class Nominee {
 
-	private int nomineeId;
+	private Integer nomineeId;
 	private String name;
-	private int phoneNumber;
-	private int accountId;
-	private int createdBy;
-	private int modifiedBy;
-	private long modifiedOn;
-	private int nomineeCustomerId;
+	private Integer phoneNumber;
+	private Integer accountId;
+	private Integer createdBy;
+	private Integer modifiedBy;
+	private Long modifiedOn;
+	private Integer nomineeCustomerId;
 	
 	//getters and setters
 	
-	public int getNomineeId() {
+	public Integer getNomineeId() {
 		return nomineeId;
 	}
-	public void setNomineeId(int nomineeId) {
+	public void setNomineeId(Integer nomineeId) {
 		this.nomineeId = nomineeId;
 	}
 	
@@ -27,45 +27,45 @@ public class Nominee {
 		this.name = name;
 	}
 	
-	public int getPhoneNumber() {
+	public Integer getPhoneNumber() {
 		return phoneNumber;
 	}
-	public void setPhoneNumber(int phoneNumber) {
+	public void setPhoneNumber(Integer phoneNumber) {
 		this.phoneNumber = phoneNumber;
 	}
 	
-	public int getAccountId() {
+	public Integer getAccountId() {
 		return accountId;
 	}
-	public void setAccountId(int accountId) {
+	public void setAccountId(Integer accountId) {
 		this.accountId = accountId;
 	}
 	
-	public int getCreatedBy() {
+	public Integer getCreatedBy() {
 		return createdBy;
 	}
-	public void setCreatedBy(int createdBy) {
+	public void setCreatedBy(Integer createdBy) {
 		this.createdBy = createdBy;
 	}
 	
-	public int getModifiedBy() {
+	public Integer getModifiedBy() {
 		return modifiedBy;
 	}
-	public void setModifiedBy(int modifiedBy) {
+	public void setModifiedBy(Integer modifiedBy) {
 		this.modifiedBy = modifiedBy;
 	}
 	
-	public long getModifiedOn() {
+	public Long getModifiedOn() {
 		return modifiedOn;
 	}
-	public void setModifiedOn(long modifiedOn) {
+	public void setModifiedOn(Long modifiedOn) {
 		this.modifiedOn = modifiedOn;
 	}
 	
-	public int getNomineeCustomerId() {
+	public Integer getNomineeCustomerId() {
 		return nomineeCustomerId;
 	}
-	public void setNomineeCustomerId(int nomineeCustomerId) {
+	public void setNomineeCustomerId(Integer nomineeCustomerId) {
 		this.nomineeCustomerId = nomineeCustomerId;
 	}
 	

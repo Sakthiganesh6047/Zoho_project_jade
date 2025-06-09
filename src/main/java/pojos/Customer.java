@@ -2,18 +2,18 @@ package pojos;
 
 public class Customer {
 
-	private long customerId;
+	private Long customerId;
 	private String aadharNumber;
 	private String panId;
 	private String address;
 	
 	//getters and setters
 	
-	public void setCustomerId(long customerId) {
+	public void setCustomerId(Long customerId) {
 		this.customerId = customerId;
 	}
 	
-	public long getCustomerId() {
+	public Long getCustomerId() {
 		return customerId;
 	}
 	

@@ -12,6 +12,7 @@ import pojos.Beneficiary;
 import util.AuthorizeUtil;
 import util.CustomException;
 import util.Results;
+import util.ValidationsUtil;
 
 public class BeneficiaryHandler {
 	
@@ -22,17 +23,28 @@ public class BeneficiaryHandler {
 	}
 
 	@Route(path = "beneficiary/add", method = "POST")
-	public String addBeneficiary(@FromBody Beneficiary beneficiary, @FromSession("userId") long userId) throws CustomException {
+	public String addBeneficiary(@FromBody Beneficiary beneficiary, @FromSession("userId") Long userId) throws CustomException {
+		
+		ValidationsUtil.isNull(userId, "UserId");
+		ValidationsUtil.ValidateBeneficiary(beneficiary);
+		
 		beneficiary.setCreatedBy(userId);
 		beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 		beneficiary.setModifiedBy(0L);
+		
 		int result = beneficiaryDAO.insertBeneficiary(beneficiary);
 		return Results.respondJson(Map.of("Status", "Created", "BeneficiaryId", result));
 	}
 	
 	@Route(path = "beneficiary/update", method = "POST")
-	public String updateBeneficiary(@FromBody Beneficiary beneficiary,@FromSession("userId") long userId,
-								@FromSession("role") int role) throws CustomException {
+	public String updateBeneficiary(@FromBody Beneficiary beneficiary, @FromSession("userId") Long userId,
+								@FromSession("role") Integer role) throws CustomException {
+		
+		ValidationsUtil.isNull(userId, "UserId");
+		ValidationsUtil.isNull(role, "User Role");
+		ValidationsUtil.checkUserRole(role);
+		ValidationsUtil.ValidateBeneficiary(beneficiary);
+		
 		if (role == 0) {
 			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId())) {
 				throw new CustomException("Unauthorized Access, Updation failed");
@@ -46,7 +58,13 @@ public class BeneficiaryHandler {
 	
 	@Route(path = "beneficiary/id", method = "POST")
 	public String getBeneficiaries(@FromBody Beneficiary beneficiary, @FromQuery("limit") int limit, @FromQuery("offset") int offset, 
-							@FromSession("userId") long userId, @FromSession("role") int role) throws CustomException {
+							@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+		
+		ValidationsUtil.checkLimitAndOffset(limit, offset);
+		ValidationsUtil.isNull(userId, "UserId");
+		ValidationsUtil.isNull(role, "User Role");
+		ValidationsUtil.checkUserRole(role);
+		
 		if (role == 0) {
 			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId())) {
 				throw new CustomException("You can't access this account's beneficiary list");
@@ -56,8 +74,14 @@ public class BeneficiaryHandler {
 	}
 	
 	@Route(path = "beneficiary/{beneficiarId}", method = "DELETE")
-	public String deleteBeneficiary(@FromPath("beneficiarId") long beneficiarId, @FromSession("userId") long userId,
-									@FromSession("role") int role) throws CustomException {
+	public String deleteBeneficiary(@FromPath("beneficiarId") Long beneficiarId, @FromSession("userId") Long userId,
+									@FromSession("role") Integer role) throws CustomException {
+		
+		ValidationsUtil.isNull(beneficiarId, "Beneficiar Id");
+		ValidationsUtil.isNull(userId, "UserId");
+		ValidationsUtil.isNull(role, "User Role");
+		ValidationsUtil.checkUserRole(role);
+		
 		if (role == 0) {
 			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiarId)) {
 				throw new CustomException("Unauthorized Access, Deletion Failed");

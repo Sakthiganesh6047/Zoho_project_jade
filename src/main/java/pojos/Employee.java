@@ -2,17 +2,17 @@ package pojos;
 
 public class Employee {
 
-	private long employeeId;
-	private int role;
-	private long branch;
+	private Long employeeId;
+	private Integer role;
+	private Long branch;
 	
 	//getters and setters
 	
-	public void setEmployeeId(long employeeId) {
+	public void setEmployeeId(Long employeeId) {
 		this.employeeId = employeeId;
 	}
 	
-	public long getEmployeeId() {
+	public Long getEmployeeId() {
 		return employeeId;
 	}
 	
@@ -24,11 +24,11 @@ public class Employee {
 		return role;
 	}
 	
-	public void setBranch(long branch) {
+	public void setBranch(Long branch) {
 		this.branch = branch;
 	}
 	
-	public long getBranch() {
+	public Long getBranch() {
 		return branch;
 	}
 }

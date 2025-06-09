@@ -4,9 +4,9 @@ public class Account {
     private Long accountId;
     private Long customerId;
     private Long branchId;
-    private int accountType;
+    private Integer accountType;
     private Double balance;
-    private int accountStatus;
+    private Integer accountStatus;
     private Long createdBy;
     private Long createdAt;
     private Long modifiedBy;
@@ -37,11 +37,11 @@ public class Account {
         this.branchId = branchId;
     }
 
-    public int getAccountType() {
+    public Integer getAccountType() {
         return accountType;
     }
 
-    public void setAccountType(int accountType) {
+    public void setAccountType(Integer accountType) {
         this.accountType = accountType;
     }
 
@@ -53,11 +53,11 @@ public class Account {
         this.balance = balance;
     }
 
-    public int getAccountStatus() {
+    public Integer getAccountStatus() {
         return accountStatus;
     }
 
-    public void setAccountStatus(int accountStatus) {
+    public void setAccountStatus(Integer accountStatus) {
         this.accountStatus = accountStatus;
     }
 

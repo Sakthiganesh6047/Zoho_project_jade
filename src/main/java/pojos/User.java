@@ -9,8 +9,8 @@ public class User {
     private String dob;
     private Integer age;
     private String gender;
-    private int userType;
-    private int status;
+    private Integer userType;
+    private Integer status;
     private Long createdBy;
     private Long modifiedBy;
     private Long modifiedOn;
@@ -80,19 +80,19 @@ public class User {
         this.gender = gender;
     }
 
-    public int getUserType() {
+    public Integer getUserType() {
         return userType;
     }
 
-    public void setUserType(int userType) {
+    public void setUserType(Integer userType) {
         this.userType = userType;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 

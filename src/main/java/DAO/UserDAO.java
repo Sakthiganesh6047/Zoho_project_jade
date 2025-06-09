@@ -30,7 +30,7 @@ public class UserDAO {
         QueryResult insertQuery = queryBuilder.insert(user).build();
         System.out.println("Insert Query: " + insertQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (long) executor.executeQuery(insertQuery, User.class);
+        return (Long) executor.executeQuery(insertQuery, User.class);
     }
     
     public long insertUser(User user, Connection conn) throws CustomException {
@@ -38,7 +38,7 @@ public class UserDAO {
         QueryResult insertQuery = queryBuilder.insert(user).build();
         System.out.println("Insert Query: " + insertQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (long) executor.executeInsertWithConn(insertQuery, conn, true);
+        return (Long) executor.executeInsertWithConn(insertQuery, conn, true);
     }
 
     public int updateUser(User user, Long userId) throws CustomException {
@@ -78,7 +78,7 @@ public class UserDAO {
         }
     }
     
-    public User getUserById(long userId) throws CustomException {
+    public User getUserById(Long userId) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(User.class);
         QueryResult getQuery = queryBuilder.select("user_id", "fullName", "email", "userType", "status", "passwordHash")
                          .where("user_id", "=", userId)
