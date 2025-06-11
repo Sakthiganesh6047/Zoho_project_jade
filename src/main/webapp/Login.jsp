@@ -31,6 +31,10 @@
         
         .main-wrapper {
         	height: 86.3vh;
+        	display: flex;
+    		flex-direction: column;
+    		align-content: center;
+   			justify-content: center;
         }
         
         .clipart-container {
@@ -118,6 +122,8 @@
 	</div>
     
     <div class=main-wrapper>
+    
+    	<div id="login-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
 	    <div class=main-container>
 	    	<div class=clipart-container>
 	    		<img src="contents/login_page_clipart.png" alt="Login Page Clipart" class=login-clipart>
@@ -125,14 +131,14 @@
 	    
 	    	<div class=logindetails-container>
 	    		<h2>Login</h2>
-				<form action="LoginServlet" method="post" class="login-form">
+				<form id="login-form" class="login-form">
 					<div class=email-container>
 						<label for="email">Email</label>
-				    	<input type="email" id="email" name="email" placeholder="Enter your email" required>
+				    	<input type="email" id="email" name="email" placeholder="Enter your email" maxlength=100 required>
 					</div>
 					<div class=email-container>
 						<label for="password">Password</label>
-				    	<input type="password" id="password" name="password" placeholder="Enter your password" required>
+				    	<input type="password" id="password" name="password" placeholder="Enter your password" maxlength=70 required>
 					</div>
 					<div>
 						<button type="submit" class="btn">Login</button>
@@ -142,6 +148,37 @@
 					<p>Don't have an account? <a href="SignUp.jsp">Sign up here</a></p>
 				</div>
 	    	</div>
+	    	<script>
+		    	document.getElementById("login-form").addEventListener("submit", function(e) {
+				    e.preventDefault(); // prevent normal form submission
+				
+				    const data = {
+				    	email: document.querySelector('input[name="email"]').value,
+				        password: document.querySelector('input[name="password"]').value
+				    };
+				
+				    fetch("${pageContext.request.contextPath}/login", {
+				        method: "POST",
+				        headers: {
+				            "Content-Type": "application/json"
+				        },
+				        body: JSON.stringify(data)
+				    })
+				    .then(async response => {
+				        if (response.ok) {
+				            window.location.href = "Dashboard.jsp";
+				        } else {
+				            // Parse JSON response body
+				            const errorData = await response.json();
+				            const errorMsg = errorData.error || "Login Failed";
+				            document.getElementById("login-error").textContent = errorMsg;
+				        }
+				    })
+				    .catch(err => {
+				        document.getElementById("login-error").textContent = "An error occurred: " + err.message;
+				    });
+				});
+			</script>
 	    </div>
 	</div>
 	<jsp:include page="Footer.jsp" />

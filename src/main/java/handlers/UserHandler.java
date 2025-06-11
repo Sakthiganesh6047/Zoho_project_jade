@@ -15,6 +15,7 @@ import util.CustomException;
 import util.DBConnection;
 import util.Password;
 import util.Results;
+import util.TimeConversion;
 import util.ValidationsUtil;
 
 public class UserHandler {
@@ -103,6 +104,9 @@ public class UserHandler {
         
         User user = profile.getUser();
         Customer customer = profile.getCustomerDetails();
+        user.setAge(TimeConversion.calculateAge(user.getDob()));
+        user.setUserType(1);
+        
         ValidationsUtil.validateUser(user);
         ValidationsUtil.validateCustomer(customer);
 
@@ -110,9 +114,9 @@ public class UserHandler {
             connection = DBConnection.getConnection();
             connection.setAutoCommit(false);
 
-            
-            user.setUserType(1);
             user.setCreatedBy(0L); // Optional: 0 or -1 for public created
+            user.setStatus(1);
+            user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
             user.setModifiedOn(Instant.now().toEpochMilli());
 
             Long generatedUserId = userDAO.insertUser(user, connection);
@@ -127,11 +131,15 @@ public class UserHandler {
             return Results.respondJson(Map.of("status", "created", "userId", generatedUserId));
 
         } catch (Exception e) {
-            if (connection != null) connection.rollback();
+            if (connection != null) {
+            	connection.rollback();
+            }
             e.printStackTrace();
             throw new CustomException("Public customer creation failed", e);
         } finally {
-            if (connection != null) connection.close();
+            if (connection != null) {
+            	connection.close();
+            }
         }
     }
     

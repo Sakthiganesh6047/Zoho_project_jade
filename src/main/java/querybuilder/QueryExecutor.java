@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,11 +70,24 @@ public class QueryExecutor {
                 }
                 return affectedRows;
             }
+            
+        } catch (SQLIntegrityConstraintViolationException e) {
+                String msg = e.getMessage();
+
+                if (msg.contains("User.phone")) {
+                    throw new CustomException("Phone number already exists.");
+                } else if (msg.contains("User.email")) {
+                    throw new CustomException("Email already exists.");
+                } else {
+                    throw new CustomException("Duplicate entry error."); // fallback
+                }
+
         } catch (Exception e) {
         	e.printStackTrace();
             throw new CustomException(e.getMessage());
         }
     }
+
     
     public <T> Object executeQuery(QueryResult queryResult, Connection connection, Class<T> pojoClass) throws CustomException {
         String sql = queryResult.getQuery().trim().toUpperCase();
@@ -111,10 +125,25 @@ public class QueryExecutor {
                 return affectedRows;
             }
 
-        } catch (Exception e) {
-        	e.printStackTrace();
-            throw new CustomException(e.getMessage());
-        }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            String msg = e.getMessage();
+
+            if (msg.contains("User.phone")) {
+                throw new CustomException("Phone number already exists.");
+            } else if (msg.contains("User.email")) {
+                throw new CustomException("Email already exists.");
+            } else if (msg.contains("Customer.aadharNumber")) {
+            	throw new CustomException("Aadhar already exists");
+            } else if(msg.contains("Customer.panId")) {
+            	throw new CustomException("PanId already exists");
+            } else {
+                throw new CustomException("Duplicate entry error."); // fallback
+            }
+
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	        throw new CustomException(e.getMessage());
+	    }
     }
 
     public long executeInsertWithConn(QueryResult queryResult, Connection conn, boolean returnGeneratedKeys) throws CustomException {
@@ -144,10 +173,21 @@ public class QueryExecutor {
                 return affectedRows;
             }
             
-        } catch (SQLException e) {
-        	e.printStackTrace();
-            throw new CustomException(e.getMessage());
-        }
+        } catch (SQLIntegrityConstraintViolationException e) {
+            String msg = e.getMessage();
+
+            if (msg.contains("User.phone")) {
+                throw new CustomException("Phone number already exists.");
+            } else if (msg.contains("User.email")) {
+                throw new CustomException("Email already exists.");
+            } else {
+                throw new CustomException("Duplicate entry error."); // fallback
+            }
+
+	    } catch (Exception e) {
+	    	e.printStackTrace();
+	        throw new CustomException(e.getMessage());
+	    }
     }
     
     private void loadYamlMappings() {

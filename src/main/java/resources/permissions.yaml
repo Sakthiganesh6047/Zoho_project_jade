@@ -1,12 +1,12 @@
 
 #role based authorization -- yaml file
-# 0 - Customer // 1 - Clerk // 2 - Manager // 3 -- GM
+# 0 - Customer // 1 - Clerk // 2 - Manager // 3 -- GM // 4 for open source
 
 UserHandler:
   getAllUsers: [3]
   createAdminUser: [3]
   createUser: [0, 1, 2, 3]
-  publicCreateCustomer: [0, 1, 2, 3]
+  publicCreateCustomer: [0, 1, 2, 3, 4]
   updateUser: [1, 2, 3]
   getUserProfileByEmail: [0, 1, 2, 3]
   getUserProfileById: [0, 1, 2, 3]

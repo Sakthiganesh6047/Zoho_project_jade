@@ -1,6 +1,8 @@
 package util;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -15,6 +17,12 @@ public class TimeConversion {
      */
     public static ZonedDateTime toZonedDateTime(long unixMillis, ZoneId zoneId) {
         return Instant.ofEpochMilli(unixMillis).atZone(zoneId);
+    }
+    
+    public static int calculateAge(String dobString) {
+        LocalDate dob = LocalDate.parse(dobString);  // ISO format: yyyy-MM-dd
+        LocalDate today = LocalDate.now();
+        return Period.between(dob, today).getYears();
     }
 }
 

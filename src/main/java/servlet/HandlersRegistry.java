@@ -64,7 +64,7 @@ public class HandlersRegistry {
             }
  
             String method = request.getMethod();     
-            int role = getUserRole(request, response);
+            Integer role = getUserRole(request, response); // -1 for open sources
 
             System.out.println("\n[LOG] Incoming request: " + method + " " + pathInfo + " | Role: " + role);
 
@@ -89,8 +89,9 @@ public class HandlersRegistry {
                         response.setContentType("application/json");
                         response.getWriter().write(json);
                     } catch (InvocationTargetException e) {
-                        Results.respondError(response, 500, e.getCause().getMessage());
-                        e.printStackTrace();
+                    	 Throwable root = getRootCause(e);   
+                    	 Results.respondError(response, 500, root.getMessage());
+                    	 e.printStackTrace();
                     } catch (Exception e) {
                         Results.respondJson(response, e.getMessage());
                     } finally {
@@ -108,12 +109,25 @@ public class HandlersRegistry {
         }
     }
     
-    private int getUserRole(HttpServletRequest request, HttpServletResponse response) throws CustomException {
+    private Integer getUserRole(HttpServletRequest request, HttpServletResponse response) throws CustomException {
     	HttpSession session = request.getSession(false);
     	if (session == null) {
     		Results.respondError(response, 403, "Session not found, Please login");
     	}
-    	return (int) session.getAttribute("role");
+    	Integer userRole = (Integer) session.getAttribute("role");
+    	if (userRole == null) {
+    		return 4;
+    	} else {
+    		return userRole;
+    	}
+    }
+    
+    public static Throwable getRootCause(Throwable t) {
+        Throwable result = t;
+        while (result.getCause() != null) {
+            result = result.getCause();
+        }
+        return result;
     }
 
 }

@@ -25,6 +25,9 @@
 		    height: 86.3vh;
 		    align-content: center;
 		    flex-wrap: wrap;
+		    flex-direction: column;
+    		align-content: center;
+    		align-items: center;
         }
         
         .container-wrapper {
@@ -186,68 +189,74 @@
 <body>
 	<jsp:include page="Header.jsp" />
 	<div class=main-wrapper>
+	
+		<div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
 		<div class=container-wrapper>
+		
 			<div class=signuppage-container>
 				<div class=clipart-container>
 		    		<img src="contents/signup_page.png" alt="Sign-Up Page Image" class=signup-clipart>
 		    	</div>
+		    	
 				<div class=form-container>
 					<h3>Create an User Account</h3><br>
-				    <form action="SignupServlet" method="post" class=signup-form>
+				    <form 
+				    		id="signup-form"
+    						class="signup-form">
 				    	
 				    	<div class=field-container>
 					    	<label>Full Name:<span class="required">*</span></label>
-					        <input type="text" name="fullname" maxlength="50" required>
+					        <input type="text" name="user.fullName" maxlength="50" required>
 				    	</div>
 				        
 				        <div class=field-container>
 					        <label>Email:<span class="required">*</span></label>
-					        <input type="email" name="email" maxlength="70" required>
+					        <input type="email" name="user.email" maxlength="70" required>
 				        </div>
 				        
 				        <div class="gender-container">
 					        <label>Gender:<span class="required">*</span></label>
-					        <input type="radio" id="male" name="gender" value="Male">
+					        <input type="radio" id="male" name="user.gender" value="Male">
 					        <label for="male">Male</label>
 					        
-					        <input type="radio" id="female" name="gender" value="Female">
+					        <input type="radio" id="female" name="user.gender" value="Female">
 					        <label for="female">Female</label>
 					
-					        <input type="radio" id="other" name="gender" value="Others">
+					        <input type="radio" id="other" name="user.gender" value="Others">
 					        <label for="other">Others</label>
 					    </div>
 					    
 					    <div>
 					    	<label for="dob">Date of Birth:<span class="required">*</span></label>
-				        	<input type="date" id="dob" name="dob" required>
+				        	<input type="date" id="dob" name="user.dob" required>
 					    </div>
 					    
 					    <div class=field-container>
 							<label for="phone">Phone Number:<span class="required">*</span></label>
-							<input type="tel" id="phone" name="phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
+							<input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
 					    </div>
 					    
 						<div class=proof-container>
 						    <div class=field-container>
 								<label for="phone">Aadhar Card Number:<span class="required">*</span></label>
-								<input type="tel" id="aadhar" name="phone" pattern="[0-9]{16}" inputmode="numeric" maxlength="10" required>
+								<input type="tel" id="aadhar" name="customerDetails.aadharNumber" pattern="[0-9]{12}" inputmode="numeric" maxlength="12" required>
 						    </div>
 						    
 						    <div class=field-container>
 						        <label>PAN Card Number:<span class="required">*</span></label>
-						        <input type="text" name="pan" maxlength="10" required>
+						        <input type="text" name="customerDetails.panId" maxlength="10" required>
 					        </div>
 						</div>
 					    
 					    <div class=field-container>
 					    	<label for="address">Address:<span class="required">*</span></label>
-				        	<textarea id="address" name="address" rows="3" maxlength="50" required></textarea>
+				        	<textarea id="address" name="customerDetails.address" rows="3" maxlength="50" required></textarea>
 				        </div>
 				        
 				        <div class=password-container>
 					        <div class=field-container>
 						        <label>Password:<span class="required">*</span></label>
-						        <input type="password" name="password" maxlength="50" required>
+						        <input type="password" name="user.passwordHash" maxlength="50" required>
 					        </div>
 					        
 					        <div class=field-container>
@@ -261,6 +270,61 @@
 				        </div>
 				        
 				    </form>
+				    
+				    <script>
+						document.getElementById("signup-form").addEventListener("submit", function(e) {
+						    e.preventDefault(); // prevent normal form submission
+						
+						    const password = document.querySelector('input[name="user.passwordHash"]').value;
+						    const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
+						
+						    if (password !== confirmPassword) {
+						        alert("Passwords do not match.");
+						        return;
+						    }
+						
+						    const data = {
+						        user: {
+						            fullName: document.querySelector('input[name="user.fullName"]').value,
+						            email: document.querySelector('input[name="user.email"]').value,
+						            phone: document.querySelector('input[name="user.phone"]').value,
+						            dob: document.querySelector('input[name="user.dob"]').value,
+						            gender: document.querySelector('input[name="user.gender"]:checked')?.value,
+						            passwordHash: password
+						        },
+						        employeeDetails: {
+						            // Fill if needed
+						        },
+						        customerDetails: {
+						            aadharNumber: document.querySelector('input[name="customerDetails.aadharNumber"]').value,
+						            panId: document.querySelector('input[name="customerDetails.panId"]').value,
+						            address: document.querySelector('textarea[name="customerDetails.address"]').value
+						        }
+						    };
+						
+						    fetch("${pageContext.request.contextPath}/jadebank/user/signup", {
+						        method: "POST",
+						        headers: {
+						            "Content-Type": "application/json"
+						        },
+						        body: JSON.stringify(data)
+						    })
+						    .then(async response => {
+						        if (response.ok) {
+						            window.location.href = "Login.jsp";
+						        } else {
+						            // Parse JSON response body
+						            const errorData = await response.json();
+						            const errorMsg = errorData.error || "Signup failed.";
+						            document.getElementById("signup-error").textContent = errorMsg;
+						        }
+						    })
+						    .catch(err => {
+						        document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
+						    });
+						});
+						</script>
+				    
 				    <div>
 						<p>Already have an account? <a href="Login.jsp">Login here</a></p>
 				    </div>

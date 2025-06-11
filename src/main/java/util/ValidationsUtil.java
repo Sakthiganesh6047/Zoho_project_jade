@@ -27,7 +27,7 @@ public class ValidationsUtil {
 	}
 	
 	public static void checkUserRole(Integer role) throws CustomException {
-		if (role < 0 || role > 3) {
+		if (role < 0 || role > 4) {
 		    throw new CustomException("Invalid user role.");
 		}
 	}

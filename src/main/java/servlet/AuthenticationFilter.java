@@ -29,10 +29,10 @@ public class AuthenticationFilter implements Filter {
         String uri = httpRequest.getRequestURI();
         HttpSession session = httpRequest.getSession(false);
 
-        boolean isLoginRequest = uri.endsWith("/login");
-        boolean isPublicResource = uri.startsWith("/public/") || uri.endsWith(".css") || uri.endsWith(".js");
+        boolean isLoginRequest = uri.endsWith("/LoginServlet") || uri.endsWith("/Login.jsp") || uri.endsWith("/login");
+        boolean isPublicResource = uri.startsWith("/public/") || uri.endsWith(".css") || uri.endsWith(".png") || uri.endsWith("LandingPage.jsp");
         boolean isLogoutRequest = uri.endsWith("/logout");
-        boolean isSignUpRequest = uri.endsWith("/signup");
+        boolean isSignUpRequest = uri.endsWith("/signup") || uri.endsWith("SignUp.jsp");
 
         boolean isLoggedIn = session != null && session.getAttribute("userId") != null;
 

@@ -29,7 +29,7 @@ public class AuthConfig {
      * @return true if authorized, false otherwise
      */
     public boolean isAuthorized(Object handler, Method method, int role) {
-        if (role < 0 || role > 3) {
+        if (role < 0 || role > 4) {
             return false;
         }
 
