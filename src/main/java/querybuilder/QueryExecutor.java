@@ -72,15 +72,15 @@ public class QueryExecutor {
             }
             
         } catch (SQLIntegrityConstraintViolationException e) {
-                String msg = e.getMessage();
+            String msg = e.getMessage();
 
-                if (msg.contains("User.phone")) {
-                    throw new CustomException("Phone number already exists.");
-                } else if (msg.contains("User.email")) {
-                    throw new CustomException("Email already exists.");
-                } else {
-                    throw new CustomException("Duplicate entry error."); // fallback
-                }
+            if (msg.contains("User.phone")) {
+                throw new CustomException("Phone number already exists.");
+            } else if (msg.contains("User.email")) {
+                throw new CustomException("Email already exists.");
+            } else {
+                throw new CustomException("Duplicate entry error.", e); // fallback
+            }
 
         } catch (Exception e) {
         	e.printStackTrace();

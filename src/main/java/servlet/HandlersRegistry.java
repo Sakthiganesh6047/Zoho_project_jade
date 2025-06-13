@@ -82,7 +82,8 @@ public class HandlersRegistry {
                         Results.respondError(response, 403, "Unauthorized access");
                         return;
                     }
-
+                    
+                    System.out.println("Method invoked: " + info.method);
                     try {
                         Object[] args = AuthorizeUtil.resolveParameters(request, info.method, pathParams);
                         String json = (String) info.method.invoke(info.handler, args);
@@ -92,8 +93,12 @@ public class HandlersRegistry {
                     	 Throwable root = getRootCause(e);   
                     	 Results.respondError(response, 500, root.getMessage());
                     	 e.printStackTrace();
+                    } catch(CustomException e) {
+                    	Results.respondError(response, 500, e.getMessage());
+                    	e.printStackTrace();
                     } catch (Exception e) {
-                        Results.respondJson(response, e.getMessage());
+                        Results.respondError(response, 400, e.getMessage());
+                        e.printStackTrace();
                     } finally {
                         long duration = System.currentTimeMillis() - startTime;
                         System.out.println("[LOG] Execution time: " + duration + "ms");
@@ -129,6 +134,11 @@ public class HandlersRegistry {
         }
         return result;
     }
+    
+//    routeMap.forEach((key, routeList) -> {
+//        System.out.println("Key: " + key);
+//        routeList.forEach(route -> System.out.println("  " + route));
+//    });
 
 }
 

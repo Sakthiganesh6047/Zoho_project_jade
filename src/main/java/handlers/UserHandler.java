@@ -3,6 +3,9 @@ package handlers;
 import java.sql.Connection;
 import java.time.Instant;
 import java.util.Map;
+
+import DAO.CustomerDAO;
+import DAO.EmployeeDAO;
 import DAO.UserDAO;
 import annotations.FromBody;
 import annotations.FromSession;
@@ -55,8 +58,11 @@ public class UserHandler {
     	ValidationsUtil.checkUserRole(creatorRole);
     	
     	User user = profile.getUser();
+    	user.setAge(TimeConversion.calculateAge(user.getDob()));
+    	user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
     	ValidationsUtil.validateUser(user);
-    	if(user.getUserType() == 1) {
+    	
+    	if (user.getUserType() == 1) {
 			ValidationsUtil.validateCustomer(profile.getCustomerDetails());
     	}
 		
@@ -66,6 +72,7 @@ public class UserHandler {
 			connection = DBConnection.getConnection();
 			connection.setAutoCommit(false);
 			
+			user.setStatus(1);
 			user.setCreatedBy(creatorId);
 			user.setModifiedOn(Instant.now().toEpochMilli());
 		
@@ -160,8 +167,8 @@ public class UserHandler {
                 }
                 break;
             case 1: // Clerk
-                if (creatorRole != 2) {
-                    throw new CustomException("Only Manager can create a Clerk.");
+                if (creatorRole != 2 || creatorRole != 3) {
+                    throw new CustomException("Only Managers and GM can create a Clerk.");
                 }
                 // Check branch match
                 Employee manager = employeeHandler.getEmployeeDetails(creatorId);
@@ -169,35 +176,86 @@ public class UserHandler {
                     throw new CustomException("Manager can only create Clerks in their own branch.");
                 }
                 break;
-            default:
-                throw new CustomException("Invalid employee role: " + newEmployeeRole);
         }
 
         employee.setEmployeeId(user.getUserId());
         employeeHandler.insertEmployeeDetails(employee, connection);
     }
     
-    @Route(path = "user/update", method = "PUT")
-    public String updateUser(@FromBody User user, @FromSession("userId") Long userId) throws CustomException {
-    	
-    	ValidationsUtil.isNull(userId, "UserId");
-    	ValidationsUtil.validateUser(user);
-    	
-    	try {
-    		user.setModifiedBy(userId);
-    		user.setModifiedOn(Instant.now().toEpochMilli());
-            int result = userDAO.updateUser(user, user.getUserId());
-            return Results.respondJson(Map.of("status", result > 0 ? "updated" : "not found", "rowsAffected", result));
-        } catch (CustomException e) {
-            throw new CustomException("User updation failed");
+    @Route(path = "user/update", method = "POST")
+    public String updateUserProfile(@FromBody UserProfile profile, @FromSession("userId") long updaterId) throws Exception {
+        Connection connection = null;
+
+        User user = profile.getUser();
+        user.setModifiedOn(Instant.now().toEpochMilli());
+
+        if (user.getUserId() == null) {
+            throw new CustomException("User ID is required for update.");
+        }
+
+        try {
+            connection = DBConnection.getConnection();
+            connection.setAutoCommit(false);
+
+            // Validate and update user
+            ValidationsUtil.validateUser(user);
+
+            // Check if password is being updated
+            if (user.getPasswordHash() != null && !user.getPasswordHash().isEmpty()) {
+                user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
+            } else {
+                // Retain the existing password hash
+                User existing = userDAO.getUserById(user.getUserId(), connection);
+                user.setPasswordHash(existing.getPasswordHash());
+            }
+
+            userDAO.updateUser(user, connection);
+
+            // Depending on the userType, update customer or employee
+            if (user.getUserType() == 1) { // Customer
+                Customer customer = profile.getCustomerDetails();
+                if (customer == null) {
+                	throw new CustomException("Customer details missing.");
+                }
+                customer.setCustomerId(user.getUserId());
+                ValidationsUtil.validateCustomer(customer);
+                CustomerDAO customerDAO = CustomerDAO.getCustomerDAOInstance();
+                customerDAO.updateCustomer(customer, connection);
+
+            } else if (user.getUserType() == 2 || user.getUserType() == 3) { // Clerk / Manager / GM
+                Employee employee = profile.getEmployeeDetails();
+                if (employee == null) throw new CustomException("Employee details missing.");
+                employee.setEmployeeId(user.getUserId());
+
+                // Optional: validate update authority for roles
+                Employee updater = employeeHandler.getEmployeeDetails(updaterId);
+                if (!hasPermissionToUpdate(updater, employee)) {
+                    throw new CustomException("Insufficient permission to update this employee.");
+                }
+
+                ValidationsUtil.validateEmployee(employee);
+                EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();
+                employeeDAO.updateEmployee(employee, connection);
+            }
+
+            connection.commit();
+            return Results.respondJson(Map.of("status", "updated", "userId", user.getUserId()));
+
+        } catch (Exception e) {
+            if (connection != null) connection.rollback();
+            e.printStackTrace();
+            throw new CustomException("User update failed", e);
+        } finally {
+            if (connection != null) connection.close();
         }
     }
     
-//    @Route(path = "getByEmail", method = "GET")
-//    public String userInfo(@FromQuery("email") String email) throws Exception {
-//    	User user = userDAO.getUserByEmail(email);
-//    	return Results.respondJson(user);
-//    }
+    private boolean hasPermissionToUpdate(Employee updater, Employee target) {
+        if (updater.getRole() == 3) return true; // GM can update anyone
+        if (updater.getRole() == 2 && target.getRole() == 1 &&
+            updater.getBranch().equals(target.getBranch())) return true; // Manager can update clerks in same branch
+        return false;
+    }
     
     @Route(path = "user/email", method = "POST")
     public String getUserProfileByEmail(@FromBody User user) throws CustomException {

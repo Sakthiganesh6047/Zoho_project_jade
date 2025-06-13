@@ -4,6 +4,7 @@ package servlet;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -24,14 +25,15 @@ public class AuthenticationFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
+        @SuppressWarnings("unused")
+		HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String uri = httpRequest.getRequestURI();
         HttpSession session = httpRequest.getSession(false);
 
         boolean isLoginRequest = uri.endsWith("/LoginServlet") || uri.endsWith("/Login.jsp") || uri.endsWith("/login");
         boolean isPublicResource = uri.startsWith("/public/") || uri.endsWith(".css") || uri.endsWith(".png") || uri.endsWith("LandingPage.jsp");
-        boolean isLogoutRequest = uri.endsWith("/logout");
+        boolean isLogoutRequest = uri.endsWith("/logout") || uri.endsWith("Logout.jsp");
         boolean isSignUpRequest = uri.endsWith("/signup") || uri.endsWith("SignUp.jsp");
 
         boolean isLoggedIn = session != null && session.getAttribute("userId") != null;
@@ -39,9 +41,12 @@ public class AuthenticationFilter implements Filter {
         if (isLoggedIn || isLoginRequest || isPublicResource || isLogoutRequest || isSignUpRequest) {
             chain.doFilter(request, response);
         } else {
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.setContentType("application/json");
-            httpResponse.getWriter().write("{\"error\":\"Unauthorized access. Please login.\"}");
+//            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            httpResponse.setContentType("application/json");
+//            httpResponse.getWriter().write("{\"error\":\"Unauthorized access. Please login.\"}");
+        	RequestDispatcher dispatcher = httpRequest.getRequestDispatcher("Login.jsp");
+        	dispatcher.forward(request, response);
+
         }
     }
 

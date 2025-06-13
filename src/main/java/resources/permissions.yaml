@@ -18,6 +18,7 @@ BranchHandler:
   branchList: [1, 2, 3]
   getBranchByIFSC: [1, 2, 3]
   getBranchById: [1, 2, 3]
+  branchListForm: [2, 3]
   
 TransactionHandler:
   fetchTransactionsofAccount: [0, 1, 2, 3]

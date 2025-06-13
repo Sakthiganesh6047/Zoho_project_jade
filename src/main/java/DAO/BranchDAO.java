@@ -19,11 +19,11 @@ public class BranchDAO {
 //        this.fieldMappings = fieldMappings;
 //    }
 
-    public int createBranch(Branch branch) throws CustomException {
+    public Long createBranch(Branch branch) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
         QueryResult query = queryBuilder.insert(branch).build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (int) executor.executeQuery(query, null);
+        return (Long) executor.executeQuery(query, null);
     }
 
     public Branch getBranchById(Long branchId) throws CustomException {
@@ -35,11 +35,20 @@ public class BranchDAO {
         return (Branch) executor.executeQuery(query, Branch.class);
     }
 
-    public List<Branch> getAllBranches(int limit, int offset) throws CustomException {
+    public List<Branch> getBranchList(int limit, int offset) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
-        QueryResult query = queryBuilder.select("*")
+        QueryResult query = queryBuilder.select("branchId", "branchName", "branchDistrict", "ifscCode")
         								.limit(limit)
         								.offset(offset)
+        								.build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return castResult(executor.executeQuery(query, Branch.class));
+    }
+    
+    public List<Branch> getAllBranches() throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
+        QueryResult query = queryBuilder.select("branchId", "branchName", "branchDistrict")
+        								.orderBy("branchDistrict", "ASC")
         								.build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Branch.class));
@@ -53,6 +62,16 @@ public class BranchDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (Branch) executor.executeQuery(query, Branch.class);
     }
+    
+    public boolean ifscExists(String ifscCode) throws CustomException {
+        QueryBuilder builder = new QueryBuilder(Branch.class);
+        QueryResult query = builder.select("branch_id")
+                                   .where("ifsc_code", "=", ifscCode)
+                                   .build();
+        List<Branch> result = castResult(QueryExecutor.getQueryExecutorInstance().executeQuery(query, Branch.class));
+        return !result.isEmpty();
+    }
+
 
     public int updateBranch(Branch branch) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);

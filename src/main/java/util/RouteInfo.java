@@ -17,4 +17,16 @@ public class RouteInfo {
         this.pathVariables = pathVariables;
         this.handler = handler;
     }
+    
+    @Override
+    public String toString() {
+        return "RouteInfo{" +
+               "pattern=" + pattern.pattern() +
+               ", method=" + method +
+               ", pathVariables=" + pathVariables +
+               ", handler=" + handler +
+               '}';
+    }
+
+
 }

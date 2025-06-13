@@ -52,14 +52,24 @@ public class EmployeeDAO {
         return employee ;
     }
 	
-	public int updateEmployee(Employee employee, Long employeeId) throws Exception {
+	public int updateEmployee(Employee employee) throws Exception {
         QueryBuilder queryBuilder = new QueryBuilder(Employee.class);
         QueryResult updateQuery = queryBuilder.update(employee)
-                         .where("employee_id", "=", employeeId)
+                         .where("employee_id", "=", employee.getEmployeeId())
                          .build();
         System.out.println("Update Query: " + updateQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (int) executor.executeQuery(updateQuery, null);
+    }
+	
+	public int updateEmployee(Employee employee, Connection connection) throws Exception {
+        QueryBuilder queryBuilder = new QueryBuilder(Employee.class);
+        QueryResult updateQuery = queryBuilder.update(employee)
+                         .where("employee_id", "=", employee.getEmployeeId())
+                         .build();
+        System.out.println("Update Query: " + updateQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (int) executor.executeQuery(updateQuery, connection, null);
     }
 	
 	public int deleteEmployee(Long employeeId) throws Exception {

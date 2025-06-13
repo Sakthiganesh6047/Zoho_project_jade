@@ -73,7 +73,7 @@ public class BeneficiaryHandler {
 		return Results.respondJson(beneficiaryDAO.getBeneficiariesByAccountId(beneficiary.getAccountId(), userId, limit, offset));	
 	}
 	
-	@Route(path = "beneficiary/{beneficiarId}", method = "DELETE")
+	@Route(path = "beneficiary/id/{beneficiarId}", method = "DELETE")
 	public String deleteBeneficiary(@FromPath("beneficiarId") Long beneficiarId, @FromSession("userId") Long userId,
 									@FromSession("role") Integer role) throws CustomException {
 		

@@ -91,10 +91,11 @@
 
         <%-- Admin / GM --%>
         <% } else if (role == 3) { %>
-            <a href="AddEmployee.jsp" class="btn">Add Employee</a>
+            <a href="EmployeeSignUp.jsp" class="btn">Add Employee</a>
             <a href="ManageBranches.jsp" class="btn">Manage Branches</a>
             <a href="SystemLogs.jsp" class="btn">System Logs</a>
             <a href="Stats.jsp" class="btn">Bank Statistics</a>
+            <a href="AddNewBranch.jsp" class="btn">Add New Branch</a>
         <% } %>
     </div>
 </div>

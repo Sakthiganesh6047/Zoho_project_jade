@@ -24,16 +24,41 @@ public class BranchHandler {
 	}
 	
 	@Route(path = "branch/new", method = "POST")
-	public String createBranch(@FromBody Branch branch, @FromSession("userId") long creatorId) throws CustomException {
+	public String createBranch(@FromBody Branch branch, @FromSession("userId") Long creatorId) throws CustomException {
 		
 		ValidationsUtil.validateBranch(branch);
 		ValidationsUtil.isNull(creatorId, "UserId");
 		
+		 // Generate IFSC code
+	    String ifscCode = generateUniqueIFSC(branch.getBranchDistrict(), branchDAO);
+	    branch.setIfscCode(ifscCode);
+		
 		branch.setCreatedBy(creatorId);
+		branch.setCreatedOn(Instant.now().toEpochMilli());
 		branch.setModifiedOn(Instant.now().toEpochMilli());
-		branch.setModifiedBy(null);
-		int result = branchDAO.createBranch(branch);
-		return Results.respondJson(Map.of("Status", "Created", "BranchId", result));
+		Long result = branchDAO.createBranch(branch);
+		return Results.respondJson(Map.of("BranchId", result));
+	}
+	
+	private String generateUniqueIFSC(String district, BranchDAO branchDAO) throws CustomException {
+	    String bankCode = "JADE"; // Replace with your fixed 4-letter bank code
+	    String districtCode = getDistrictCode(district); // Convert district to numeric/short code
+
+	    for (int i = 1; i <= 999; i++) {
+	        String branchSerial = String.format("%03d", i);
+	        String candidateIfsc = bankCode + districtCode + branchSerial;
+	        if (!branchDAO.ifscExists(candidateIfsc)) {
+	            return candidateIfsc;
+	        }
+	    }
+
+	    throw new CustomException("Unable to generate unique IFSC code after 999 attempts");
+	}
+	
+	private String getDistrictCode(String district) {
+	    // Simplified example — ideally use a map or hashed code system
+	    int hash = Math.abs(district.toLowerCase().hashCode());
+	    return String.format("%03d", hash % 1000); // ensure 3-digit code
 	}
 	
 	@Route(path = "branch/update", method = "POST")
@@ -56,13 +81,19 @@ public class BranchHandler {
 		return Results.respondJson(Map.of("Status", "Updated", "Rows Affected", rowsAffected));
 	}
 	
-	@Route(path = "branch/list", method = "GET")
+	@Route(path = "branch/all", method = "GET")
 	public String branchList(@FromQuery("limit") int limit, @FromQuery("offset") int offset) throws CustomException {
 		ValidationsUtil.checkLimitAndOffset(limit, offset);
-		return Results.respondJson(branchDAO.getAllBranches(limit, offset));
+		return Results.respondJson(branchDAO.getBranchList(limit, offset));
 	}
 	
-	@Route(path = "branch/{ifsc}", method = "GET")
+	@Route(path = "branch/list", method = "GET")
+	public String branchListForm() throws CustomException {
+		System.out.print("here");
+		return Results.respondJson(branchDAO.getAllBranches());
+	}
+	
+	@Route(path = "branch/ifsc/{ifsc}", method = "GET")
 	public String getBranchByIFSC(@FromPath("ifsc") String ifsc) throws CustomException {
 		
 		ValidationsUtil.isNull(ifsc, "IFSC Code");
@@ -71,7 +102,7 @@ public class BranchHandler {
 		return Results.respondJson(branchDAO.getBranchByIfsc(ifsc));
 	}
 	
-	@Route(path = "branch/{branchId}", method = "GET")
+	@Route(path = "branch/id/{branchId}", method = "GET")
 	public String getBranchById(@FromPath("branchId") long branchId) throws CustomException {
 		
 		ValidationsUtil.isNull(branchId, "BranchId");

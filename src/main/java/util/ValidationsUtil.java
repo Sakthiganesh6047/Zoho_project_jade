@@ -4,6 +4,7 @@ import pojos.Account;
 import pojos.Beneficiary;
 import pojos.Branch;
 import pojos.Customer;
+import pojos.Employee;
 import pojos.Transaction;
 import pojos.User;
 
@@ -95,12 +96,23 @@ public class ValidationsUtil {
 		
 	}
 	
+	public static void validateEmployee(Employee employee) throws CustomException {
+		
+		Integer role = employee.getRole();
+		Long branch = employee.getBranch();
+		
+		if (role == null || role <= 1 || role >= 3) {
+			throw new CustomException ("Invalid employee Role");
+		}
+		
+		ValidationsUtil.isNull(branch, "Branch");
+	}
+	
 	public static void validateBranch(Branch branch) throws CustomException {
 		
 		String branchName = branch.getBranchName();
 		String branchDistrict = branch.getBranchDistrict();
 		String address = branch.getBranchDistrict();
-		String ifscCode = branch.getIfscCode();
 		
 		if (branchName == null || !branchName.matches("^[A-Za-z0-9 .'-]{3,100}$")) {
 		    throw new CustomException("Branch name must be 3 to 100 characters long");
@@ -112,10 +124,6 @@ public class ValidationsUtil {
 
 		if (address == null || address.isBlank() || address.length() < 5 || address.length() > 250) {
 		    throw new CustomException("Address must be between 5 and 250 characters");
-		}
-
-		if (ifscCode == null || !ifscCode.matches("^JADE[A-Z0-9]{7}$")) {
-		    throw new CustomException("IFSC code must start with 'JADE' followed by 7 uppercase digits");
 		}
 
 	}

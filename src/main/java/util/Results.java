@@ -36,7 +36,9 @@ public class Results {
 	public static String respondJson(Object data) throws CustomException {
         ObjectMapper mapper = new ObjectMapper();
         try {
-			return mapper.writeValueAsString(data);
+        	String result = mapper.writeValueAsString(data);
+        	//System.out.print(result);
+			return result;
 		} catch (JsonProcessingException e) {
 			throw new CustomException("Error while converting to JSON", e);
 		}

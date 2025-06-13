@@ -53,48 +53,52 @@ public class AuthorizeUtil {
 	    return false;
 	}
 	
-	public static Object[] resolveParameters(HttpServletRequest request, Method method, Map<String, String> pathParams) throws IOException {
-        Parameter[] parameters = method.getParameters();
-        Object[] args = new Object[parameters.length];
-        ObjectMapper mapper = new ObjectMapper();
-        
-        HttpSession session = request.getSession(false);
-
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter param = parameters[i];
-            Class<?> type = param.getType();
-
-            if (param.isAnnotationPresent(FromQuery.class)) {
-                String key = param.getAnnotation(FromQuery.class).value();
-                String val = request.getParameter(key);
-                args[i] = convertToType(val, type);
-
-            } else if (param.isAnnotationPresent(FromHeader.class)) {
-                String key = param.getAnnotation(FromHeader.class).value();
-                String val = request.getHeader(key);
-                args[i] = convertToType(val, type);
-
-            } else if (param.isAnnotationPresent(FromBody.class)) {
-                args[i] = mapper.readValue(request.getReader(), type);
-
-            } else if (param.isAnnotationPresent(FromSession.class)) {
-                String value = null;
-                if (session != null) {
-                    String key = param.getAnnotation(FromSession.class).value();
-                    value = (String) session.getAttribute(key);
-                }
-                args[i] = convertToType(value, type);
-
-            } else if (param.isAnnotationPresent(FromPath.class)) {
-                String key = param.getAnnotation(FromPath.class).value();
-                String val = pathParams.get(key);
-                args[i] = convertToType(val, type);
-
-            } else {
-                args[i] = null;
-            }
-        }
-        return args;
+	public static Object[] resolveParameters(HttpServletRequest request, Method method, Map<String, String> pathParams) throws CustomException {
+		try {
+	        Parameter[] parameters = method.getParameters();
+	        Object[] args = new Object[parameters.length];
+	        ObjectMapper mapper = new ObjectMapper();
+	        
+	        HttpSession session = request.getSession(false);
+	
+	        for (int i = 0; i < parameters.length; i++) {
+	            Parameter param = parameters[i];
+	            Class<?> type = param.getType();
+	
+	            if (param.isAnnotationPresent(FromQuery.class)) {
+	                String key = param.getAnnotation(FromQuery.class).value();
+	                String val = request.getParameter(key);
+	                args[i] = convertToType(val, type);
+	
+	            } else if (param.isAnnotationPresent(FromHeader.class)) {
+	                String key = param.getAnnotation(FromHeader.class).value();
+	                String val = request.getHeader(key);
+	                args[i] = convertToType(val, type);
+	
+	            } else if (param.isAnnotationPresent(FromBody.class)) {
+	                args[i] = mapper.readValue(request.getReader(), type);
+	
+	            } else if (param.isAnnotationPresent(FromSession.class)) {
+	                Object value = null;
+	                if (session != null) {
+	                    String key = param.getAnnotation(FromSession.class).value();
+	                    value = session.getAttribute(key);
+	                }
+	                args[i] = convertToType(value.toString(), type);
+	
+	            } else if (param.isAnnotationPresent(FromPath.class)) {
+	                String key = param.getAnnotation(FromPath.class).value();
+	                String val = pathParams.get(key);
+	                args[i] = convertToType(val, type);
+	
+	            } else {
+	                args[i] = null;
+	            }
+	        }
+	        return args;
+		} catch(Exception e) {
+			throw new CustomException("Error in resolving parameters", e);
+		}
     }
 	
 	public static Object[] resolveParameter(HttpServletRequest request, Method method) throws IOException {

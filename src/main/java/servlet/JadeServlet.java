@@ -37,7 +37,7 @@ public class JadeServlet extends HttpServlet {
             TransactionDAO transactionDAO = new TransactionDAO();
             BranchDAO branchDAO = new BranchDAO();
             EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();
-            CustomerDAO customerDAO = new CustomerDAO();
+            CustomerDAO customerDAO = CustomerDAO.getCustomerDAOInstance();
             BeneficiaryDAO beneficiaryDAO = BeneficiaryDAO.getBeneficiaryDAOInstance();
             
             AccountHandler accountHandler = new AccountHandler(accountDAO);

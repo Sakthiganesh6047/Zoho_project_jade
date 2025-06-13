@@ -3,7 +3,6 @@ package DAO;
 import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
-
 import pojos.Customer;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
@@ -20,6 +19,20 @@ public class CustomerDAO {
 //        this.fieldMappings = fieldMappings;
 //    }
 
+	private CustomerDAO() {
+		if (CustomerDAOHelper.INSTANCE != null) {
+			throw new IllegalStateException("CustomerDAO instance already created");
+		}
+	}
+	
+	private static class CustomerDAOHelper{
+		private static final CustomerDAO INSTANCE = new CustomerDAO();
+	}
+	
+	public static CustomerDAO getCustomerDAOInstance() {
+		return CustomerDAOHelper.INSTANCE;
+	}
+	
     public long createCustomer(Customer customer) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Customer.class);
         QueryResult query = queryBuilder.insert(customer).build();
@@ -68,6 +81,15 @@ public class CustomerDAO {
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (int) executor.executeQuery(query, null);
+    }
+    
+    public int updateCustomer(Customer customer, Connection connection) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Customer.class);
+        QueryResult query = queryBuilder.update(customer)
+                .where("customer_id", "=", customer.getCustomerId())
+                .build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (int) executor.executeQuery(query, connection, null);
     }
 
     public int deleteCustomer(Long customerId) throws CustomException {
