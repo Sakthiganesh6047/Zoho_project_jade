@@ -121,6 +121,22 @@ public class UserDAO {
         	throw new CustomException("No users found for this userId");
         }
     }
+    
+    public QueryResult getAllEmployeeDetails() throws CustomException {
+        QueryBuilder employeeQB = new QueryBuilder(Employee.class);
+        
+        employeeQB
+            .select(
+                "name AS employee_name",
+                "email AS employee_email",
+                "role AS employee_role",
+                "branchId AS employee_branch"
+            )
+            .join("INNER", "user u", "u.user_id = employee.employee_id");
+
+        return employeeQB.build();
+    }
+
 
     @SuppressWarnings("unchecked")
 	public List<User> getAllUsers(int limit, int offset) throws CustomException {

@@ -108,7 +108,7 @@
     
     function editBranch(branchId) {
         // Option 1: Redirect to an edit page
-        window.location.href = "editbranch.jsp?branchId=" + encodeURIComponent(branchId);
+        window.location.href = "AddNewBranch.jsp?branchId=" + encodeURIComponent(branchId);
 
         // Option 2: (if using modal or inline form)
         // fetch(`/jadebank/branch/id?branchId=${branchId}`)

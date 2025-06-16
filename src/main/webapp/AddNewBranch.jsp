@@ -96,8 +96,10 @@
 
     <div class="branch-form-wrapper">
         <div class="branch-form-container">
-            <h2>Add New Branch</h2>
+            <h2 id="form-title">Add New Branch</h2>
             <form id="branch-form">
+            	<input type="hidden" name="branchId" id="branchId">
+            	
                 <label for="branchName">Branch Name</label>
                 <input type="text" name="branchName" required>
 
@@ -135,51 +137,78 @@
 	<!-- Your custom script -->
 	<script>
 		$(document).ready(function () {
-	    	$('#branchDistrict').select2({
-	      		placeholder: "-- Select District --",
-	      		width: '100%'
-	    	});
+		    const urlParams = new URLSearchParams(window.location.search);
+		    const branchId = urlParams.get("branchId");
 	
-			document.getElementById("branch-form").addEventListener("submit", function (e) {
-	      		e.preventDefault();
+		    $('#branchDistrict').select2({
+		        placeholder: "-- Select District --",
+		        width: '100%'
+		    });
 	
-	      		const branchData = {
-	        		branchName: document.querySelector('input[name="branchName"]').value,
-	        		branchDistrict: document.querySelector('select[name="branchDistrict"]').value,
-	        		address: document.querySelector('textarea[name="address"]').value
-	      		};
+		    // If editing, fetch existing branch data
+		    if (branchId) {
+		        document.getElementById("form-title").innerText = "Edit Branch";
+		        console.log(branchId);
+		        console.log(`<%= request.getContextPath() %>/jadebank/branch/id/${branchId}`);
+		        fetch('${pageContext.request.contextPath}/jadebank/branch/id/' + branchId)
+		            .then(response => response.json())
+		            .then(branch => {
+		                document.querySelector('input[name="branchName"]').value = branch.branchName;
+		                document.querySelector('select[name="branchDistrict"]').value = branch.branchDistrict;
+		                document.querySelector('textarea[name="address"]').value = branch.address;
+		                document.getElementById("branchId").value = branch.branchId;
+		                $('#branchDistrict').val(branch.branchDistrict).trigger('change');
+		            })
+		            .catch(err => {
+		                console.error("Failed to load branch details:", err);
+		                document.getElementById("response").innerText = "Error loading branch data.";
+		            });
+		    }
 	
-				fetch("<%= request.getContextPath() %>/jadebank/branch/new", {
-	    	    	method: "POST",
-	    	    	headers: {
-	    	      		"Content-Type": "application/json"
-	    	    	},
-	    	    	body: JSON.stringify(branchData)
-	    	  	})
-	    	  	.then(async (response) => {
-	    	    	const data = await response.json();
+		    document.getElementById("branch-form").addEventListener("submit", function (e) {
+		        e.preventDefault();
 	
-	    	    	if (!response.ok) {
-	    	      		document.getElementById("response").innerText = data.error || "Failed to create branch.";
-	    	      		document.getElementById("response").style.color = "red";
-	    	    	} else {
-	    	      		document.getElementById("response").innerText = `Branch Created.`;
-	    	      		document.getElementById("response").style.color = "green";
+		        const branchData = {
+		            branchId: document.getElementById("branchId").value || null,
+		            branchName: document.querySelector('input[name="branchName"]').value,
+		            branchDistrict: document.querySelector('select[name="branchDistrict"]').value,
+		            address: document.querySelector('textarea[name="address"]').value
+		        };
 	
-	    	      		// Clear the form
-	    	      		document.getElementById("branch-form").reset();
+		        const isEdit = !!branchData.branchId;
+		        const apiUrl = isEdit ? "<%= request.getContextPath() %>/jadebank/branch/update" : "<%= request.getContextPath() %>/jadebank/branch/new";
 	
-	    	      		// Reset the Select2 dropdown
-	    	      		$('#branchDistrict').val('').trigger('change');
-	    	    	}
-	    	  	})
-	    	  	.catch(err => {
-	    	    	document.getElementById("response").innerText = "Failed to create branch. Please try again.";
-	    	    	document.getElementById("response").style.color = "red";
-	    	    	console.error(err);
-	    	  	});
-	    	});
+		        fetch(apiUrl, {
+		            method: "POST",
+		            headers: {
+		                "Content-Type": "application/json"
+		            },
+		            body: JSON.stringify(branchData)
+		        })
+		            .then(async (response) => {
+		                const data = await response.json();
+	
+		                if (!response.ok) {
+		                    document.getElementById("response").innerText = data.error || "Failed to save branch.";
+		                    document.getElementById("response").style.color = "red";
+		                } else {
+		                    document.getElementById("response").innerText = isEdit ? "Branch updated successfully." : "Branch created successfully.";
+		                    document.getElementById("response").style.color = "green";
+	
+		                    if (!isEdit) {
+		                        document.getElementById("branch-form").reset();
+		                        $('#branchDistrict').val('').trigger('change');
+		                    }
+		                }
+		            })
+		            .catch(err => {
+		                document.getElementById("response").innerText = "Something went wrong.";
+		                document.getElementById("response").style.color = "red";
+		                console.error(err);
+		            });
+		    });
 		});
 	</script>
+
 </body>
 </html>

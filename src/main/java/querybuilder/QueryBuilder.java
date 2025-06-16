@@ -17,6 +17,8 @@ public class QueryBuilder {
     private List<String> joins = new ArrayList<>();
     private List<String> orderByFields = new ArrayList<>();
     private List<Object> parameters = new ArrayList<>();
+    private List<Object> setParameters = new ArrayList<>();
+    private Set<String> updateOnlyFields = new HashSet<>();
     private boolean isUpdate = false, isDelete = false, isSelect = false, isInsert = false;
     private Object entity;
     private Integer limit = null, offset = null;
@@ -59,20 +61,23 @@ public class QueryBuilder {
     public QueryBuilder update(Object entity) {
         this.entity = entity;
         this.isUpdate = true;
+        this.updateOnlyFields.clear(); // default: all fields
         return this;
     }
+
+    public QueryBuilder update(Object entity, String... fieldsToUpdate) {
+        this.entity = entity;
+        this.isUpdate = true;
+        this.updateOnlyFields.clear();
+        this.updateOnlyFields.addAll(Arrays.asList(fieldsToUpdate));
+        return this;
+    }
+
 
     public QueryBuilder delete() {
         this.isDelete = true;
         return this;
     }
-
-//    public QueryBuilder where(String field, Object value) {
-//        String column = fieldMappings.getOrDefault(field, field);
-//        this.conditions.add(column + " = ?");
-//        this.parameters.add(value);
-//        return this;
-//    }
     
     public QueryBuilder where(String field, String operator, Object value, String logic) {
         String column = fieldMappings.getOrDefault(field, field);
@@ -173,96 +178,122 @@ public class QueryBuilder {
     }
 
     public QueryResult build() throws CustomException {
-    	try {
-	        StringBuilder query = new StringBuilder();
-	
-	        if (isInsert) {
-	            query.append("INSERT INTO ").append(tableName).append(" (");
-	            StringBuilder valuesPlaceholder = new StringBuilder("VALUES (");
-	
-	            for (Field field : entity.getClass().getDeclaredFields()) {
-	                field.setAccessible(true);
-	                String columnName = fieldMappings.get(field.getName());
-	                Object value = field.get(entity);
-	
-	                if (columnName != null) {
-	                    query.append(columnName).append(", ");
-	                    valuesPlaceholder.append("?, ");
-	                    parameters.add(value);
-	                }
-	            }
-	
-	            query.setLength(query.length() - 2);
-	            valuesPlaceholder.setLength(valuesPlaceholder.length() - 2);
-	            query.append(") ").append(valuesPlaceholder).append(")");
-	
-	        } else if (isUpdate) {
-	            query.append("UPDATE ").append(tableName).append(" SET ");
-	
-	            for (Field field : entity.getClass().getDeclaredFields()) {
-	                field.setAccessible(true);
-	                String columnName = fieldMappings.get(field.getName());
-	                Object value = field.get(entity);
-	
-	                if (columnName != null) {
-	                    query.append(columnName).append(" = ?, ");
-	                    parameters.add(value);
-	                }
-	            }
-	
-	            query.setLength(query.length() - 2);
-	            if (!conditions.isEmpty()) {
-	                query.append(" WHERE ").append(String.join(" AND ", conditions));
-	            }
-	
-	        } else if (isDelete) {
-	            query.append("DELETE FROM ").append(tableName);
-	            if (!conditions.isEmpty()) {
-	                query.append(" WHERE ").append(String.join(" AND ", conditions));
-	            }
-	
-	        } else if (isSelect) {
-	            query.append("SELECT ");
-	            if (selectedFields.isEmpty()) {
-	                query.append("*");
-	            } else {
-	                for (String field : selectedFields) {
-	                    query.append(fieldMappings.getOrDefault(field, field)).append(", ");
-	                }
-	                query.setLength(query.length() - 2);
-	            }
-	
-	            query.append(" FROM ").append(tableName);
-	
-	            if (!joins.isEmpty()) {
-	                query.append(" ").append(String.join(" ", joins));
-	            }
-	
-	            if (!conditions.isEmpty()) {
-	                query.append(" WHERE ").append(String.join(" AND ", conditions));
-	            }
-	
-	            if (!orderByFields.isEmpty()) {
-	                query.append(" ORDER BY ").append(String.join(", ", orderByFields));
-	            }
-	
-	            if (limit != null) {
-	                query.append(" LIMIT ").append(limit);
-	            }
-	            
-	            if (offset != null) {
-	                query.append(" OFFSET ").append(offset);
-	            }
-	            
-	            if (forUpdate) {
-	                query.append(" FOR UPDATE");
-	            }
-	        }
-	
-	        return new QueryResult(query.toString(), parameters);
-	    } catch(IllegalAccessException e) {
-	    	throw new CustomException("Error occured while building the query", e);
-	    }
+        try {
+            StringBuilder query = new StringBuilder();
+           
+            if (isInsert) {
+            	parameters.clear();
+                query.append("INSERT INTO ").append(tableName).append(" (");
+                StringBuilder valuesPlaceholder = new StringBuilder("VALUES (");
+
+                for (Field field : entity.getClass().getDeclaredFields()) {
+                    field.setAccessible(true);
+                    String columnName = fieldMappings.get(field.getName());
+                    Object value = field.get(entity);
+
+                    if (columnName != null) {
+                        query.append(columnName).append(", ");
+                        valuesPlaceholder.append("?, ");
+                        parameters.add(value);
+                    }
+                }
+
+                // Remove trailing comma
+                query.setLength(query.length() - 2);
+                valuesPlaceholder.setLength(valuesPlaceholder.length() - 2);
+                query.append(") ").append(valuesPlaceholder).append(")");
+
+            } else if (isUpdate) {
+                query.append("UPDATE ").append(tableName).append(" SET ");
+
+                setParameters.clear();
+                List<Object> whereParams = new ArrayList<>(parameters); // save WHERE clause params
+                parameters.clear(); // clear and collect SET values first
+
+                for (String fieldName : fieldMappings.keySet()) {
+                    Field field;
+                    try {
+                        field = entity.getClass().getDeclaredField(fieldName);
+                    } catch (NoSuchFieldException e) {
+                        continue;
+                    }
+
+                    field.setAccessible(true);
+                    Object value = field.get(entity);
+                    String columnName = fieldMappings.get(fieldName);
+                    boolean includeField = updateOnlyFields.isEmpty() || updateOnlyFields.contains(fieldName);
+
+                    if (includeField && columnName != null) {
+                        query.append(columnName).append(" = ?, ");
+                        setParameters.add(value);
+                    }
+                }
+
+                if (setParameters.isEmpty()) {
+                    throw new CustomException("No valid fields to update.");
+                }
+
+                query.setLength(query.length() - 2); // remove trailing comma
+
+                if (!conditions.isEmpty()) {
+                    query.append(" WHERE ").append(String.join(" AND ", conditions));
+                }
+
+                // Correct parameter order: SET first, then WHERE
+                parameters.addAll(setParameters);
+                parameters.addAll(whereParams);
+            } else if (isDelete) {
+                query.append("DELETE FROM ").append(tableName);
+                if (!conditions.isEmpty()) {
+                    query.append(" WHERE ").append(String.join(" AND ", conditions));
+                }
+
+            } else if (isSelect) {
+                query.append("SELECT ");
+                if (selectedFields.isEmpty()) {
+                    query.append("*");
+                } else {
+                    for (String field : selectedFields) {
+                        query.append(fieldMappings.getOrDefault(field, field)).append(", ");
+                    }
+                    query.setLength(query.length() - 2);
+                }
+
+                query.append(" FROM ").append(tableName);
+
+                if (!joins.isEmpty()) {
+                    query.append(" ").append(String.join(" ", joins));
+                }
+
+                if (!conditions.isEmpty()) {
+                    query.append(" WHERE ").append(String.join(" AND ", conditions));
+                }
+
+                if (!orderByFields.isEmpty()) {
+                    query.append(" ORDER BY ").append(String.join(", ", orderByFields));
+                }
+
+                if (limit != null) {
+                    query.append(" LIMIT ").append(limit);
+                }
+
+                if (offset != null) {
+                    query.append(" OFFSET ").append(offset);
+                }
+
+                if (forUpdate) {
+                    query.append(" FOR UPDATE");
+                }
+            }
+            
+            for (Object param : parameters) {
+            	System.out.println(param);
+            }
+            
+            return new QueryResult(query.toString(), parameters);
+        } catch (IllegalAccessException e) {
+            throw new CustomException("Error occurred while building the query", e);
+        }
     }
 }
 

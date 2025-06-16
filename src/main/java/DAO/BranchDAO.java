@@ -8,6 +8,7 @@ import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.Results;
 
 public class BranchDAO {
 
@@ -26,13 +27,15 @@ public class BranchDAO {
         return (Long) executor.executeQuery(query, null);
     }
 
-    public Branch getBranchById(Long branchId) throws CustomException {
+    @SuppressWarnings("unchecked")
+	public Branch getBranchById(Long branchId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
         QueryResult query = queryBuilder.select("*")
                 .where("branch_id", "=", branchId)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (Branch) executor.executeQuery(query, Branch.class);
+        List<Branch> branchList = (List<Branch>) executor.executeQuery(query, Branch.class);
+        return Results.getSingleResult(branchList);
     }
 
     public List<Branch> getBranchList(int limit, int offset) throws CustomException {
@@ -75,7 +78,7 @@ public class BranchDAO {
 
     public int updateBranch(Branch branch) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
-        QueryResult query = queryBuilder.update(branch)
+        QueryResult query = queryBuilder.update(branch, "branchName", "branchDistrict", "address")
                 .where("branch_id", "=", branch.getBranchId())
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();

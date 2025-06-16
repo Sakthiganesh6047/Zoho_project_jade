@@ -16,6 +16,7 @@ import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 import util.CustomException;
 import util.DBConnection;
+import util.DuplicateEntryUtil;
 
 public class QueryExecutor {
 	
@@ -73,15 +74,8 @@ public class QueryExecutor {
             
         } catch (SQLIntegrityConstraintViolationException e) {
             String msg = e.getMessage();
-
-            if (msg.contains("User.phone")) {
-                throw new CustomException("Phone number already exists.");
-            } else if (msg.contains("User.email")) {
-                throw new CustomException("Email already exists.");
-            } else {
-                throw new CustomException("Duplicate entry error.", e); // fallback
-            }
-
+            DuplicateEntryUtil.handleDuplicateEntryExceptions(msg);
+            throw new CustomException("Duplicate entry error.", e); // fallback
         } catch (Exception e) {
         	e.printStackTrace();
             throw new CustomException(e.getMessage());
@@ -127,19 +121,8 @@ public class QueryExecutor {
 
         } catch (SQLIntegrityConstraintViolationException e) {
             String msg = e.getMessage();
-
-            if (msg.contains("User.phone")) {
-                throw new CustomException("Phone number already exists.");
-            } else if (msg.contains("User.email")) {
-                throw new CustomException("Email already exists.");
-            } else if (msg.contains("Customer.aadharNumber")) {
-            	throw new CustomException("Aadhar already exists");
-            } else if(msg.contains("Customer.panId")) {
-            	throw new CustomException("PanId already exists");
-            } else {
-                throw new CustomException("Duplicate entry error."); // fallback
-            }
-
+            DuplicateEntryUtil.handleDuplicateEntryExceptions(msg);
+            throw new CustomException("Duplicate entry error.", e); // fallback
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        throw new CustomException(e.getMessage());
@@ -175,15 +158,8 @@ public class QueryExecutor {
             
         } catch (SQLIntegrityConstraintViolationException e) {
             String msg = e.getMessage();
-
-            if (msg.contains("User.phone")) {
-                throw new CustomException("Phone number already exists.");
-            } else if (msg.contains("User.email")) {
-                throw new CustomException("Email already exists.");
-            } else {
-                throw new CustomException("Duplicate entry error."); // fallback
-            }
-
+            DuplicateEntryUtil.handleDuplicateEntryExceptions(msg);
+            throw new CustomException("Duplicate entry error.", e); // fallback
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        throw new CustomException(e.getMessage());
