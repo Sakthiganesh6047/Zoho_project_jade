@@ -23,18 +23,18 @@ import pojos.Employee;
 
 public class AuthorizeUtil {
 
-	public static Employee getEmployeeDetails(long employeeId) throws CustomException {
+	public static Employee getEmployeeDetails(Long employeeId) throws CustomException {
     	EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();
     	return employeeDAO.getEmployeeById(employeeId);
     }
 	
-	public static Account getAccountDetails(long accountId) throws CustomException {
+	public static Account getAccountDetails(Long accountId) throws CustomException {
 		AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
 		return accountDAO.getAccountById(accountId);
 	}
 	
-	public static boolean isSameBranch(long userId, long accountId) throws CustomException {
-		Employee employee = getEmployeeDetails(userId);
+	public static boolean isSameBranch(Long staffId, long accountId) throws CustomException {
+		Employee employee = getEmployeeDetails(staffId);
 		Account account1 = getAccountDetails(accountId);
 		if (!(employee.getBranch() == account1.getBranchId())) {
 			return false;
@@ -42,7 +42,7 @@ public class AuthorizeUtil {
 		return true;
 	}
 	
-	public static boolean isAuthorizedOwner(long customerId, long accountId) throws CustomException {
+	public static boolean isAuthorizedOwner(Long customerId, Long accountId) throws CustomException {
 		AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
 	    List<Account> accounts = accountDAO.getAccNosByCustomerId(customerId);
 	    for (Account account : accounts) {

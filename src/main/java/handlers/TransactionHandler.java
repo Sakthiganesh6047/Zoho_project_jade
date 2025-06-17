@@ -1,5 +1,6 @@
 package handlers;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
@@ -7,6 +8,7 @@ import java.util.Map;
 import DAO.AccountDAO;
 import DAO.BeneficiaryDAO;
 import DAO.TransactionDAO;
+import DAO.UserDAO;
 import annotations.FromBody;
 import annotations.FromPath;
 import annotations.FromQuery;
@@ -17,9 +19,11 @@ import pojos.Beneficiary;
 import pojos.Employee;
 import pojos.Transaction;
 import pojos.TransferWrapper;
+import pojos.User;
 import util.AuthorizeUtil;
 import util.CustomException;
 import util.DBConnection;
+import util.Password;
 import util.Results;
 import util.ValidationsUtil;
 
@@ -123,11 +127,18 @@ public class TransactionHandler {
     
     @Route(path = "transaction/transfer", method = "POST")
     public String newTransfer(@FromBody TransferWrapper transferWrapper, @FromSession("userId") long userId, 
-    					@FromSession("role") int userRole) throws CustomException {
+    					@FromSession("role") Integer userRole) throws CustomException {
     	
     	ValidationsUtil.isNull(userId, "UserId");
     	ValidationsUtil.isNull(userRole, "User Role");
     	ValidationsUtil.checkUserRole(userRole);
+    	
+    	User inputUser = transferWrapper.getUser();
+    	UserDAO userDAO = UserDAO.getUserDAOInstance();
+    	User fetchedUser = userDAO.getUserPassword(userId);
+    	if (!Password.verifyPassword(inputUser.getPasswordHash(), fetchedUser.getPasswordHash())) {
+    		throw new CustomException("Password Wrong, Transaction Aborted");
+    	}
     	
     	Connection connection = null;
 
@@ -183,9 +194,9 @@ public class TransactionHandler {
         }
     }
     
-    private void handleCredit(Transaction transaction, long userId, int userRole, Connection connection) throws CustomException {
+    private void handleCredit(Transaction transaction, Long userId, Integer userRole, Connection connection) throws CustomException {
     	Account account = null;
-    	double amount = 0;
+    	BigDecimal amount = null;
     	try {
     		
 	        long accountId = transaction.getAccountId();
@@ -197,7 +208,7 @@ public class TransactionHandler {
 	        	throw new CustomException("Account not found.");
 	        }
 	
-	        double newBalance = account.getBalance() + amount;
+	        BigDecimal newBalance = account.getBalance().add(amount);;
 	        updateBalance(account, newBalance, userId, accountDAO, connection);
 	
 	        transaction.setCreatedBy(userId);
@@ -214,7 +225,7 @@ public class TransactionHandler {
     }
     
     private void handleDebit(Transaction transaction, long userId, int userRole, Connection connection) throws CustomException {
-	    double amount = 0;
+    	BigDecimal amount = null;
 	    Account account = null;
     	
     	try {
@@ -227,12 +238,9 @@ public class TransactionHandler {
 	        	throw new CustomException("Account not found.");
 	        }
 	
-	        if (account.getBalance() < amount) {
-	        	//addFailedStatement(account, amount, userId, 2, "insufficient balance", connection);
-	            throw new CustomException("Insufficient balance.");
-	        }
+	        isSufficientBalance(account.getBalance(), amount);
 	
-	        double newBalance = account.getBalance() - amount;
+	        BigDecimal newBalance = account.getBalance().subtract(amount);
 	        updateBalance(account, newBalance, userId, accountDAO, connection);
 	
 	        transaction.setCreatedBy(userId);
@@ -245,11 +253,11 @@ public class TransactionHandler {
     	}
     }
     
-    private void handleTransferInside(Transaction transaction, Beneficiary beneficiary, long userId, int role, Connection connection) throws CustomException {
+    private void handleTransferInside(Transaction transaction, Beneficiary beneficiary, Long userId, Integer role, Connection connection) throws CustomException {
     	
     	long toAccountId = 0;
     	Account fromAccount = null;
-    	double amount = 0;
+    	BigDecimal amount = null;
     	
     	try {
     	
@@ -268,8 +276,8 @@ public class TransactionHandler {
 	
 	        isSufficientBalance(fromAccount.getBalance(), amount);
 	        
-	        double fromAccBalance = fromAccount.getBalance() - amount;
-	        double toAccBalance = toAccount.getBalance() + amount;
+	        BigDecimal fromAccBalance = fromAccount.getBalance().subtract(amount);
+	        BigDecimal toAccBalance = toAccount.getBalance().subtract(amount);
 	
 	        // Update balances
 	        updateBalance(fromAccount, fromAccBalance, userId, accountDAO, connection);
@@ -310,18 +318,21 @@ public class TransactionHandler {
 	    }
     }
     
-    private void handleTransferOutside(Transaction transaction, Beneficiary beneficiary, long userId, int userRole, Connection connection) {
+    private void handleTransferOutside(Transaction transaction, Beneficiary beneficiary, long userId, int userRole, Connection connection) throws CustomException {
+    	
+    	Account account = null;
+    	BigDecimal amount = null;
     	
     	try {
 	    	long accountId = transaction.getAccountId();
-	        Double amount = transaction.getAmount();
+	    	amount = transaction.getAmount();
 	        BeneficiaryDAO beneficiaryDAO = BeneficiaryDAO.getBeneficiaryDAOInstance();
 	        
 	        AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
-	        Account account = accountDAO.getAccountForUpdate(accountId, connection);
+	        account = accountDAO.getAccountForUpdate(accountId, connection);
 	        
 	        isSufficientBalance(account.getBalance(), amount); 
-	        double newBalance = 0;
+	        BigDecimal newBalance = null;
     	
     		switch(userRole) {
 	    		case 0:
@@ -334,7 +345,7 @@ public class TransactionHandler {
 	    	        	throw new CustomException("Unauthorized Access, please check your account number");
 	    	        }
 	    	        
-	    	        newBalance = account.getBalance() - amount;
+	    	        newBalance = account.getBalance().subtract(amount);
 	    	        updateBalance(account, newBalance, userId, accountDAO, connection);
 	    	        break;
 	    	
@@ -349,7 +360,7 @@ public class TransactionHandler {
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 	    			long beneficiaryId = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
-	    			newBalance = account.getBalance() - amount;
+	    			newBalance = account.getBalance().subtract(amount);
 	    			transaction.setTransferReference(beneficiaryId);
 	    			break;
 	    			
@@ -357,7 +368,7 @@ public class TransactionHandler {
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 	    			long beneficiaryId1 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
-	    			newBalance = account.getBalance() - amount;
+	    			newBalance = account.getBalance().subtract(amount);
 	    			transaction.setTransferReference(beneficiaryId1);
 	    			break;
 	    	}
@@ -368,19 +379,17 @@ public class TransactionHandler {
 	        transactionDAO.createTransaction(transaction, connection);
     		
 	    } catch (CustomException e) {
-	    	
+	    	addFailedStatement(account, amount, userId, 2, e.getLocalizedMessage(), connection);
 	    }
-    		
     }
     
-    private void isSufficientBalance(double balance, double amount) throws CustomException {
-    	if (balance < amount) {
-        	//addFailedStatement(account, amount, userId, 2, "insufficient balance", connection);
+    private void isSufficientBalance(BigDecimal balance, BigDecimal amount) throws CustomException {
+        if (balance == null || amount == null || balance.compareTo(amount) < 0) {
             throw new CustomException("Insufficient balance.");
         }
     }
 
-    private void updateBalance(Account account, double amount, long userId, AccountDAO accountDAO, Connection connection) throws CustomException {
+    private void updateBalance(Account account, BigDecimal amount, Long userId, AccountDAO accountDAO, Connection connection) throws CustomException {
     	try {
 	    	account.setBalance(amount);
 	    	account.setModifiedBy(userId);
@@ -391,7 +400,7 @@ public class TransactionHandler {
     	}
     }
     
-    private void addFailedStatement(Account account, double amount, long userId, int type, String description, Connection connection) throws CustomException {
+    private void addFailedStatement(Account account, BigDecimal amount, Long userId, Integer type, String description, Connection connection) throws CustomException {
     	try {
 	    	Transaction transaction = new Transaction();
 	    	transaction.setAccountId(account.getAccountId());
@@ -408,7 +417,7 @@ public class TransactionHandler {
     	}
     }
     
-    private void addFailedStatement(Account account, double amount, long userId, int type, long transferId, String description, Connection connection) throws CustomException {
+    private void addFailedStatement(Account account, BigDecimal amount, Long userId, Integer type, Long transferId, String description, Connection connection) throws CustomException {
     	try {
 	    	Transaction transaction = new Transaction();
 	    	transaction.setAccountId(account.getAccountId());

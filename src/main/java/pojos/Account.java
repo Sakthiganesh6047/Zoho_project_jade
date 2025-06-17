@@ -1,11 +1,13 @@
 package pojos;
 
+import java.math.BigDecimal;
+
 public class Account {
     private Long accountId;
     private Long customerId;
     private Long branchId;
     private Integer accountType;
-    private Double balance;
+    private BigDecimal balance;
     private Integer accountStatus;
     private Long createdBy;
     private Long createdAt;
@@ -45,11 +47,11 @@ public class Account {
         this.accountType = accountType;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void setBalance(Double balance) {
+    public void setBalance(BigDecimal balance) {
         this.balance = balance;
     }
 

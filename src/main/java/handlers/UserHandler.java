@@ -8,12 +8,14 @@ import DAO.CustomerDAO;
 import DAO.EmployeeDAO;
 import DAO.UserDAO;
 import annotations.FromBody;
+import annotations.FromQuery;
 import annotations.FromSession;
 import annotations.Route;
 import pojos.Customer;
 import pojos.Employee;
 import pojos.User;
 import pojos.UserProfile;
+import util.AuthorizeUtil;
 import util.CustomException;
 import util.DBConnection;
 import util.Password;
@@ -222,9 +224,11 @@ public class UserHandler {
                 CustomerDAO customerDAO = CustomerDAO.getCustomerDAOInstance();
                 customerDAO.updateCustomer(customer, connection);
 
-            } else if (user.getUserType() == 2 || user.getUserType() == 3) { // Clerk / Manager / GM
+            } else if (user.getUserType() == 2) { // Clerk / Manager / GM
                 Employee employee = profile.getEmployeeDetails();
-                if (employee == null) throw new CustomException("Employee details missing.");
+                if (employee == null) {
+                	throw new CustomException("Employee details missing.");
+                }
                 employee.setEmployeeId(user.getUserId());
 
                 // Optional: validate update authority for roles
@@ -283,6 +287,20 @@ public class UserHandler {
         return Results.respondJson(profile);
     }
     
+    @Route(path = "user/phone", method = "POST")
+    public String getUserByPhone(@FromBody User user) throws CustomException {
+    	
+    	String phone = user.getPhone();
+    	ValidationsUtil.isNull(phone, "Phone Number");
+    	ValidationsUtil.isEmpty(phone, "Phone Number");
+    	
+    	User fetchedUser = userDAO.getUserByPhone(phone);
+    	if (fetchedUser.getUserType() == 2) {
+    		throw new CustomException("Invalid User Type, check Phone Number");
+    	}
+    	return Results.respondJson(fetchedUser);
+    }
+    
     @Route(path = "user/id", method = "POST")
     public String getUserProfileById(@FromBody User user) throws CustomException {
     	
@@ -306,6 +324,22 @@ public class UserHandler {
                 break;
         }
         return Results.respondJson(profile);
+    }
+    
+    @Route(path = "user/employeelist", method = "GET")
+    public String getEmployeeProfiles(@FromSession("userId") Long userId, @FromSession("role") Integer role,
+    								@FromQuery("limit") int limit, @FromQuery("offset") int offset) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+    	
+    	if(role == 2) {
+    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+    		return Results.respondJson(userDAO.getAllEmployeeDetails(employee.getBranch(), limit, offset));
+    	} else {
+    		return Results.respondJson(userDAO.getAllEmployeeDetails(limit, offset));
+    	}
     }
 
     @Route(path = "user/delete", method = "POST")

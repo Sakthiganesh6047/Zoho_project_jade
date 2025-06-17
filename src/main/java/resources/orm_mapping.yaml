@@ -43,6 +43,16 @@ Employee:
     role: role
     branch: branch
 
+EmployeeProfile:
+  table: User u
+  fields:
+    employeeId: employee_id
+    employeeName: employee_name
+    employeeEmail: employee_email
+    employeeRole: employee_role
+    employeeBranch: employee_branch
+    employeeBranchName: employee_branch_name
+
 Account:
   table: Account
   fields:

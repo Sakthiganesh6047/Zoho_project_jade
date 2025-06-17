@@ -56,6 +56,16 @@ public class BranchDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Branch.class));
     }
+    
+    public List<Branch> getAllBranches(Long branchId) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
+        QueryResult query = queryBuilder.select("branchId", "branchName", "branchDistrict")
+        								.where("branchId", "=", branchId)
+        								.orderBy("branchDistrict", "ASC")
+        								.build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return castResult(executor.executeQuery(query, Branch.class));
+    }
 
     public Branch getBranchByIfsc(String ifsc) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);

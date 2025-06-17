@@ -7,111 +7,89 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Roboto Flex', sans-serif;
+            font-family: "Roboto Flex", sans-serif;
             background-color: #f9f9f9;
             margin: 0;
+            padding: 0;
         }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 0px 40px;
-        }
+
         .main-wrapper {
-            display: flex;
-            justify-content: center;
-            height: 86.3vh;
-            flex-direction: column;
-            align-items: center;
+            padding: 20px;
         }
+
         .container-wrapper {
-            display: flex;
-            height: min-content;
+            max-width: 900px;
+            margin: auto;
+            background: #fff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
         .signuppage-container {
             display: flex;
-            flex-direction: row;
-            align-items: flex-end;
-            justify-content: center;
-            border-radius: 10px;
-            box-shadow: 0px 0px 6px 0px #373962;
+            gap: 20px;
         }
+
         .clipart-container {
-            display: flex;
-        }
-        .signup-clipart {
-            height: 840px;
-            width: 600px;
-        }
-        label {
-            font-weight: 600;
-            color: #555;
-            margin-bottom: 5px;
-            display: block;
-        }
-        label .required {
-            color: red;
-            font-size: 1.2rem;
-            margin-left: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="password"], select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #bbb;
-            border-radius: 8px;
-            font-size: 1rem;
-            box-sizing: border-box;
-        }
-        input:focus, select:focus {
-            border-color: #007BFF;
-            outline: none;
-        }
-        .gender-container {
+            flex: 1;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+        }
+
+        .signup-clipart {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .form-container {
+            flex: 1;
+        }
+
+        .field-container {
             margin-bottom: 15px;
         }
-        .proof-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
+
+        .field-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
-        .password-container {
-            display: flex;
-            justify-content: space-between;
-        }
-        button {
-            background: #373962;
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            cursor: pointer;
+
+        .field-container input,
+        .field-container select {
             width: 100%;
-            font-size: 1rem;
-            transition: transform 0.2s;
-            font-weight: bold;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        button:hover {
-            transform: translateY(-3px);
-        }
-        h3 {
-            color: #373962;
-            margin: 0;
-            font-size: 20px;
-        }
-        .signup-form {
-            max-width: 420px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+
         .required {
             color: red;
-            margin-left: 2px;
+        }
+
+        .gender-container,
+        .proof-container,
+        .password-container {
+            margin-bottom: 15px;
+        }
+
+        .gender-container label {
+            margin-right: 15px;
+        }
+
+        .btn {
+            background-color: #1976d2;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #155a9c;
         }
     </style>
 </head>
@@ -125,8 +103,10 @@
                 <img src="contents/signup_page.png" alt="Sign-Up Page Image" class="signup-clipart">
             </div>
             <div class="form-container">
-                <h3>New Employee Creation</h3><br>
+                <h3 id="form-title">New Employee Creation</h3><br>
                 <form id="signup-form" class="signup-form">
+                    <input type="hidden" name="user.userId" id="userId">
+
                     <div class="field-container">
                         <label>Full Name:<span class="required">*</span></label>
                         <input type="text" name="user.fullName" maxlength="50" required>
@@ -137,11 +117,11 @@
                     </div>
                     <div class="gender-container">
                         <label>Gender:<span class="required">*</span></label>
-                        <input type="radio" id="male" name="user.gender" value="Male"><label for="male">Male</label>
-                        <input type="radio" id="female" name="user.gender" value="Female"><label for="female">Female</label>
-                        <input type="radio" id="other" name="user.gender" value="Others"><label for="other">Others</label>
+                        <input type="radio" id="male" name="user.gender" value="male"><label for="male">Male</label>
+                        <input type="radio" id="female" name="user.gender" value="female"><label for="female">Female</label>
+                        <input type="radio" id="other" name="user.gender" value="others"><label for="other">Others</label>
                     </div>
-                    <div>
+                    <div class="field-container">
                         <label for="dob">Date of Birth:<span class="required">*</span></label>
                         <input type="date" id="dob" name="user.dob" required>
                     </div>
@@ -154,9 +134,9 @@
                             <label for="role">Role<span class="required">*</span></label>
                             <select id="role" name="employeeDetails.role" required>
                                 <option value="">-- Select Role --</option>
-                                <option value="1">Employee</option>
+                                <option value="1">Clerk</option>
                                 <option value="2">Manager</option>
-                                <option value="3">Admin</option>
+                                <option value="3">General Manager</option>
                             </select>
                         </div>
                         <div class="field-container">
@@ -167,7 +147,7 @@
                         </div>
                     </div>
                     <div class="password-container">
-                        <div class="field-container" style= "padding-right: 10px">
+                        <div class="field-container" style="padding-right: 10px">
                             <label>Password:<span class="required">*</span></label>
                             <input type="password" name="user.passwordHash" maxlength="50" required>
                         </div>
@@ -177,7 +157,7 @@
                         </div>
                     </div><br>
                     <div>
-                        <button type="submit" class="btn">Register</button>
+                        <button type="submit" class="btn" id="form-submit-btn">Register</button>
                     </div>
                     <br>
                 </form>
@@ -189,79 +169,141 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  // Fetch branch list and populate select box
-  fetch("${pageContext.request.contextPath}/jadebank/branch/list")
-	  .then(response => response.json())
-	  .then(data => {
-	    const branchSelect = document.getElementById("branchId");
-	    branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
-	
-	    data.forEach(branchData => {
-	      const option = document.createElement("option");
-	      option.value = branchData.branchId;
-	      option.textContent = (branchData.branchName ?? "Unnamed") + " - " + (branchData.branchDistrict ?? "Unknown");
-	      branchSelect.appendChild(option);
-	    });
-	  })
-	  .catch(error => {
-	    console.error("Error fetching branch list:", error);
-	  });
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeId = urlParams.get("employeeId");
+    console.log(employeeId);
 
-  // Form submit
-  document.getElementById("signup-form").addEventListener("submit", function (e) {
-    e.preventDefault();
+    // Load branch list
+    fetch("${pageContext.request.contextPath}/jadebank/branch/list")
+        .then(response => response.json())
+        .then(data => {
+            const branchSelect = document.getElementById("branchId");
+            branchSelect.innerHTML = '<option value="">-- Select Branch --</option>';
+            data.forEach(branchData => {
+                const option = document.createElement("option");
+                option.value = branchData.branchId;
+                option.textContent = (branchData.branchName ?? "Unnamed") + " - " + (branchData.branchDistrict ?? "Unknown");
+                branchSelect.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error("Error fetching branch list:", error);
+        });
 
-    const password = document.querySelector('input[name="user.passwordHash"]').value;
-    const confirmPassword = document.querySelector('input[name="confirmPassword"]').value;
-    if (password !== confirmPassword) {
-      document.getElementById("signup-error").textContent = "Passwords do not match.";
-      return;
+    // Edit mode: populate form
+    if (employeeId) {
+        document.getElementById("form-title").textContent = "Edit Employee";
+        document.getElementById("form-submit-btn").textContent = "Update";
+
+        fetch(`${pageContext.request.contextPath}/jadebank/user/id`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+				userId: employeeId
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+            	const user = data.user;
+            	const emp = data.employeeDetails;
+
+            	document.getElementById("userId").value = user.userId || "";
+            	document.querySelector('input[name="user.fullName"]').value = user.fullName || "";
+            	document.querySelector('input[name="user.email"]').value = user.email || "";
+            	document.querySelector('input[name="user.phone"]').value = user.phone || "";
+            	document.querySelector('input[name="user.dob"]').value = user.dob || "";
+
+            	const gender = (data.user.gender || "").toLowerCase();
+            	const genderInputs = document.querySelectorAll('input[name="user.gender"]');
+
+            	let found = false;
+            	genderInputs.forEach(input => {
+            	    if (input.value.toLowerCase() === gender) {
+            	        input.checked = true;
+            	        found = true;
+            	    }
+            	});
+
+            	if (!found) {
+            	    console.warn("No matching gender input found for:", gender);
+            	}
+
+            	document.querySelector('select[name="employeeDetails.role"]').value = emp.role || "";
+            	document.querySelector('select[name="employeeDetails.branchId"]').value = emp.branch || "";
+
+
+                // Hide password section in edit mode
+                document.querySelectorAll('.password-container').forEach(el => el.style.display = "none");
+            })
+            .catch(err => {
+                console.error("Failed to fetch employee data:", err);
+                document.getElementById("signup-error").textContent = "Failed to load employee data.";
+            });
     }
 
-    const gender = document.querySelector('input[name="user.gender"]:checked')?.value;
-    if (!gender) {
-      document.getElementById("signup-error").textContent = "Please select a gender.";
-      return;
-    }
+    // Submit handler
+    document.getElementById("signup-form").addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    const data = {
-      user: {
-        fullName: document.querySelector('input[name="user.fullName"]').value,
-        email: document.querySelector('input[name="user.email"]').value,
-        phone: document.querySelector('input[name="user.phone"]').value,
-        dob: document.querySelector('input[name="user.dob"]').value,
-        userType: 2,
-        gender: gender,
-        passwordHash: password
-      },
-      employeeDetails: {
-        role: document.querySelector('select[name="employeeDetails.role"]').value,
-        branch: document.querySelector('select[name="employeeDetails.branchId"]').value
-      }
-    };
+        const gender = document.querySelector('input[name="user.gender"]:checked')?.value;
+        if (!gender) {
+            document.getElementById("signup-error").textContent = "Please select a gender.";
+            return;
+        }
 
-    fetch("${pageContext.request.contextPath}/jadebank/user/new", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    })
-      .then(async response => {
-		  if (response.ok) {
-		    document.getElementById("signup-error").style.color = "green";
-		    document.getElementById("signup-error").textContent = "Employee created successfully.";
-		
-		    // Clear the form
-		    document.getElementById("signup-form").reset(); // Replace with your form's ID
-		  } else {
-		    const errorData = await response.json();
-		    document.getElementById("signup-error").style.color = "red";
-		    document.getElementById("signup-error").textContent = errorData.error || "Signup failed.";
-		  }
-		})
-      .catch(err => {
-        document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
-      });
-  });
+        const password = document.querySelector('input[name="user.passwordHash"]')?.value;
+        const confirmPassword = document.querySelector('input[name="confirmPassword"]')?.value;
+        if (!employeeId && password !== confirmPassword) {
+            document.getElementById("signup-error").textContent = "Passwords do not match.";
+            return;
+        }
+
+        const data = {
+            user: {
+                userId: employeeId,
+                fullName: document.querySelector('input[name="user.fullName"]').value,
+                email: document.querySelector('input[name="user.email"]').value,
+                phone: document.querySelector('input[name="user.phone"]').value,
+                dob: document.querySelector('input[name="user.dob"]').value,
+                userType: 2,
+                gender: gender,
+                passwordHash: password
+            },
+            employeeDetails: {
+                role: document.querySelector('select[name="employeeDetails.role"]').value,
+                branch: document.querySelector('select[name="employeeDetails.branchId"]').value
+            }
+        };
+
+        const isEdit = !!employeeId;
+        const endpoint = isEdit ? "update" : "new";
+
+        fetch(`${pageContext.request.contextPath}/jadebank/user/${endpoint}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+        .then(async response => {
+            if (response.ok) {
+                document.getElementById("signup-error").style.color = "green";
+                document.getElementById("signup-error").textContent = isEdit
+                    ? "Employee updated successfully."
+                    : "Employee created successfully.";
+                if (!isEdit) {
+                    document.getElementById("signup-form").reset();
+                }
+            } else {
+                const errorData = await response.json();
+                document.getElementById("signup-error").style.color = "red";
+                document.getElementById("signup-error").textContent = errorData.error || "Operation failed.";
+            }
+        })
+        .catch(err => {
+            document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
+        });
+    });
 });
 </script>
 

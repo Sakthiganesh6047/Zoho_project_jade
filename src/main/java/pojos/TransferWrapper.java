@@ -4,6 +4,7 @@ public class TransferWrapper {
 
 	private Transaction transaction;
 	private Beneficiary beneficiary;
+	private User user;
 	
 	//constructors
 	
@@ -29,5 +30,13 @@ public class TransferWrapper {
 
 	public void setBeneficiary(Beneficiary beneficiary) {
 		this.beneficiary = beneficiary;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public void setUser(User user) {
+		this.user=user;
 	}
 }

@@ -1,11 +1,13 @@
 package pojos;
 
+import java.math.BigDecimal;
+
 public class Transaction {
     private Long transactionId;
     private Long accountId;
     private Long customerId;
-    private Double amount;
-    private Double closingBalance;
+    private BigDecimal amount;
+    private BigDecimal closingBalance;
     private Integer transactionType;
     private Long transactionDate;
     private String description;
@@ -38,19 +40,19 @@ public class Transaction {
         this.customerId = customerId;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
-    public Double getClosingBalance() {
+    public BigDecimal getClosingBalance() {
         return closingBalance;
     }
 
-    public void setClosingBalance(Double closingBalance) {
+    public void setClosingBalance(BigDecimal closingBalance) {
         this.closingBalance = closingBalance;
     }
 

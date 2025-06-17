@@ -2,12 +2,15 @@
 
 import java.sql.Connection;
 import java.util.List;
+
+import pojos.EmployeeProfile;
 import pojos.User;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
 import util.Results;
+import util.ValidationsUtil;
 
 public class UserDAO {
 	
@@ -88,9 +91,26 @@ public class UserDAO {
         }
     }
     
+    public User getUserByPhone(String phone) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(User.class);
+    	QueryResult getQuery = queryBuilder.select("userId", "fullName", "email", "userType", "status")
+                							.where("phone", "LIKE", phone)
+                							.build();
+    	System.out.println("Select Query: " + getQuery);
+    	QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+    	@SuppressWarnings("unchecked")
+		List<User> resultList = (List<User>) executor.executeQuery(getQuery, User.class);
+        User user = Results.getSingleResult(resultList);
+        if (user != null) {
+        	return user;
+        } else {
+        	throw new CustomException("No users found for this Phone Number");
+        }
+    }
+    
     public User getUserById(Long userId) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(User.class);
-        QueryResult getQuery = queryBuilder.select("user_id", "fullName", "email", "userType", "status", "passwordHash")
+        QueryResult getQuery = queryBuilder.select("user_id", "fullName", "email", "userType", "status", "dob", "phone", "gender")
                          .where("user_id", "=", userId)
                          .build();
         System.out.println("Select Query: " + getQuery);
@@ -122,21 +142,69 @@ public class UserDAO {
         }
     }
     
-    public QueryResult getAllEmployeeDetails() throws CustomException {
-        QueryBuilder employeeQB = new QueryBuilder(Employee.class);
-        
-        employeeQB
-            .select(
-                "name AS employee_name",
-                "email AS employee_email",
-                "role AS employee_role",
-                "branchId AS employee_branch"
-            )
-            .join("INNER", "user u", "u.user_id = employee.employee_id");
-
-        return employeeQB.build();
+    public User getUserPassword(Long userId) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(User.class);
+        QueryResult getQuery = queryBuilder.select("user_id", "passwordHash")
+                         .where("user_id", "=", userId)
+                         .build();
+        System.out.println("Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        @SuppressWarnings("unchecked")
+		List<User> resultList = (List<User>) executor.executeQuery(getQuery, User.class);
+        User user = Results.getSingleResult(resultList);
+        if (user != null) {
+        	return user;
+        } else {
+        	throw new CustomException("No users found for this userId");
+        }
     }
-
+    
+    @SuppressWarnings("unchecked")
+	public List<EmployeeProfile> getAllEmployeeDetails(int limit, int offset) throws CustomException {
+    	
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+    	
+        QueryBuilder queryBuilder = new QueryBuilder(EmployeeProfile.class);
+        QueryResult getQuery = queryBuilder.select( "u.user_id AS employee_id",
+                									"u.full_name AS employee_name",
+                									"u.email AS employee_email",
+                									"e.role AS employee_role",
+                									"e.branch AS employee_branch",
+                									"b.branch_name AS employee_branch_name")
+        											.join("INNER", "Employee e", "u.user_id = e.employee_id")
+        											.join("INNER", "Branch b", "e.branch = b.branch_id")
+        											.limit(limit)
+        											.offset(offset)
+        											.orderBy("employee_id", "ASC")
+        											.build();
+        System.out.println("Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (List<EmployeeProfile>) executor.executeQuery(getQuery, EmployeeProfile.class);
+    }
+    
+    @SuppressWarnings("unchecked")
+	public List<EmployeeProfile> getAllEmployeeDetails(Long branchId, int limit, int offset) throws CustomException {
+    	
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+    	
+        QueryBuilder queryBuilder = new QueryBuilder(EmployeeProfile.class);
+        QueryResult getQuery = queryBuilder.select( "u.user_id AS employee_id",
+        											"u.full_name AS employee_name",
+                									"u.email AS employee_email",
+                									"e.role AS employee_role",
+                									"e.branch_id AS employee_branch",
+        											"b.branch_name AS employee_branch_name")
+        											.join("INNER", "Employee e", "u.user_id = e.employee_id")
+        											.join("INNER", "Branch b", "e.branch_id = b.branch_id")
+        											.where("e.branch_id", "=", branchId)
+        											.limit(limit)
+        											.offset(offset)
+        											.orderBy("employee_id", "ASC")
+        											.build();
+        System.out.println("Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (List<EmployeeProfile>) executor.executeQuery(getQuery, EmployeeProfile.class);
+    }
 
     @SuppressWarnings("unchecked")
 	public List<User> getAllUsers(int limit, int offset) throws CustomException {

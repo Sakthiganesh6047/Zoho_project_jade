@@ -82,18 +82,29 @@
             <a href="AddCustomer.jsp" class="btn">Add Customer</a>
             <a href="OpenAccount.jsp" class="btn">Open Account</a>
             <a href="SearchCustomer.jsp" class="btn">View Customer Details</a>
+            <a href="OpenAccount.jsp" class="btn">Open New Account</a>
+            <a href="AccountsList.jsp" class="btn">Branch Accounts List</a>
 
         <%-- Manager --%>
         <% } else if (role == 2) { %>
+        	<a href="ViewEmployees.jsp" class="btn">View Employees</a>
             <a href="ApproveAccounts.jsp" class="btn">Approve Accounts</a>
             <a href="EmployeePerformance.jsp" class="btn">Employee Performance</a>
             <a href="BranchOverview.jsp" class="btn">Branch Overview</a>
+            <a href="EmployeeSignUp.jsp" class="btn">Add Employee</a>
+            <a href="OpenAccount.jsp" class="btn">Open New Account</a>
+            <a href="AccountsList.jsp" class="btn">Branch Accounts List</a>
 
         <%-- Admin / GM --%>
         <% } else if (role == 3) { %>
             <a href="EmployeeSignUp.jsp" class="btn">Add Employee</a>
+            <a href="ViewEmployees.jsp" class="btn">View Employees</a>
             <a href="ManageBranches.jsp" class="btn">Manage Branches</a>
             <a href="AddNewBranch.jsp" class="btn">Add New Branch</a>
+            <a href="CustomerSignUp.jsp" class="btn">Add New Customer</a>
+            <a href="OpenAccount.jsp" class="btn">Open New Account</a>
+            <a href="AccountsList.jsp" class="btn">Branch Accounts List</a>
+            <a href="Credit.jsp" class="btn">Credit</a>
         <% } %>
     </div>
 </div>

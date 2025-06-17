@@ -3,11 +3,14 @@ package handlers;
 import java.time.Instant;
 import java.util.Map;
 import DAO.AccountDAO;
+import DAO.UserDAO;
 import annotations.FromBody;
+import annotations.FromPath;
 import annotations.FromQuery;
 import annotations.FromSession;
 import annotations.Route;
 import pojos.Account;
+import pojos.AccountProfile;
 import pojos.Employee;
 import pojos.User;
 import util.AuthorizeUtil;
@@ -40,12 +43,12 @@ public class AccountHandler {
     		account.setAccountStatus(1);
     	}
     	long accountId = accountDAO.createAccount(account);
-    	return Results.respondJson(Map.of("Status", "Created", "Account Id", accountId));
+    	return Results.respondJson(Map.of("Account Id", accountId));
     }
     
     @Route(path = "account/id", method = "GET")
     public String getCustomerAccounts(@FromBody User user, @FromSession("userId") Long sessionId, 
-    									@FromSession("role") Integer role) throws CustomException {
+    								@FromSession("role") Integer role) throws CustomException {
     	
     	ValidationsUtil.isNull(user.getUserId(), "CustomerId");;
     	ValidationsUtil.isNull(sessionId, "UserId");
@@ -59,22 +62,25 @@ public class AccountHandler {
     	}
     }
     
-    @Route(path = "accounts/list", method = "GET")
-    public String getAccountsList(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+    @Route(path = "accounts/list/{branchId}", method = "GET")
+    public String getAccountsList(@FromPath("branchId") Long branchId, @FromQuery("limit") int limit, 
+    							@FromQuery("offset") int offset, @FromSession("userId") Long userId, 
+    						@FromSession("role") Integer role) throws CustomException {
     	
     	ValidationsUtil.isNull(userId, "UserId");
     	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkLimitAndOffset(limit, offset);
     	ValidationsUtil.checkUserRole(role);
     	
     	if (role <= 2) {
     		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
     		return Results.respondJson(accountDAO.getAccountsList(employee.getBranch()));
     	} else {
-    		return Results.respondJson(accountDAO.getAccountsList());
+    		return Results.respondJson(accountDAO.getAccountsByBranchId(branchId));
     	}
     }
     
-    @Route(path = "account/details", method = "GET")
+    @Route(path = "account/details", method = "POST")
     public String getAccountDetails(@FromBody Account account, @FromSession("userId") Long sessionId, 
     							@FromSession("role") Integer role) throws CustomException {
     	
@@ -85,14 +91,26 @@ public class AccountHandler {
     	ValidationsUtil.isNull(role, "User Role");
     	ValidationsUtil.checkUserRole(role);
     	
+//    	if(role == 2) {
+//    		AuthorizeUtil.isSameBranch(sessionId, accountId);
+//    	}
+    	
     	Account fetchedAccount = accountDAO.getAccountById(accountId);
+    	Long customerId = fetchedAccount.getCustomerId();
     	
     	if(role == 0) {
-    		if (!(fetchedAccount.getCustomerId() == sessionId)) {
+    		if (!(customerId == sessionId)) {
     			throw new CustomException("Unauthorized access");
     		} 
     	}
-    	return Results.respondJson(fetchedAccount);
+    	
+    	UserDAO userDAO = UserDAO.getUserDAOInstance();
+    	User user = userDAO.getUserById(customerId);
+    	
+    	AccountProfile accountProfile = new AccountProfile();
+    	accountProfile.setFullName(user.getFullName());
+    	accountProfile.setCustomerId(customerId);
+    	return Results.respondJson(accountProfile);
     }
     
     @Route(path = "account/update", method = "POST")

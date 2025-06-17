@@ -1,5 +1,7 @@
 package util;
 
+import java.math.BigDecimal;
+
 import pojos.Account;
 import pojos.Beneficiary;
 import pojos.Branch;
@@ -163,7 +165,7 @@ public class ValidationsUtil {
 		Long customerId = account.getCustomerId();
 	    Long branchId = account.getBranchId();
 	    Integer accountType = account.getAccountType();
-	    Double balance = account.getBalance();
+	    BigDecimal balance = account.getBalance();
 	    
 	    if (customerId == null || customerId <= 0) {
 		    throw new CustomException("Invalid customer Id");
@@ -177,9 +179,9 @@ public class ValidationsUtil {
 		    throw new CustomException("Invalid account type");
 		}
 	    
-	    if (balance == null || balance <= 0) {
-		    throw new CustomException("Invalid branch");
-		}
+	    if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) {
+	        throw new CustomException("Invalid Balance");
+	    }
 	    
 	}
 	
@@ -187,7 +189,7 @@ public class ValidationsUtil {
 		
 		Long accountId = transaction.getAccountId();
 		Long customerId = transaction.getCustomerId();
-		Double amount = transaction.getAmount();
+		BigDecimal amount = transaction.getAmount();
 		Integer transactionType = transaction.getTransactionType();
 		
 		if (accountId == null || accountId <= 0) {
@@ -198,7 +200,7 @@ public class ValidationsUtil {
 		    throw new CustomException("Valid customer ID is required.");
 		}
 
-		if (amount == null || amount <= 0) {
+		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
 		    throw new CustomException("Transaction amount must be greater than zero.");
 		}
 

@@ -62,8 +62,8 @@ public class BranchHandler {
 	}
 	
 	@Route(path = "branch/update", method = "POST")
-	public String modifyBranch(@FromBody Branch branch, @FromSession("userId") long modifierId, 
-								@FromSession("role") int modifierRole) throws CustomException {
+	public String modifyBranch(@FromBody Branch branch, @FromSession("userId") Long modifierId, 
+								@FromSession("role") Integer modifierRole) throws CustomException {
 		
 		ValidationsUtil.validateBranch(branch);
 		ValidationsUtil.isNull(modifierId, "UserId");
@@ -88,8 +88,11 @@ public class BranchHandler {
 	}
 	
 	@Route(path = "branch/list", method = "GET")
-	public String branchListForm() throws CustomException {
-		System.out.print("here");
+	public String branchListForm(@FromSession("userId") Long userId, @FromSession("role") Integer userRole) throws CustomException {
+		if(userRole == 2 || userRole == 1) {
+			Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+			return Results.respondJson(branchDAO.getAllBranches(employee.getBranch()));
+		}
 		return Results.respondJson(branchDAO.getAllBranches());
 	}
 	

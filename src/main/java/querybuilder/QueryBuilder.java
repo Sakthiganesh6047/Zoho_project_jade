@@ -286,10 +286,6 @@ public class QueryBuilder {
                 }
             }
             
-            for (Object param : parameters) {
-            	System.out.println(param);
-            }
-            
             return new QueryResult(query.toString(), parameters);
         } catch (IllegalAccessException e) {
             throw new CustomException("Error occurred while building the query", e);

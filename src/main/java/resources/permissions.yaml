@@ -9,7 +9,9 @@ UserHandler:
   publicCreateCustomer: [0, 1, 2, 3, 4]
   updateUser: [1, 2, 3]
   getUserProfileByEmail: [0, 1, 2, 3]
+  getUserByPhone: [1, 2, 3]
   getUserProfileById: [0, 1, 2, 3]
+  getEmployeeProfiles: [2, 3]
   deleteUser: [3]
   
 BranchHandler:
@@ -18,7 +20,7 @@ BranchHandler:
   branchList: [1, 2, 3]
   getBranchByIFSC: [1, 2, 3]
   getBranchById: [1, 2, 3]
-  branchListForm: [2, 3]
+  branchListForm: [1, 2, 3]
   
 TransactionHandler:
   fetchTransactionsofAccount: [0, 1, 2, 3]
