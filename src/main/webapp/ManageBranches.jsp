@@ -4,48 +4,90 @@
     <title>Branch List - JadeBank</title>
     <style>
         body { 
-        	font-family: Arial, sans-serif; padding: 20px; 
-        }
-        
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .pagination-controls { margin-top: 20px; display: flex; gap: 10px; align-items: center; }
+		    margin: 0; 
+		    display: flex; 
+		    flex-direction: column; 
+		    min-height: 100vh;
+		}
+		
+		.body-wrapper {
+		    display: flex; 
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 70px;
+		    color: white;
+		}
+		
+		.list-wrapper {
+		    width: calc(100% - 70px);
+		    padding: 20px;
+		}
+		
+		table { 
+		    border-collapse: collapse; 
+		    width: 100%; 
+		    margin-top: 20px; 
+		}
+		
+		th, td { 
+		    border: 1px solid #ddd; 
+		    padding: 8px; 
+		    text-align: left; 
+		}
+		
+		th { 
+		    background-color: #f2f2f2; 
+		}
+		
+		.pagination-controls { 
+		    margin-top: 20px; 
+		    display: flex; 
+		    gap: 10px; 
+		    align-items: center; 
+		}
     </style>
 </head>
 <body>
-
-<jsp:include page="LoggedInHeader.jsp" />
-<jsp:include page="SideBar.jsp" />
-
-<h2>Branch List</h2>
-
-<div class="pagination-controls">
-    <label for="limit">Rows per page:</label>
-    <select id="limit">
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="20">20</option>
-    </select>
-
-    <button onclick="previousPage()">Previous</button>
-    <button onclick="nextPage()">Next</button>
-</div>
-
-<table id="branch-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>District</th>
-            <th>IFSC Code</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-
-<jsp:include page="Footer.jsp" />
+	<jsp:include page="LoggedInHeader.jsp" />
+	<div class="body-wrapper">
+	
+		<div class="sidebar-wrapper">
+			<jsp:include page="SideBar.jsp" />
+		</div>
+		
+		<div class="list-wrapper">
+			<h2>Branch List</h2>
+			
+			<div class="pagination-controls">
+			    <label for="limit">Rows per page:</label>
+			    <select id="limit">
+			        <option value="5">5</option>
+			        <option value="10" selected>10</option>
+			        <option value="20">20</option>
+			    </select>
+			
+			    <button onclick="previousPage()">Previous</button>
+			    <button onclick="nextPage()">Next</button>
+			</div>
+			
+			<table id="branch-table">
+			    <thead>
+			        <tr>
+			            <th>ID</th>
+			            <th>Name</th>
+			            <th>District</th>
+			            <th>IFSC Code</th>
+			            <th>Actions</th>
+			        </tr>
+			    </thead>
+			    <tbody></tbody>
+			</table>
+		</div>
+	</div>
+	<jsp:include page="Footer.jsp" />
 
 <script>
     let offset = 0;

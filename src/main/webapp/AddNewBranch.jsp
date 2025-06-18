@@ -58,7 +58,7 @@
             margin-top: 25px;
             padding: 12px;
             font-size: 16px;
-            background-color: #373962;
+            background-color: #2980b9;
             color: white;
             border: none;
             border-radius: 8px;
