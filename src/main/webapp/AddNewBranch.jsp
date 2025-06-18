@@ -10,13 +10,18 @@
             margin: 0;
             padding: 0;
         }
+        
+        .body-wrapper{
+        	margin: 0; display: flex; flex-direction: column; min-height: 100vh;
+        }
 
         .branch-form-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: calc(100vh - 120px); /* Account for header and footer */
-        }
+		    padding: 40px;
+		    width: 100%;
+		    display: flex;
+		    justify-content: center;
+		    align-items: flex-start;
+		}
 
         .branch-form-container {
             background-color: white;
@@ -53,7 +58,7 @@
             margin-top: 25px;
             padding: 12px;
             font-size: 16px;
-            background-color: #2980b9;
+            background-color: #373962;
             color: white;
             border: none;
             border-radius: 8px;
@@ -92,43 +97,55 @@
 </head>
 <body>
 
-    <jsp:include page="LoggedInHeader.jsp" />
+	<div class="body-wrapper">
 
-    <div class="branch-form-wrapper">
-        <div class="branch-form-container">
-            <h2 id="form-title">Add New Branch</h2>
-            <form id="branch-form">
-            	<input type="hidden" name="branchId" id="branchId">
-            	
-                <label for="branchName">Branch Name</label>
-                <input type="text" name="branchName" required>
-
-                <label for="branchDistrict">District</label>
-				<select name="branchDistrict" id="branchDistrict" class="styled-select" required>
-				    <option value="">-- Select District --</option>
-				    <option value="Chennai">Chennai</option>
-				    <option value="Coimbatore">Coimbatore</option>
-				    <option value="Madurai">Madurai</option>
-				    <option value="Tiruchirappalli">Tiruchirappalli</option>
-				    <option value="Salem">Salem</option>
-				    <option value="Tirunelveli">Tirunelveli</option>
-				    <option value="Erode">Erode</option>
-				    <option value="Vellore">Vellore</option>
-				    <option value="Thoothukudi">Thoothukudi</option>
-				    <option value="Dindigul">Dindigul</option>
-				</select>
-
-                <label for="address">Address</label>
-                <textarea name="address" rows="4" required></textarea>
-
-                <button type="submit">Create Branch</button>
-
-                <div class="response-message" id="response"></div>
-            </form>
-        </div>
-    </div>
-
-    <jsp:include page="Footer.jsp" />
+	    <jsp:include page="LoggedInHeader.jsp" />  
+	
+		<div style="display: flex; flex: 1;">
+	
+		<!-- Sidebar (fixed width) -->
+		    <div style="width: 240px;">
+		        <jsp:include page="SideBar.jsp" />
+		    </div>
+		    
+		    <div class="branch-form-wrapper">
+		        <div class="branch-form-container">
+		            <h2 id="form-title">Add New Branch</h2>
+		            <form id="branch-form">
+		            	<input type="hidden" name="branchId" id="branchId">
+		            	
+		                <label for="branchName">Branch Name</label>
+		                <input type="text" name="branchName" required>
+		
+		                <label for="branchDistrict">District</label>
+						<select name="branchDistrict" id="branchDistrict" class="styled-select" required>
+						    <option value="">-- Select District --</option>
+						    <option value="Chennai">Chennai</option>
+						    <option value="Coimbatore">Coimbatore</option>
+						    <option value="Madurai">Madurai</option>
+						    <option value="Tiruchirappalli">Tiruchirappalli</option>
+						    <option value="Salem">Salem</option>
+						    <option value="Tirunelveli">Tirunelveli</option>
+						    <option value="Erode">Erode</option>
+						    <option value="Vellore">Vellore</option>
+						    <option value="Thoothukudi">Thoothukudi</option>
+						    <option value="Dindigul">Dindigul</option>
+						</select>
+		
+		                <label for="address">Address</label>
+		                <textarea name="address" rows="4" required></textarea>
+		
+		                <button type="submit">Create Branch</button>
+		
+		                <div class="response-message" id="response"></div>
+		            </form>
+		        </div>
+		    </div>
+		</div>
+	
+	    <jsp:include page="Footer.jsp" />
+	    
+	</div>
 
    <!-- Load jQuery and Select2 -->
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

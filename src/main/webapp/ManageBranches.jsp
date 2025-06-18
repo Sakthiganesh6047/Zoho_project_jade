@@ -16,6 +16,7 @@
 <body>
 
 <jsp:include page="LoggedInHeader.jsp" />
+<jsp:include page="SideBar.jsp" />
 
 <h2>Branch List</h2>
 

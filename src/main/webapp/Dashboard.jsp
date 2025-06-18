@@ -56,6 +56,8 @@
 </head>
 <body>
 
+<jsp:include page="SideBar.jsp" />
+
 <header style="display: flex; justify-content: space-between; align-items: center;">
     <h2>Welcome to Jade Bank</h2>
     <form action="Logout.jsp" method="post" style="margin: 0;">

@@ -50,7 +50,7 @@ public class TransactionHandler {
     			throw new CustomException("Unauthorized Access, check account number");
     		}
     	} 
-    	if (userRole < 3 || userRole > 0) {
+    	if (userRole == 1 || userRole == 2) {
     		if(!AuthorizeUtil.isSameBranch(userId, accountId)) {
     			throw new CustomException("Unauthorized Access, contact specific branch");
     		}
