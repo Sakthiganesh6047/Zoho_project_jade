@@ -35,9 +35,9 @@ public class TransactionHandler {
         this.transactionDAO = transactionDAO;
     }
     
-    @Route(path = "transactions/Account", method = "POST")
+    @Route(path = "transactions/account", method = "POST")
     public String fetchTransactionsofAccount(@FromBody Account account, @FromQuery("limit") int limit, @FromQuery("offset") int offset, 
-    									@FromSession("userid") Long userId, @FromSession("role") Integer userRole) throws CustomException {
+    									@FromSession("userId") Long userId, @FromSession("role") Integer userRole) throws CustomException {
     	
     	Long accountId = account.getAccountId();
     	ValidationsUtil.isNull(userId, "UserId");
@@ -182,7 +182,7 @@ public class TransactionHandler {
                 }
             }
             e.printStackTrace();
-            return Results.respondJson(Map.of("status", "failed", "message", e.getMessage()));
+            throw new CustomException("Transaction Failed: " + e.getMessage());
         } finally {
             if (connection != null) {
                 try {
@@ -194,7 +194,7 @@ public class TransactionHandler {
         }
     }
     
-    private void handleCredit(Transaction transaction, Long userId, Integer userRole, Connection connection) throws CustomException {
+    private void handleCredit(Transaction transaction, Long userId, Integer userRole, Connection connection) throws Exception {
     	Account account = null;
     	BigDecimal amount = null;
     	try {
@@ -208,49 +208,59 @@ public class TransactionHandler {
 	        	throw new CustomException("Account not found.");
 	        }
 	
-	        BigDecimal newBalance = account.getBalance().add(amount);;
+	        BigDecimal newBalance = account.getBalance().add(amount);
 	        updateBalance(account, newBalance, userId, accountDAO, connection);
 	
 	        transaction.setCreatedBy(userId);
 	        transaction.setTransactionDate(Instant.now().toEpochMilli());
 	        transaction.setClosingBalance(newBalance);
-	        transaction.setTransactionStatus(1);
-	        transaction.setTransferReference(0L);
+	        transaction.setTransactionStatus(1); // success
 	        transactionDAO.createTransaction(transaction, connection);
 	        
     	} catch (CustomException e) {
-    		addFailedStatement(account, amount, userId, 1, e.getLocalizedMessage(), connection);
-    		throw new CustomException("Credit operation failed!", e);
+    		try {
+                addFailedStatement(account, amount, userId, 2, e.getLocalizedMessage(), connection);
+                connection.commit();  // commit the failed transaction insert
+            } catch (Exception logEx) {
+                logEx.printStackTrace();
+            }
+            throw new CustomException(e.getMessage());
     	}
     }
     
     private void handleDebit(Transaction transaction, long userId, int userRole, Connection connection) throws CustomException {
-    	BigDecimal amount = null;
-	    Account account = null;
-    	
-    	try {
-    		long accountId = transaction.getAccountId();
-	        amount = transaction.getAmount();
-	
-	        AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
-	        account = accountDAO.getAccountForUpdate(accountId, connection);
-	        if (account == null) {
-	        	throw new CustomException("Account not found.");
-	        }
-	
-	        isSufficientBalance(account.getBalance(), amount);
-	
-	        BigDecimal newBalance = account.getBalance().subtract(amount);
-	        updateBalance(account, newBalance, userId, accountDAO, connection);
-	
-	        transaction.setCreatedBy(userId);
-	        transaction.setClosingBalance(newBalance);
-	        transaction.setTransactionDate(Instant.now().toEpochMilli());
-	        transactionDAO.createTransaction(transaction, connection);
-    	} catch(CustomException e) {
-    		addFailedStatement(account, amount, userId, 2, e.getLocalizedMessage(), connection);
-    		throw new CustomException("Debit operation Failed", e);
-    	}
+        BigDecimal amount = transaction.getAmount();
+        Account account = null;
+
+        try {
+            long accountId = transaction.getAccountId();
+
+            AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
+            account = accountDAO.getAccountForUpdate(accountId, connection);
+            if (account == null) {
+                throw new CustomException("Account not found.");
+            }
+
+            isSufficientBalance(account.getBalance(), amount);
+
+            BigDecimal newBalance = account.getBalance().subtract(amount);
+            updateBalance(account, newBalance, userId, accountDAO, connection);
+
+            transaction.setCreatedBy(userId);
+            transaction.setClosingBalance(newBalance);
+            transaction.setTransactionDate(Instant.now().toEpochMilli());
+            transaction.setTransactionStatus(1); // success
+            transactionDAO.createTransaction(transaction, connection);
+
+        } catch(CustomException e) {
+            try {
+                addFailedStatement(account, amount, userId, 2, e.getLocalizedMessage(), connection);
+                connection.commit();  // commit the failed transaction insert
+            } catch (Exception logEx) {
+                logEx.printStackTrace();
+            }
+            throw new CustomException(e.getMessage());
+        }
     }
     
     private void handleTransferInside(Transaction transaction, Beneficiary beneficiary, Long userId, Integer role, Connection connection) throws CustomException {
@@ -277,7 +287,7 @@ public class TransactionHandler {
 	        isSufficientBalance(fromAccount.getBalance(), amount);
 	        
 	        BigDecimal fromAccBalance = fromAccount.getBalance().subtract(amount);
-	        BigDecimal toAccBalance = toAccount.getBalance().subtract(amount);
+	        BigDecimal toAccBalance = toAccount.getBalance().add(amount);
 	
 	        // Update balances
 	        updateBalance(fromAccount, fromAccBalance, userId, accountDAO, connection);
@@ -293,7 +303,7 @@ public class TransactionHandler {
 	        debitTxn.setClosingBalance(fromAccBalance);
 	        debitTxn.setTransactionType(2); //debit
 	        debitTxn.setTransactionDate(timestamp);
-	        debitTxn.setDescription("Transfer to account " + toAccountId);
+	        debitTxn.setDescription(transaction.getDescription());
 	        debitTxn.setTransferReference(toAccountId);
 	        debitTxn.setTransactionStatus(1); // 1 - Success
 	        debitTxn.setCreatedBy(userId);
@@ -307,14 +317,19 @@ public class TransactionHandler {
 	        creditTxn.setClosingBalance(toAccBalance);
 	        creditTxn.setTransactionType(1);
 	        creditTxn.setTransactionDate(timestamp);
-	        creditTxn.setDescription("Transfer from account " + fromAccountId);
+	        creditTxn.setDescription("Transfered from " + fromAccountId);
 	        creditTxn.setTransferReference(fromAccountId);
 	        creditTxn.setTransactionStatus(1); // success
 	        creditTxn.setCreatedBy(userId);
 	        transactionDAO.createTransaction(creditTxn, connection);
 	    } catch(CustomException e) {
-	    	addFailedStatement(fromAccount, amount, userId, 3, toAccountId, e.getLocalizedMessage(), connection);
-	    	throw new CustomException("Transfer operation failed", e);
+	    	try {
+                addFailedStatement(fromAccount, amount, userId, 2, toAccountId, e.getLocalizedMessage(), connection);
+                connection.commit();  // commit the failed transaction insert
+            } catch (Exception logEx) {
+                logEx.printStackTrace();
+            }
+            throw new CustomException(e.getMessage());
 	    }
     }
     
@@ -322,6 +337,7 @@ public class TransactionHandler {
     	
     	Account account = null;
     	BigDecimal amount = null;
+    	Long beneficiaryAccountNumber = null;
     	
     	try {
 	    	long accountId = transaction.getAccountId();
@@ -340,6 +356,7 @@ public class TransactionHandler {
 	    			if (beneficiary1 == null) {
 	    				throw new CustomException("Beneficiary details not found");
 	    			}
+	    			beneficiaryAccountNumber = beneficiary1.getBeneficiaryAccountNumber();
 	    	        
 	    	        if (AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
 	    	        	throw new CustomException("Unauthorized Access, please check your account number");
@@ -357,35 +374,47 @@ public class TransactionHandler {
 	    				throw new CustomException("Unauthorized Access, contact specific branch");
 	    			}
 	    			
+	    			beneficiary.setAccountId(accountId);
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
+	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
 	    			long beneficiaryId = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
 	    			newBalance = account.getBalance().subtract(amount);
 	    			transaction.setTransferReference(beneficiaryId);
 	    			break;
 	    			
 	    		case 3:
+	    			beneficiary.setAccountId(accountId);
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
+	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
 	    			long beneficiaryId1 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
 	    			newBalance = account.getBalance().subtract(amount);
 	    			transaction.setTransferReference(beneficiaryId1);
 	    			break;
 	    	}
     		
+    		transaction.setTransactionType(2);
+    		transaction.setTransactionStatus(1);
     		transaction.setCreatedBy(userId);
 	        transaction.setClosingBalance(newBalance);
 	        transaction.setTransactionDate(Instant.now().toEpochMilli());
 	        transactionDAO.createTransaction(transaction, connection);
     		
 	    } catch (CustomException e) {
-	    	addFailedStatement(account, amount, userId, 2, e.getLocalizedMessage(), connection);
+	    	try {
+                addFailedStatement(account, amount, userId, 2, beneficiaryAccountNumber, e.getLocalizedMessage(), connection);
+                connection.commit();  // commit the failed transaction insert
+            } catch (Exception logEx) {
+                logEx.printStackTrace();
+            }
+            throw new CustomException(e.getMessage());
 	    }
     }
     
     private void isSufficientBalance(BigDecimal balance, BigDecimal amount) throws CustomException {
         if (balance == null || amount == null || balance.compareTo(amount) < 0) {
-            throw new CustomException("Insufficient balance.");
+            throw new CustomException("Insufficient balance");
         }
     }
 
@@ -394,7 +423,7 @@ public class TransactionHandler {
 	    	account.setBalance(amount);
 	    	account.setModifiedBy(userId);
 	    	account.setModifiedOn(Instant.now().toEpochMilli());
-	    	accountDAO.updateAccount(account);
+	    	accountDAO.updateAccount(account, connection);
     	} catch (CustomException e) {
     		throw new CustomException("Error in updating account balance", e);
     	}
@@ -410,7 +439,8 @@ public class TransactionHandler {
 	    	transaction.setTransactionType(type);
 	    	transaction.setTransactionDate(Instant.now().toEpochMilli());
 	    	transaction.setDescription(description);
-	    	transaction.setTransactionStatus(0);
+	    	transaction.setTransactionStatus(2);
+	    	transaction.setCreatedBy(userId);
 	    	transactionDAO.createTransaction(transaction, connection);
     	} catch(CustomException e) {
     		throw new CustomException("Error while adding failed statement in Transaction", e);
@@ -428,7 +458,8 @@ public class TransactionHandler {
 	    	transaction.setTransactionDate(Instant.now().toEpochMilli());
 	    	transaction.setDescription(description);
 	    	transaction.setTransferReference(transferId);
-	    	transaction.setTransactionStatus(0);
+	    	transaction.setTransactionStatus(2);
+	    	transaction.setCreatedBy(userId);
 	    	transactionDAO.createTransaction(transaction, connection);
     	} catch(CustomException e) {
     		throw new CustomException("Error while adding failed statement in Transaction", e);

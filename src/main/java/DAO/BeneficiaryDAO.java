@@ -35,7 +35,8 @@ public class BeneficiaryDAO {
 	
 	public long addAsBeneficiary(Beneficiary benefiaciary, Connection connection) throws CustomException {
 		QueryBuilder queryBuilder = new QueryBuilder(Beneficiary.class);
-		QueryResult insertQuery = queryBuilder.insert(benefiaciary).build();
+		QueryResult insertQuery = queryBuilder.insert(benefiaciary)
+											  .build();
         System.out.println("Insert Query: " + insertQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (long) executor.executeInsertWithConn(insertQuery, connection, true);

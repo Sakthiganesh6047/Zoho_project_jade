@@ -20,18 +20,18 @@ public class TransactionDAO {
 //        this.fieldMappings = fieldMappings;
 //    }
 
-    public int createTransaction(Transaction transaction) throws CustomException {
+    public Long createTransaction(Transaction transaction) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
         QueryResult query = queryBuilder.insert(transaction).build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (int) executor.executeQuery(query, null);
+        return (Long) executor.executeQuery(query, null);
     }
     
-    public int createTransaction(Transaction transaction, Connection connection) throws CustomException {
+    public Long createTransaction(Transaction transaction, Connection connection) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
         QueryResult query = queryBuilder.insert(transaction).build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (int) executor.executeQuery(query, connection, null);
+        return (Long) executor.executeQuery(query, connection, null);
     }
 
     public Transaction getTransactionById(Long transactionId) throws CustomException {
@@ -49,6 +49,7 @@ public class TransactionDAO {
                 .where("account_id", "=", accountId)
                 .limit(limit)
                 .offset(offset)
+                .orderBy("transactionDate", "ASC")
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Transaction.class));

@@ -68,7 +68,7 @@ Account:
     modifiedOn: modified_on
 
 Transaction:
-  table: Transaction
+  table: "`Transaction`"
   fields:
     transactionId: transaction_id
     accountId: account_id
@@ -112,12 +112,12 @@ Nominee:
 Beneficiary:
   table: Beneficiary
   fields:
-    beneficiaryId: beneficiary_id
+    beneficiaryId: beneficiar_id
     beneficiaryName: beneficiar_name
     bankName: bank_name
     beneficiaryAccountNumber: account_number
-    ifsc_code: ifscCode
+    ifscCode: ifsc_code
     accountId: account_id
     createdBy: created_by
-    modifiedBy: modified_on
+    modifiedBy: modified_by
     modifiedOn: modified_on

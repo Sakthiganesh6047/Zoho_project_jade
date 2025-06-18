@@ -84,6 +84,10 @@
             <a href="SearchCustomer.jsp" class="btn">View Customer Details</a>
             <a href="OpenAccount.jsp" class="btn">Open New Account</a>
             <a href="AccountsList.jsp" class="btn">Branch Accounts List</a>
+            <a href="Debit.jsp" class="btn">Debit</a>
+            <a href="TransferInside.jsp" class="btn">Transfer Inside the Bank</a>
+            <a href="TransferOutside.jsp" class="btn">Transfer Outside Bank</a>
+            <a href="AccountTransactions.jsp" class="btn">View Transactions</a>
 
         <%-- Manager --%>
         <% } else if (role == 2) { %>
@@ -94,6 +98,10 @@
             <a href="EmployeeSignUp.jsp" class="btn">Add Employee</a>
             <a href="OpenAccount.jsp" class="btn">Open New Account</a>
             <a href="AccountsList.jsp" class="btn">Branch Accounts List</a>
+            <a href="Debit.jsp" class="btn">Debit</a>
+            <a href="TransferInside.jsp" class="btn">Transfer Inside Bank</a>
+            <a href="TransferOutside.jsp" class="btn">Transfer Outside Bank</a>
+            <a href="AccountTransactions.jsp" class="btn">View Transactions</a>
 
         <%-- Admin / GM --%>
         <% } else if (role == 3) { %>
@@ -105,6 +113,10 @@
             <a href="OpenAccount.jsp" class="btn">Open New Account</a>
             <a href="AccountsList.jsp" class="btn">Branch Accounts List</a>
             <a href="Credit.jsp" class="btn">Credit</a>
+            <a href="Debit.jsp" class="btn">Debit</a>
+            <a href="TransferInside.jsp" class="btn">Transfer Inside the Bank</a>
+            <a href="TransferOutside.jsp" class="btn">Transfer Outside Bank</a>
+            <a href="AccountTransactions.jsp" class="btn">View Transactions</a>
         <% } %>
     </div>
 </div>

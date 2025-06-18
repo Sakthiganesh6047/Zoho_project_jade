@@ -73,15 +73,15 @@ public class QueryExecutor {
             }
             
         } catch (SQLIntegrityConstraintViolationException e) {
+        	e.printStackTrace();
             String msg = e.getMessage();
             DuplicateEntryUtil.handleDuplicateEntryExceptions(msg);
-            throw new CustomException("Duplicate entry error.", e); // fallback
+            throw new CustomException(e.getMessage()); // fallback
         } catch (Exception e) {
         	e.printStackTrace();
             throw new CustomException(e.getMessage());
         }
     }
-
     
     public <T> Object executeQuery(QueryResult queryResult, Connection connection, Class<T> pojoClass) throws CustomException {
         String sql = queryResult.getQuery().trim().toUpperCase();
@@ -120,9 +120,10 @@ public class QueryExecutor {
             }
 
         } catch (SQLIntegrityConstraintViolationException e) {
+        	e.printStackTrace();
             String msg = e.getMessage();
             DuplicateEntryUtil.handleDuplicateEntryExceptions(msg);
-            throw new CustomException("Duplicate entry error.", e); // fallback
+            throw new CustomException(e.getMessage()); // fallback
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        throw new CustomException(e.getMessage());
@@ -157,9 +158,10 @@ public class QueryExecutor {
             }
             
         } catch (SQLIntegrityConstraintViolationException e) {
+        	e.printStackTrace();
             String msg = e.getMessage();
             DuplicateEntryUtil.handleDuplicateEntryExceptions(msg);
-            throw new CustomException("Duplicate entry error.", e); // fallback
+            throw new CustomException(e.getMessage()); // fallback
 	    } catch (Exception e) {
 	    	e.printStackTrace();
 	        throw new CustomException(e.getMessage());

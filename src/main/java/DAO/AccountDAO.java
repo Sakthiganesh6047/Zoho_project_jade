@@ -9,6 +9,7 @@ import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.Results;
 
 public class AccountDAO {
 	
@@ -26,11 +27,11 @@ public class AccountDAO {
 		return AccountDAOHelper.INSTANCE;
 	}
 
-    public long createAccount(Account account) throws CustomException {
+    public Long createAccount(Account account) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult createQuery = queryBuilder.insert(account).build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (long) executor.executeQuery(createQuery, null);
+        return (Long) executor.executeQuery(createQuery, null);
     }
 
     public Account getAccountById(long accountId) throws CustomException {
@@ -39,17 +40,10 @@ public class AccountDAO {
 						                .where("account_id", "=", accountId)
 						                .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (Account) executor.executeQuery(query, Account.class);
+        @SuppressWarnings("unchecked")
+		List<Account> accounts = (List<Account>) executor.executeQuery(query, Account.class);
+        return Results.getSingleResult(accounts);
     }
-    
-//    public Account getAccountById(long accountId, Connection connection) throws CustomException {
-//    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
-//        QueryResult query = queryBuilder.select("*")
-//						                .where("account_id", "=", accountId)
-//						                .build();
-//        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-//        return (Account) executor.executeQuery(query, connection, Account.class);
-//    }
     
     public Account getAccountForUpdate(long accountId, Connection connection) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
@@ -58,7 +52,9 @@ public class AccountDAO {
 						                .forUpdate()
 						                .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (Account) executor.executeQuery(query, connection, Account.class);
+        @SuppressWarnings("unchecked")
+		List<Account> accounts = (List<Account>) executor.executeQuery(query, connection, Account.class);
+        return Results.getSingleResult(accounts);
     }
 
     public List<Account> getAccountsByCustomerId(long customerId) throws CustomException {
@@ -130,11 +126,20 @@ public class AccountDAO {
 
     public int updateAccount(Account account) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
-        QueryResult query = queryBuilder.update(account)
+        QueryResult query = queryBuilder.update(account, "balance", "modifiedBy", "modifiedOn")
                 .where("account_id", "=", account.getAccountId())
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (int) executor.executeQuery(query, null);
+    }
+    
+    public int updateAccount(Account account, Connection connection) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
+        QueryResult query = queryBuilder.update(account, "balance", "modifiedBy", "modifiedOn")
+                .where("account_id", "=", account.getAccountId())
+                .build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (int) executor.executeQuery(query, connection, null);
     }
 
     public int deleteAccount(long accountId) throws CustomException {

@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Credit Amount</title>
+    <title>Debit Amount</title>
     <style>
         body {
             font-family: "Roboto", sans-serif;
             background-color: #f7f7f7;
         }
-        .credit-form-container {
+        .debit-form-container {
             width: 400px;
             margin: 50px auto;
             padding: 25px;
@@ -65,89 +65,75 @@
 </head>
 <body>
     <jsp:include page="LoggedInHeader.jsp" />
-
-    <div class="credit-form-container">
-        <h2>Credit Transaction</h2>
-        <form id="creditForm">
-            <label for="accountId">Account ID:</label>
-            <input type="number" id="accountId" name="accountId" required>
-
-            <div id="account-info"></div>
-
-            <button type="button" onclick="fetchAccountDetails()">Check Details</button>
-
-            <label for="amount">Amount:</label>
-            <input type="number" id="amount" name="amount" step="0.01" required>
-
-            <button type="button" onclick="openPasswordModal()">Credit</button>
-            <div id="credit-status"></div>
-        </form>
+    
+    <div class="debit-form-container">
+	    <h2>Debit Amount from Account</h2>
+	
+	    <form id="debitForm">
+	        <label>Account ID: <input type="number" id="accountId" required></label><br>
+	        <div id="infoDiv" style="font-weight: bold;"></div>
+	        <button type="button" onclick="checkDetails()">Check Details</button><br>
+	        <label>Amount: <input type="number" id="amount" required></label><br>
+	        <button type="button" onclick="showPasswordModal()">Submit Debit</button>
+	        <div id="debit-status"></div>
+	    </form>
     </div>
 
     <!-- Password Modal -->
-    <div class="modal" id="passwordModal">
+    <div id="passwordModal" class="modal">
         <div class="modal-content">
-            <h3>Confirm Password</h3>
-            <input type="password" id="confirmPassword" placeholder="Enter your password" required>
-            <br>
-            <button onclick="submitCredit()">Confirm</button>
+            <label>Enter Password to Confirm:</label><br>
+            <input type="password" id="confirmPassword"><br><br>
+            <button onclick="submitDebit()">Confirm</button>
+            <button onclick="closeModal()">Cancel</button>
         </div>
     </div>
-
-    <jsp:include page="Footer.jsp" />
 
     <script>
         let accountDetails = null;
 
-        function fetchAccountDetails() {
+        function checkDetails() {
             const accountId = parseInt(document.getElementById("accountId").value);
-            const infoDiv = document.getElementById("account-info");
-            infoDiv.textContent = "";
-
-            if (!accountId) {
-                infoDiv.textContent = "Please enter a valid account ID.";
-                return;
-            }
+            if (!accountId) return;
 
             fetch(`${pageContext.request.contextPath}/jadebank/account/details`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ accountId: accountId })
             })
-            .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch"))
+            .then(res => res.ok ? res.json() : Promise.reject("Fetch failed"))
             .then(data => {
             	if (!data || !data.fullName || !data.customerId) {
                     infoDiv.textContent = "No customer data found.";
                     return;
                 }
                 accountDetails = data;
-                infoDiv.textContent = "Customer Data: Name: " + data.fullName + ", CustomerId: " + data.customerId ;
+                document.getElementById("infoDiv").textContent = "Customer Data: Name: " + data.fullName + ", CustomerId: " + data.customerId;
             })
             .catch(err => {
-                infoDiv.textContent = "Error fetching account details.";
+                document.getElementById("infoDiv").textContent = "Account not found";
                 console.error(err);
             });
         }
 
-        function openPasswordModal() {
-            document.getElementById("passwordModal").style.display = "flex";
+        function showPasswordModal() {
+            document.getElementById("passwordModal").style.display = "block";
         }
 
-        function submitCredit() {
+        function closeModal() {
+            document.getElementById("passwordModal").style.display = "none";
+            document.getElementById("confirmPassword").value = "";
+        }
+
+        function submitDebit() {
             const accountId = parseInt(document.getElementById("accountId").value);
             const amount = parseFloat(document.getElementById("amount").value);
             const password = document.getElementById("confirmPassword").value;
-            const statusDiv = document.getElementById("credit-status");
+            const statusDiv = document.getElementById("debit-status");
             const modal = document.getElementById("passwordModal");
 
-            if (!accountId || !amount || amount <= 0 || !password) {
-                statusDiv.textContent = "All fields and password are required.";
-                statusDiv.style.color = "red";
-                return;
-            }
-            
-            if (!accountDetails || !accountDetails.customerId) {
-                statusDiv.textContent = "Customer details are not loaded. Please use 'Check Details' first.";
+            if (!accountId || !amount || amount <= 0 || !password || !accountDetails) {
+                statusDiv.textContent = "All fields, password, and account check are required.";
                 statusDiv.style.color = "red";
                 return;
             }
@@ -157,10 +143,10 @@
                     accountId: accountId,
                     customerId: accountDetails.customerId,
                     amount: amount,
-                    transactionType: 1
+                    transactionType: 2 // 2 = Debit
                 },
                 user: {
-                passwordHash: password
+                    passwordHash: password
                 }
             };
 
@@ -170,20 +156,22 @@
                 body: JSON.stringify(data)
             })
             .then(async res => {
-                modal.style.display = "none";
-                if (res.ok) {
-                    statusDiv.textContent = "Amount credited successfully.";
-                    statusDiv.style.color = "green";
-                    document.getElementById("creditForm").reset();
-                    document.getElementById("confirmPassword").value = "";
-                    document.getElementById("account-info").textContent = "";
-                } else {
-                    const error = await res.json();
-                    statusDiv.textContent = error.error || "Credit failed.";
-                    document.getElementById("confirmPassword").value = "";
-                    statusDiv.style.color = "red";
-                }
-            })
+			    modal.style.display = "none";
+			    document.getElementById("confirmPassword").value = "";
+			
+			    const result = await res.json();
+			
+			    if (res.ok && result.status === "success") {
+			        statusDiv.textContent = "Amount debited successfully.";
+			        statusDiv.style.color = "green";
+			        document.getElementById("debitForm").reset();
+			        document.getElementById("infoDiv").textContent = "";
+			        accountDetails = null;
+			    } else {
+			        statusDiv.textContent = result.error || "Debit failed.";
+			        statusDiv.style.color = "red";
+			    }
+			})
             .catch(err => {
                 modal.style.display = "none";
                 document.getElementById("confirmPassword").value = "";
@@ -191,14 +179,8 @@
                 statusDiv.style.color = "red";
             });
         }
-
-        // Close modal on outside click
-        window.onclick = function(event) {
-            const modal = document.getElementById("passwordModal");
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        };
     </script>
+
+    <jsp:include page="Footer.jsp" />
 </body>
 </html>

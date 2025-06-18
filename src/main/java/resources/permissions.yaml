@@ -1,3 +1,8 @@
+#Transactiontype
+#1 - credit // 2 - debit // 3 - transfer inside // 4 - transfer outside
+
+#Transaction Status
+#1 - success // 2 - failed
 
 #role based authorization -- yaml file
 # 0 - Customer // 1 - Clerk // 2 - Manager // 3 -- GM // 4 for open source
