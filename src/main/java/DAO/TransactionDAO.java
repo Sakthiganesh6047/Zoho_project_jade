@@ -3,7 +3,6 @@ package DAO;
 import java.sql.Connection;
 import java.util.Collections;
 import java.util.List;
-
 import pojos.Transaction;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
@@ -20,6 +19,20 @@ public class TransactionDAO {
 //        this.fieldMappings = fieldMappings;
 //    }
 
+	private TransactionDAO() {
+		if (TransactionDAOHelper.INSTANCE != null) {
+			throw new IllegalStateException("TransactionDAO instance already created");
+		}
+	}
+	
+	private static class TransactionDAOHelper{
+		private static final TransactionDAO INSTANCE = new TransactionDAO();
+	}
+	
+	public static TransactionDAO getBranchDAOInstance() {
+		return TransactionDAOHelper.INSTANCE;
+	}
+	
     public Long createTransaction(Transaction transaction) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Transaction.class);
         QueryResult query = queryBuilder.insert(transaction).build();
@@ -61,7 +74,7 @@ public class TransactionDAO {
                 .where("customer_id", "=", customerId)
                 .limit(limit)
                 .offset(offset)
-                .orderBy("transaction_date", "DSC")
+                .orderBy("transaction_date", "DESC")
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Transaction.class));

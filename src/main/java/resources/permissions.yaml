@@ -38,6 +38,7 @@ AccountHandler:
   createAccount: [0, 1, 2, 3]
   getCustomerAccounts: [0, 1, 2, 3]
   getAccountsList: [1, 2, 3]
+  getAccountDetailsForBeneficiary: [0, 1, 2, 3]
   getAccountDetails: [0, 1, 2, 3]
   updateAccount: [0, 1, 2, 3]
   activateAccount: [1, 2, 3]

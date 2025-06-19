@@ -45,12 +45,12 @@ public class TransactionHandler {
     	ValidationsUtil.checkUserRole(userRole);
     	ValidationsUtil.checkLimitAndOffset(limit, offset);
     	
-    	if (userRole == 0) {
+    	if (userRole.equals(0)) {
     		if(!AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
     			throw new CustomException("Unauthorized Access, check account number");
     		}
     	} 
-    	if (userRole == 1 || userRole == 2) {
+    	if (userRole.equals(1) || userRole.equals(2)){
     		if(!AuthorizeUtil.isSameBranch(userId, accountId)) {
     			throw new CustomException("Unauthorized Access, contact specific branch");
     		}
@@ -69,7 +69,7 @@ public class TransactionHandler {
     	ValidationsUtil.checkUserRole(userRole);
     	
     	if (userRole == 0) {
-    		if(userId != customerId) {
+    		if(!(userId.equals(customerId))) {
     			throw new CustomException("Unauthoried Access, check customer Id");
     		}
     	}
@@ -149,6 +149,15 @@ public class TransactionHandler {
             Transaction transaction = transferWrapper.getTransaction();
             Beneficiary beneficiary = transferWrapper.getBeneficiary();
             ValidationsUtil.ValidateTransactions(transaction);
+            
+            if(userRole.equals(0)) {
+            	System.out.println(beneficiary.getBankName().toLowerCase());
+            	if(beneficiary.getBankName().equalsIgnoreCase("jade bank")) {
+            		transaction.setTransactionType(3);
+            	} else {
+            		transaction.setTransactionType(4);
+            	}
+            }
 
             int type = transaction.getTransactionType(); // "1 - credit", "2 - debit", "3 - inside bank", "4 - outside bank"
             //double amount = transaction.getAmount();
@@ -352,13 +361,23 @@ public class TransactionHandler {
     	
     		switch(userRole) {
 	    		case 0:
-	    			Beneficiary beneficiary1 = beneficiaryDAO.getBeneficiaryById(beneficiary.getBeneficiaryId());
-	    			if (beneficiary1 == null) {
-	    				throw new CustomException("Beneficiary details not found");
+	    			
+	    			if(beneficiary.getBeneficiaryId().equals(0L)) {
+	    				beneficiary.setAccountId(accountId);
+		    			beneficiary.setCreatedBy(userId);
+		    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
+		    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
+		    			beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+	    			} else {
+	    				Beneficiary beneficiary1 = beneficiaryDAO.getBeneficiaryById(beneficiary.getBeneficiaryId());
+		    			if (beneficiary1 == null) {
+		    				throw new CustomException("Beneficiary details not found");
+		    			}
 	    			}
-	    			beneficiaryAccountNumber = beneficiary1.getBeneficiaryAccountNumber();
+	    		
+	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
 	    	        
-	    	        if (AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
+	    	        if (!(AuthorizeUtil.isAuthorizedOwner(userId, accountId))) {
 	    	        	throw new CustomException("Unauthorized Access, please check your account number");
 	    	        }
 	    	        
@@ -378,9 +397,9 @@ public class TransactionHandler {
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
-	    			long beneficiaryId = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+	    			long beneficiaryId1 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
 	    			newBalance = account.getBalance().subtract(amount);
-	    			transaction.setTransferReference(beneficiaryId);
+	    			transaction.setTransferReference(beneficiaryId1);
 	    			break;
 	    			
 	    		case 3:
@@ -388,9 +407,9 @@ public class TransactionHandler {
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
-	    			long beneficiaryId1 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+	    			long beneficiaryId2 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
 	    			newBalance = account.getBalance().subtract(amount);
-	    			transaction.setTransferReference(beneficiaryId1);
+	    			transaction.setTransferReference(beneficiaryId2);
 	    			break;
 	    	}
     		

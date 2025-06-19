@@ -15,7 +15,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 87vh;
         }
 
         .sidebar-wrapper {
@@ -75,7 +75,7 @@
             padding: 8px 16px;
             margin: 0 5px;
             border: none;
-            background-color: #4CAF50;
+            background-color: #414485;
             color: white;
             border-radius: 5px;
             cursor: pointer;
@@ -145,7 +145,7 @@
 <script>
     const userId = <%= userId != null ? userId : "null" %>;
     let currentPage = 0;
-    const pageSize = 5;
+    const pageSize = 20;
 
     document.addEventListener("DOMContentLoaded", () => {
         if (!userId) return;
@@ -229,7 +229,7 @@
     }
     
     function deleteBeneficiary(beneficiaryId) {
-        if (!confirm("Are you sure you want to delete this beneficiary?")) return;
+        //if (!confirm("Are you sure you want to delete this beneficiary?")) return;
 
         fetch("${pageContext.request.contextPath}/jadebank/beneficiary/id/" + beneficiaryId, {
             method: "POST"

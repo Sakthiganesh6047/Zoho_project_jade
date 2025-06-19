@@ -11,6 +11,7 @@ public class AccountProfile {
 	String email;
 	BigDecimal balance;
 	Integer accountType;
+	String ifscCode;
 	Long CreatedAt;
 	
 	public Long getAccountId() {
@@ -60,6 +61,13 @@ public class AccountProfile {
 	}
 	public void setAccountType(Integer accountType) {
 		this.accountType = accountType;
+	}
+	
+	public String getIfscCode() {
+		return ifscCode;
+	}
+	public void setIfscCode(String ifscCode) {
+		this.ifscCode = ifscCode;
 	}
 	
 	public Long getCreatedAt() {

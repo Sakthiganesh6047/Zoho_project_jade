@@ -72,11 +72,12 @@
     <div class="button-grid">
         <%-- Customer --%>
         <% if (role == 0) { %>
-            <a href="Transfer.jsp" class="btn">Transfer Money</a>
+            <a href="CustomerTransfer.jsp" class="btn">Transfer Money</a>
             <a href="ViewBalance.jsp" class="btn">View Balance</a>
-            <a href="Transactions.jsp" class="btn">View Transactions</a>
+            <a href="CustomerAccTransactions.jsp" class="btn">View Transactions</a>
             <a href="AddBeneficiary.jsp" class="btn">Add Beneficiary</a>
             <a href="BeneficiaryList.jsp" class="btn">Manage Beneficiaries</a>
+            <a href="QuickTransfer.jsp" class="btn">Instant Money Transfer</a>
 
         <%-- Employee --%>
         <% } else if (role == 1) { %>

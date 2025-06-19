@@ -7,18 +7,16 @@
 <head>
     <title>Add Beneficiary - JadeBank</title>
     <style>
-        /* Your existing styles remain unchanged */
+        /* Styles remain unchanged */
         body {
             font-family: "Roboto", sans-serif;
             background-color: #f5f7fa;
             margin: 0;
         }
-
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 87vh;
         }
-
         .sidebar-wrapper {
             width: 60px;
             background-color: #373962;
@@ -28,18 +26,15 @@
             border-radius: 0 12px 12px 0;
             z-index: 1000;
         }
-
         .main-wrapper {
             margin-left: 70px;
             padding: 40px 20px;
             flex: 1;
         }
-
         h2 {
             text-align: center;
             margin-bottom: 25px;
         }
-
         .form-container {
             max-width: 500px;
             margin: auto;
@@ -48,13 +43,11 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
         label {
             font-weight: bold;
             display: block;
             margin: 12px 0 6px;
         }
-
         input, select {
             width: 100%;
             padding: 10px;
@@ -62,22 +55,19 @@
             border: 1px solid #ccc;
             border-radius: 6px;
         }
-
         button {
             padding: 12px 20px;
             border: none;
             border-radius: 6px;
-            background-color: #4CAF50;
+            background-color: #414485;
             color: white;
             font-weight: bold;
             cursor: pointer;
             width: 100%;
         }
-
         button:hover {
             background-color: #388e3c;
         }
-
         #status {
             margin-top: 16px;
             font-weight: bold;
@@ -103,14 +93,22 @@
                     <option value="">-- Select Account --</option>
                 </select>
 
-                <label for="beneficiaryName">Beneficiary Name:</label>
-                <input type="text" id="beneficiaryName" required>
-
                 <label for="bankName">Bank Name:</label>
-                <input type="text" id="bankName" required>
+                <select id="bankName" required>
+                    <option value="">-- Select Bank --</option>
+                    <option value="Jade Bank">Jade Bank</option>
+                    <option value="SBI">SBI</option>
+                    <option value="ICICI">ICICI</option>
+                    <option value="HDFC">HDFC</option>
+                    <option value="Axis">Axis</option>
+                    <option value="Other">Other</option>
+                </select>
 
                 <label for="accountNumber">Account Number:</label>
                 <input type="number" id="accountNumber" required>
+
+                <label for="beneficiaryName">Beneficiary Name:</label>
+                <input type="text" id="beneficiaryName" required>
 
                 <label for="ifscCode">IFSC Code:</label>
                 <input type="text" id="ifscCode" required>
@@ -143,10 +141,40 @@
                 select.appendChild(option);
             });
         })
-        .catch(err => {
-            console.error("Error fetching accounts:", err);
-        });
+        .catch(err => console.error("Error fetching accounts:", err));
     }
+
+    document.getElementById("bankName").addEventListener("change", function () {
+        const bank = this.value;
+        const accField = document.getElementById("accountNumber");
+        const nameField = document.getElementById("beneficiaryName");
+        const ifscField = document.getElementById("ifscCode");
+
+        if (bank === "Jade Bank") {
+            accField.addEventListener("blur", () => {
+                const enteredAcc = parseInt(accField.value);
+                if (enteredAcc) {
+                    fetch(`${pageContext.request.contextPath}/jadebank/account/beneficiarydetail`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ accountId: enteredAcc })
+                    })
+                    .then(res => res.ok ? res.json() : Promise.reject("Not found"))
+                    .then(data => {
+                        if (data.fullName) nameField.value = data.fullName;
+                        if (data.ifscCode) ifscField.value = data.ifscCode;
+                    })
+                    .catch(() => {
+                        nameField.value = "";
+                        ifscField.value = "";
+                    });
+                }
+            });
+        } else {
+            nameField.value = "";
+            ifscField.value = "";
+        }
+    });
 
     document.getElementById("beneficiaryForm").addEventListener("submit", function(e) {
         e.preventDefault();

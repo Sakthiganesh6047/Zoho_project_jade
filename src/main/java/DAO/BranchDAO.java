@@ -2,7 +2,6 @@ package DAO;
 
 import java.util.Collections;
 import java.util.List;
-
 import pojos.Branch;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
@@ -20,6 +19,20 @@ public class BranchDAO {
 //        this.fieldMappings = fieldMappings;
 //    }
 
+	private BranchDAO() {
+		if (BranchDAOHelper.INSTANCE != null) {
+			throw new IllegalStateException("BranchDAO instance already created");
+		}
+	}
+	
+	private static class BranchDAOHelper{
+		private static final BranchDAO INSTANCE = new BranchDAO();
+	}
+	
+	public static BranchDAO getBranchDAOInstance() {
+		return BranchDAOHelper.INSTANCE;
+	}
+	
     public Long createBranch(Branch branch) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
         QueryResult query = queryBuilder.insert(branch).build();

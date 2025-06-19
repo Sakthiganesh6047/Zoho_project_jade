@@ -3,6 +3,7 @@ package handlers;
 import java.time.Instant;
 import java.util.Map;
 import DAO.AccountDAO;
+import DAO.BranchDAO;
 import DAO.UserDAO;
 import annotations.FromBody;
 import annotations.FromPath;
@@ -11,6 +12,7 @@ import annotations.FromSession;
 import annotations.Route;
 import pojos.Account;
 import pojos.AccountProfile;
+import pojos.Branch;
 import pojos.Employee;
 import pojos.User;
 import util.AuthorizeUtil;
@@ -80,6 +82,29 @@ public class AccountHandler {
     	}
     }
     
+    @Route(path = "account/beneficiarydetail", method = "POST")
+    public String getAccountDetailsForBeneficiary(@FromBody Account account, @FromSession("userId") Long userId, 
+    											@FromSession("role") Integer role) throws CustomException  {
+    	
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(accountId, "Account Number");
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	Account fetchedAccount = accountDAO.getAccountById(accountId);
+    	AccountProfile accountProfile = new AccountProfile();
+    	BranchDAO branchDAO = BranchDAO.getBranchDAOInstance();
+    	Branch branch = branchDAO.getBranchById(fetchedAccount.getBranchId());
+    	UserDAO userDAO = UserDAO.getUserDAOInstance();
+    	User user = userDAO.getUserById(fetchedAccount.getCustomerId());
+    	accountProfile.setAccountId(accountId);
+    	accountProfile.setFullName(user.getFullName());
+    	accountProfile.setIfscCode(branch.getIfscCode());
+    	return Results.respondJson(accountProfile);
+    }
+    
     @Route(path = "account/details", method = "POST")
     public String getAccountDetails(@FromBody Account account, @FromSession("userId") Long sessionId, 
     							@FromSession("role") Integer role) throws CustomException {
@@ -99,8 +124,8 @@ public class AccountHandler {
     	Long customerId = fetchedAccount.getCustomerId();
     	
     	if(role == 0) {
-    		if (!(customerId == sessionId)) {
-    			throw new CustomException("Unauthorized access");
+    		if (!(customerId.equals(sessionId))) {
+    			throw new CustomException("Unauthorized access, check Account Number");
     		} 
     	}
     	

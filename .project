@@ -28,4 +28,16 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>src/main/webapp/contents/man_6997551.png</name>
+			<type>1</type>
+			<location>/home/sakthi-23682/Downloads/man_6997551.png</location>
+		</link>
+		<link>
+			<name>src/main/webapp/contents/woman_6997664.png</name>
+			<type>1</type>
+			<location>/home/sakthi-23682/Downloads/woman_6997664.png</location>
+		</link>
+	</linkedResources>
 </projectDescription>

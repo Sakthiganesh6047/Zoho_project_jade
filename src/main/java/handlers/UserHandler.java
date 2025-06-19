@@ -11,6 +11,7 @@ import annotations.FromBody;
 import annotations.FromQuery;
 import annotations.FromSession;
 import annotations.Route;
+import pojos.Credential;
 import pojos.Customer;
 import pojos.Employee;
 import pojos.User;
@@ -324,6 +325,31 @@ public class UserHandler {
                 break;
         }
         return Results.respondJson(profile);
+    }
+    
+    @Route(path = "user/profile", method = "GET")
+    public String getUserProfileById(@FromSession("userId") Long userId) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+        return Results.respondJson(userDAO.getUserById(userId));
+    }
+    
+    @Route(path = "user/password", method = "POST")
+    public String changePassword(@FromBody Credential credential, @FromSession("userId") Long userId) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	User fetchedUser = userDAO.getPasswordById(userId);
+    	
+    	if(!(Password.verifyPassword(credential.getPassword(), fetchedUser.getPasswordHash()))){
+    		throw new CustomException("Wrong Password!");
+    	}
+    	
+    	if(!(Password.verifyPassword(credential.getNewPassword(), fetchedUser.getPasswordHash()))){
+    		throw new CustomException("Your Old password cannot be your New password!");
+    	}
+    	
+    	fetchedUser.setPasswordHash(Password.hashPassword(credential.getNewPassword()));
+    	return Results.respondJson(userDAO.updatePassword(fetchedUser));
     }
     
     @Route(path = "user/employeelist", method = "GET")

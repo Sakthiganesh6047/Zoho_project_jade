@@ -169,14 +169,19 @@
 
     <% if (role == 0) { %>
     
-    	<div class="dropdown">
-            <a href="#"><i class="fas fa-money-bill-transfer"></i><span>Transact</span></a>
-            <div class="dropdown-content">
-                <a href="TransferInside.jsp">- Internal Transfer</a>
-                <a href="TransferOutside.jsp">- External Transfer</a>
-            </div>
+        <a href="CustomerTransfer.jsp"><i class="fas fa-money-bill-transfer"></i><span>Transact</span></a>
+        
+        <a href="QuickTransfer.jsp"><i class="fa-solid fa-money-bill-trend-up"></i><span>Instant Transfer</span></a>
+        
+        <a href="CustomerAccTransactions.jsp"><i class="fas fa-clock-rotate-left"></i><span>View Transactions</span></a>
+
+        <div class="dropdown">
+        	<a href="#"><i class="fa-solid fa-user-plus"></i><span>Beneficiaries</span></a>
+        		<div class="dropdown-content">
+        			<a href="AddBeneficiary.jsp" class="btn">- Add Beneficiary</a>
+        			<a href="BeneficiaryList.jsp" class="btn">- Manage Beneficiaries</a>
+        		</div>
         </div>
-        <a href="ViewTransactions.jsp"><i class="fas fa-clock-rotate-left"></i><span>History</span></a>
         
     <% } else if (role == 1) { %>
     

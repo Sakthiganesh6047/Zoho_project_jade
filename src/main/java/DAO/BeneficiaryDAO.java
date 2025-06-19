@@ -8,6 +8,7 @@ import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.Results;
 
 public class BeneficiaryDAO {
 	
@@ -33,23 +34,23 @@ public class BeneficiaryDAO {
         return (Long) executor.executeQuery(insertQuery, Beneficiary.class);
 	}
 	
-	public long addAsBeneficiary(Beneficiary benefiaciary, Connection connection) throws CustomException {
+	public Long addAsBeneficiary(Beneficiary benefiaciary, Connection connection) throws CustomException {
 		QueryBuilder queryBuilder = new QueryBuilder(Beneficiary.class);
 		QueryResult insertQuery = queryBuilder.insert(benefiaciary)
 											  .build();
         System.out.println("Insert Query: " + insertQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (long) executor.executeInsertWithConn(insertQuery, connection, true);
+        return (Long) executor.executeInsertWithConn(insertQuery, connection, true);
 	}
 	
-	public int updateBeneficiary(Beneficiary beneficiary) throws CustomException {
+	public Integer updateBeneficiary(Beneficiary beneficiary) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(Beneficiary.class);
         QueryResult updateQuery = queryBuilder.update(beneficiary)
                          .where("beneficiar_id", "=", beneficiary.getBeneficiaryId())
                          .build();
         System.out.println("Update Query: " + updateQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (int) executor.executeQuery(updateQuery, null);
+        return (Integer) executor.executeQuery(updateQuery, null);
     }
 	
 	public int deleteBeneficiary(Long beneficiaryId) throws CustomException {
@@ -69,7 +70,9 @@ public class BeneficiaryDAO {
         				.build();
         System.out.println("Paginated Select Query: " + getQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (Beneficiary) executor.executeQuery(getQuery, Beneficiary.class);
+        @SuppressWarnings("unchecked")
+		List<Beneficiary> beneficiaries = (List<Beneficiary>) executor.executeQuery(getQuery, Beneficiary.class);
+        return Results.getSingleResult(beneficiaries);
 	}
 	
 	@SuppressWarnings("unchecked")

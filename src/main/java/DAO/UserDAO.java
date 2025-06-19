@@ -54,6 +54,16 @@ public class UserDAO {
         return (int) executor.executeQuery(updateQuery, null);
     }
     
+    public int updatePassword(User user) throws CustomException {
+        QueryBuilder queryBuilder = new QueryBuilder(User.class);
+        QueryResult updateQuery = queryBuilder.update(user, "passwordHash")
+                         .where("user_id", "=", user.getUserId())
+                         .build();
+        System.out.println("Update Query: " + updateQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (int) executor.executeQuery(updateQuery, null);
+    }
+    
     public int updateUser(User user, Connection connection) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(User.class);
         QueryResult updateQuery = queryBuilder.update(user)
@@ -111,6 +121,23 @@ public class UserDAO {
     public User getUserById(Long userId) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(User.class);
         QueryResult getQuery = queryBuilder.select("user_id", "fullName", "email", "userType", "status", "dob", "phone", "gender")
+                         .where("user_id", "=", userId)
+                         .build();
+        System.out.println("Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        @SuppressWarnings("unchecked")
+		List<User> resultList = (List<User>) executor.executeQuery(getQuery, User.class);
+        User user = Results.getSingleResult(resultList);
+        if (user != null) {
+        	return user;
+        } else {
+        	throw new CustomException("No users found for this userId");
+        }
+    }
+    
+    public User getPasswordById(Long userId) throws CustomException {
+        QueryBuilder queryBuilder = new QueryBuilder(User.class);
+        QueryResult getQuery = queryBuilder.select("user_id", "passwordHash")
                          .where("user_id", "=", userId)
                          .build();
         System.out.println("Select Query: " + getQuery);

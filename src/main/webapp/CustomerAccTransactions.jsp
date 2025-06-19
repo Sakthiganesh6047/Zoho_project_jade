@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
+<%
+    Long userId = (Long) session.getAttribute("userId");
+%>
 <head>
     <title>View Transactions</title>
     <style>
@@ -149,7 +152,10 @@
 		    <div style="display: flex; gap: 20px; align-items: flex-end;">
 		        <div style="flex: 1;">
 		            <label for="accountId"><strong>Account ID:</strong></label>
-		            <input type="number" id="accountId" placeholder="Enter Account ID" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+		            <select id="accountId" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+					    <option value="">-- Select Account --</option>
+					    <option value="ALL">All Accounts</option>
+					</select>
 		        </div>
 		        <div style="width: 100px;">
 		            <label for="limit"><strong>Limit:</strong></label>
@@ -193,31 +199,69 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
+
+	document.addEventListener("DOMContentLoaded", () => {
+	    const userId = <%= userId != null ? userId : "null" %>;
+	
+	    if (userId) {
+	        fetch(`${pageContext.request.contextPath}/jadebank/account/id`, {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({ userId: userId })
+	        })
+	        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch accounts"))
+	        .then(accounts => {
+	            const dropdown = document.getElementById("accountId");
+	            accounts.forEach(acc => {
+	                const option = document.createElement("option");
+	                option.value = acc.accountId;
+	                option.textContent = "ID: " + acc.accountId + " | Type: " + (acc.accountType === 1 ? "Savings" : "Current");
+	                dropdown.appendChild(option);
+	            });
+	        })
+	        .catch(err => {
+	            document.getElementById("errorMsg").textContent = "Failed to load account list.";
+	            console.error(err);
+	        });
+	    }
+	});
+
     let currentOffset = 0;
     const pageSize = 10;
 
     function fetchTransactions(resetPage = false) {
-        const accountId = parseInt(document.getElementById("accountId").value.trim());
+        const selectedValue = document.getElementById("accountId").value;
         const limit = parseInt(document.getElementById("limit").value.trim());
         const errorMsg = document.getElementById("errorMsg");
 
-        if (!accountId || limit < 1) {
-            errorMsg.textContent = "Please enter a valid Account ID and Limit.";
+        if (!selectedValue || limit < 1) {
+            errorMsg.textContent = "Please select an account or All Accounts, and enter a valid Limit.";
             return;
         }
 
         if (resetPage) {
-            currentOffset = 0; // Reset to first page
+            currentOffset = 0;
         }
 
         errorMsg.textContent = "";
 
-        fetch("${pageContext.request.contextPath}/jadebank/transactions/account?limit=" + limit + "&offset=" + currentOffset, {
+        let fetchUrl = "";
+        let fetchBody = {};
+
+        if (selectedValue === "ALL") {
+            fetchUrl = "${pageContext.request.contextPath}/jadebank/transactions/customer?limit=" + limit + "&offset=" + currentOffset;
+            fetchBody = { customerId: <%= userId != null ? userId : "null" %> };
+        } else {
+            fetchUrl = "${pageContext.request.contextPath}/jadebank/transactions/account?limit=" + limit + "offset=" + currentOffset;
+            fetchBody = { accountId: parseLong(selectedValue) };
+        }
+
+        fetch(fetchUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ accountId: accountId })
+            body: JSON.stringify(fetchBody)
         })
-        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch"))
+        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions"))
         .then(data => {
             const tbody = document.getElementById("transactionBody");
             tbody.innerHTML = "";
@@ -230,7 +274,8 @@
 
             data.forEach(txn => {
                 const row = document.createElement("tr");
-                const statusText = txn.transactionStatus === 1 ? "Success" : (txn.transactionStatus === 2 ? "Failure" : "Unknown");
+                const statusText = txn.transactionStatus === 1 ? "Success" :
+                                   txn.transactionStatus === 2 ? "Failure" : "Unknown";
 
                 row.innerHTML =
                     "<td>" + txn.transactionId + "</td>" +
@@ -241,6 +286,7 @@
                     "<td>" + (txn.beneficiaryAccount || "-") + "</td>" +
                     "<td>" + (txn.description || "") + "</td>" +
                     "<td>" + statusText + "</td>";
+
                 tbody.appendChild(row);
             });
 
@@ -252,6 +298,7 @@
             console.error(err);
         });
     }
+
 
     function nextPage() {
         const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
