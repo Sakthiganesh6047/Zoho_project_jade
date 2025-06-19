@@ -3,10 +3,30 @@
 <head>
     <title>View Employees - JadeBank</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
+        
+        body { 
+		    margin: 0; 
+		    display: flex; 
+		    flex-direction: column; 
+		    min-height: 100vh;
+		    font-family: Arial, sans-serif;
+		}
+		
+		.body-wrapper {
+		    display: flex; 
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 70px;
+		    color: white;
+		}
+		
+		.content-wrapper {
+		    width: calc(100% - 70px);
+		    padding: 20px;
+		}
 
         h2 {
             text-align: center;
@@ -39,37 +59,45 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
-<h2>Employee List</h2>
-
-<div class="pagination-controls">
-    <label for="limit">Rows per page:</label>
-    <select id="limit">
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="20">20</option>
-    </select>
-    <button onclick="previousPage()">Previous</button>
-    <button onclick="nextPage()">Next</button>
-</div>
-
-<table id="employee-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Branch Id</th>
-            <th>Branch Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-
-<jsp:include page="Footer.jsp" />
+	<jsp:include page="LoggedInHeader.jsp" />
+	
+	<div class="body-wrapper">
+		
+		<div class="sidebar-wrapper">
+			<jsp:include page="SideBar.jsp" />
+		</div>
+	
+		<div class="content-wrapper">
+			<h2>Employee List</h2>
+			
+			<div class="pagination-controls">
+			    <label for="limit">Rows per page:</label>
+			    <select id="limit">
+			        <option value="5">5</option>
+			        <option value="10" selected>10</option>
+			        <option value="20">20</option>
+			    </select>
+			    <button onclick="previousPage()">Previous</button>
+			    <button onclick="nextPage()">Next</button>
+			</div>
+			
+			<table id="employee-table">
+			    <thead>
+			        <tr>
+			            <th>ID</th>
+			            <th>Name</th>
+			            <th>Email</th>
+			            <th>Role</th>
+			            <th>Branch Id</th>
+			            <th>Branch Name</th>
+			            <th>Actions</th>
+			        </tr>
+			    </thead>
+			    <tbody></tbody>
+			</table>
+		</div>
+	</div>
+	<jsp:include page="Footer.jsp" />
 
 <script>
     let offset = 0;

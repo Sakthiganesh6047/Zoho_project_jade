@@ -14,103 +14,110 @@
 
 <style>
     .sidebar {
-        width: 60px;
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        background-color: 373962;
-        border-radius: 0 12px 12px 0;
-        color: white;
-        overflow-x: hidden;
-        transition: width 0.3s ease;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+	    width: 60px;
+	    height: 100vh;
+	    position: fixed;
+	    left: 0;
+	    background-color: #373962;
+	    border-radius: 0 12px 12px 0;
+	    color: white;
+	    overflow-x: hidden;
+	    transition: width 0.3s ease;
+	    z-index: 1000;
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	}
+	
+	.sidebar:hover {
+	    width: 240px;
+	    align-items: stretch;
+	}
+	
+	.sidebar .mini-logo {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    justify-content: center;
+	    height: 100%;
+	    margin-top: 20px;
+	    font-size: 24px;
+	    font-weight: bold;
+	    letter-spacing: 2px;
+	}
+	
+	.sidebar:hover .mini-logo {
+	    display: none;
+	}
+	
+	.sidebar .sidebar-content {
+	    display: none;
+	    padding: 10px;
+	}
+	
+	.sidebar:hover .sidebar-content {
+	    display: block;
+	}
+	
+	.sidebar h3 {
+	    text-align: center;
+	    font-size: 1.2em;
+	    margin-bottom: 10px;
+	}
+	
+	.userinfo {
+	    text-align: center;
+	    font-size: 0.9em;
+	    color: #ccc;
+	    margin-bottom: 20px;
+	}
+	
+	.sidebar a {
+	    display: block;
+	    padding: 12px 16px;
+	    color: white;
+	    text-decoration: none;
+	    white-space: nowrap;
+	    overflow: hidden;
+	    transition: background 0.3s, color 0.3s;
+	}
+	
+	.sidebar a:hover {
+	    background-color: white;
+	    color: #373962;
+	}
+	
+	.dropdown {
+	    position: relative;
+	}
+	
+	.dropdown-content {
+	    display: none;
+	    flex-direction: column;
+	    background-color: white; /* entire dropdown box white */
+	    margin-left: 20px;
+	    padding-left: 10px;
+	    border-radius: 6px;
+	    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+	}
+	
+	.sidebar:hover .dropdown:hover .dropdown-content {
+	    display: flex;
+	}
+	
+	.dropdown-content a {
+	    padding: 10px 15px;
+	    background-color: white; /* background remains white */
+	    color: #373962;
+	    text-decoration: none;
+	    transition: background 0.3s;
+	}
+	
+	.dropdown-content a:hover {
+	    background-color: #f0f0f0; /* light hover effect */
+	    color: #373962;
+	}
 
-    .sidebar:hover {
-        width: 220px;
-        align-items: stretch;
-    }
-
-    .sidebar .mini-logo {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        justify-content: center; /* center vertically */
-    	height: 100%; /* full height of sidebar */
-        margin-top: 20px;
-        font-size: 24px;
-        font-weight: bold;
-        letter-spacing: 2px;
-    }
-
-    .sidebar:hover .mini-logo {
-        display: none;
-    }
-
-    .sidebar .sidebar-content {
-        display: none;
-        padding: 10px;
-    }
-
-    .sidebar:hover .sidebar-content {
-        display: block;
-    }
-
-    .sidebar h3 {
-        text-align: center;
-        font-size: 1.2em;
-        margin-bottom: 10px;
-    }
-
-    .userinfo {
-        text-align: center;
-        font-size: 0.9em;
-        color: #ccc;
-        margin-bottom: 20px;
-    }
-
-    .sidebar a {
-        display: block;
-        padding: 12px 16px;
-        color: white;
-        text-decoration: none;
-        white-space: nowrap;
-        overflow: hidden;
-        transition: background 0.3s;
-    }
-
-    .sidebar a:hover {
-        background-color: #00509e;
-    }
-
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown-content {
-        display: none;
-        flex-direction: column;
-        background-color: #003f7d;
-        margin-left: 20px;
-        padding-left: 10px;
-    }
-
-    .sidebar:hover .dropdown:hover .dropdown-content {
-        display: flex;
-    }
-
-    .dropdown-content a {
-        padding: 10px 15px;
-        background-color: #003f7d;
-    }
-
-    .dropdown-content a:hover {
-        background-color: #00509e;
-    }
 </style>
 
 <div class="sidebar">
@@ -128,7 +135,7 @@
         <h3>JadeBank</h3>
         <div class="userinfo"><em><%= roleLabel %></em></div>
 
-        <a href="Home.jsp">Home</a>
+        <a href="Dashboard.jsp">Home</a>
 
         <% if (role >= 0 && role <= 3) { %>
             <div class="dropdown">

@@ -4,14 +4,43 @@
     <title>Outside Bank Transfer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            padding: 40px;
+            font-family: "Roboto", sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .body-wrapper {
+            display: flex;
+            flex: 1;
+            min-height: 70vh;
+        }
+
+        .sidebar-wrapper {
+            width: 60px;
+            border-radius: 0 12px 12px 0;
+            background-color: #373962;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .content-wrapper {
+            margin-left: 70px;
+            padding: 40px 20px;
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         form {
-            max-width: 600px;
-            margin: auto;
+            width: 100%;
+            max-width: 650px;
             background: #fff;
             padding: 30px;
             border-radius: 12px;
@@ -21,22 +50,27 @@
         h2 {
             text-align: center;
             margin-bottom: 25px;
+            color: #373962;
         }
 
         fieldset {
             border: none;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            padding: 0;
         }
 
         legend {
-            font-size: 1.2em;
+            font-size: 1.2rem;
             margin-bottom: 10px;
             font-weight: bold;
+            color: #333;
         }
 
         label {
             display: block;
-            margin: 8px 0 5px;
+            margin-top: 10px;
+            font-weight: 600;
+            color: #444;
         }
 
         input {
@@ -44,55 +78,93 @@
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
-            margin-bottom: 10px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        .account-fetch {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .account-fetch input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .account-fetch button {
+            padding: 10px 14px;
+            margin-top: 0;
+            height: 42px;
+            width: 15%;
         }
 
         button {
-            background-color: #0066cc;
+            background-color: #414485;
             color: white;
             border: none;
-            padding: 12px 18px;
+            padding: 12px;
             border-radius: 6px;
             cursor: pointer;
-            margin-top: 10px;
+            font-weight: bold;
+            margin-top: 15px;
+            width: 100%;
         }
 
         button:hover {
-            background-color: #004d99;
+            background-color: #0056b3;
         }
 
         .info-box {
-            background-color: #f0f9ff;
-            padding: 10px;
-            margin-top: 8px;
-            border-left: 5px solid #007acc;
-            border-radius: 4px;
+            background-color: #eef6ff;
+            padding: 12px;
+            margin-top: 10px;
+            border-left: 4px solid #007acc;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: #333;
         }
-        
+
         .modal-backdrop {
-		    position: fixed;
-		    top: 0;
-		    left: 0;
-		    width: 100%;
-		    height: 100%;
-		    background-color: rgba(0,0,0,0.5);
-		    display: none;
-		    justify-content: center;
-		    align-items: center;
-		    z-index: 1000;
-		}
-		
-		.modal-content {
-		    background: #fff;
-		    padding: 20px 30px;
-		    border-radius: 10px;
-		    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-		    max-width: 400px;
-		    width: 100%;
-		}
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 320px;
+            text-align: center;
+        }
+
+        .modal-content input {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
 
         .error {
             color: red;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -100,57 +172,70 @@
 
 <jsp:include page="LoggedInHeader.jsp" />
 
-<h2>Outside Bank Transfer</h2>
+<div class="body-wrapper">
+    <div class="sidebar-wrapper">
+        <jsp:include page="SideBar.jsp" />
+    </div>
 
-<form id="transferForm" method="post" action="jadebank/transfer">
-    <input type="hidden" name="transaction.transactionType" value="4" />
+    <div class="content-wrapper">
+        <form id="transferForm" method="post" action="jadebank/transfer">
+            <h2>Outside Bank Transfer</h2>
 
-    <!-- Sender Section -->
-    <fieldset>
-        <legend>Sender Details</legend>
-        <label for="senderAccountId">Your Account ID:</label>
-        <input type="number" name="transaction.accountId" id="senderAccountId" required />
-        <button type="button" onclick="fetchSenderDetails()">Fetch Details</button>
-        <div id="infoDiv" class="info-box"></div>
+            <input type="hidden" name="transaction.transactionType" value="4" />
 
-        <label for="transaction.amount">Amount:</label>
-        <input type="number" step="0.01" name="transaction.amount" id="amount" required />
+            <!-- Sender Section -->
+            <fieldset>
+                <legend>Sender Details</legend>
 
-        <label for="transaction.description">Description:</label>
-        <input type="text" name="transaction.description" id="description" />
-    </fieldset>
+                <label for="senderAccountId">Sender Account ID:</label>
+                <div class="account-fetch">
+                    <input type="number" name="transaction.accountId" id="senderAccountId" required />
+                    <button type="button" onclick="fetchSenderDetails()">Fetch</button>
+                </div>
 
-    <!-- Receiver Section -->
-    <fieldset>
-        <legend>Receiver (Other Bank) Details</legend>
-        <label for="beneficiaryAccountNumber">Account Number:</label>
-        <input type="number" name="beneficiary.accountNumber" id="beneficiaryAccountNumber" required />
+                <div id="infoDiv" class="info-box"></div>
 
-        <label for="beneficiaryAccountHolder">Account Holder Name:</label>
-        <input type="text" name="beneficiary.accountHolderName" id="beneficiaryAccountHolder" required />
+                <label for="amount">Amount:</label>
+                <input type="number" step="0.01" name="transaction.amount" id="amount" required />
 
-        <label for="beneficiaryBankName">Bank Name:</label>
-        <input type="text" name="beneficiary.bankName" id="beneficiaryBankName" required />
+                <label for="description">Description:</label>
+                <input type="text" name="transaction.description" id="description" />
+            </fieldset>
 
-        <label for="beneficiaryIfscCode">IFSC Code:</label>
-        <input type="text" name="beneficiary.ifscCode" id="beneficiaryIfscCode" required />
-    </fieldset>
+            <!-- Receiver Section -->
+            <fieldset>
+                <legend>Receiver Details</legend>
 
-    <!-- Password Section (Modal-style area) -->
-    <div id="passwordModal" class="modal-backdrop">
-	    <div class="modal-content">
-	        <p>Confirm Password:</p>
-	        <input type="password" id="confirmPassword" />
-	        <button type="button" onclick="submitTransfer()">Confirm</button>
-	        <button type="button" onclick="closeModal()">Cancel</button>
-	    </div>
-	</div>
+                <label for="beneficiaryAccountNumber">Account Number:</label>
+                <input type="number" name="beneficiary.accountNumber" id="beneficiaryAccountNumber" required />
 
+                <label for="beneficiaryAccountHolder">Account Holder Name:</label>
+                <input type="text" name="beneficiary.accountHolderName" id="beneficiaryAccountHolder" required />
 
-    <div id="transfer-status" class="info-box"></div>
+                <label for="beneficiaryBankName">Bank Name:</label>
+                <input type="text" name="beneficiary.bankName" id="beneficiaryBankName" required />
 
-    <button type="button" onclick="showPasswordModal()">Transfer</button>
-</form>
+                <label for="beneficiaryIfscCode">IFSC Code:</label>
+                <input type="text" name="beneficiary.ifscCode" id="beneficiaryIfscCode" required />
+            </fieldset>
+
+            <div id="transfer-status" class="info-box"></div>
+            <button type="button" onclick="showPasswordModal()">Transfer</button>
+        </form>
+    </div>
+</div>
+
+<!-- Password Modal -->
+<div id="passwordModal" class="modal-backdrop">
+    <div class="modal-content">
+        <p><strong>Confirm Password:</strong></p>
+        <input type="password" id="confirmPassword" placeholder="Enter your password">
+        <button type="button" onclick="submitTransfer()">Confirm</button>
+        <button type="button" onclick="closeModal()">Cancel</button>
+    </div>
+</div>
+
+<jsp:include page="Footer.jsp" />
 
 <script>
     let senderDetails = null;
@@ -184,8 +269,7 @@
     }
 
     function closeModal() {
-        const modal = document.getElementById("passwordModal");
-        modal.style.display = "none";
+        document.getElementById("passwordModal").style.display = "none";
         document.getElementById("confirmPassword").value = "";
     }
 
@@ -195,7 +279,6 @@
         const description = document.getElementById("description").value;
         const password = document.getElementById("confirmPassword").value;
         const statusDiv = document.getElementById("transfer-status");
-        const modal = document.getElementById("passwordModal");
 
         const beneficiary = {
             beneficiaryAccountNumber: document.getElementById("beneficiaryAccountNumber").value.trim(),
@@ -230,9 +313,7 @@
             body: JSON.stringify(data)
         })
         .then(async res => {
-            modal.style.display = "none";
-            document.getElementById("confirmPassword").value = "";
-
+            closeModal();
             const result = await res.json();
 
             if (res.ok && result.status === "success") {
@@ -247,14 +328,12 @@
             }
         })
         .catch(err => {
-            modal.style.display = "none";
-            document.getElementById("confirmPassword").value = "";
+            closeModal();
             statusDiv.textContent = "Network error: " + err.message;
             statusDiv.style.color = "red";
         });
     }
 </script>
 
-<jsp:include page="Footer.jsp" />
 </body>
 </html>

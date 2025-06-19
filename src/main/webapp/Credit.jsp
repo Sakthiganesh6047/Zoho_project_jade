@@ -5,96 +5,181 @@
     <title>Credit Amount</title>
     <style>
         body {
-            font-family: "Roboto", sans-serif;
-            background-color: #f7f7f7;
-        }
-        .credit-form-container {
-            width: 400px;
-            margin: 50px auto;
-            padding: 25px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        label, input, button {
-            display: block;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        input[type="number"], input[type="password"] {
-            padding: 8px;
-        }
-        button {
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #account-info {
-            font-size: 14px;
-            margin-top: -10px;
-            margin-bottom: 10px;
-            color: #444;
-        }
-        #credit-status {
-            margin-top: 10px;
-            font-weight: bold;
-            text-align: center;
-        }
-        /* Modal style */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 300px;
-            text-align: center;
-        }
+		    font-family: "Roboto", sans-serif;
+		    background-color: #f7f7f7;
+		    margin: 0;
+		    display: flex;
+		    flex-direction: column;
+		    min-height: 100vh;
+		}
+		
+		.body-wrapper {
+		    display: flex;
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 60px;
+		    border-radius: 0 12px 12px 0;
+		    background-color: #373962;
+		    color: white;
+		    height: 100vh;
+		    position: fixed;
+		    left: 0;
+		    z-index: 1000;
+		}
+		
+		.content-wrapper {
+		    margin-left: 70px;
+		    flex: 1;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    padding: 40px 20px;
+		}
+		
+		.form-box {
+		    background: white;
+		    padding: 30px;
+		    border-radius: 10px;
+		    max-width: 450px;
+		    width: 100%;
+		    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+		}
+		
+		h2 {
+		    text-align: center;
+		    color: #373962;
+		    margin-bottom: 25px;
+		}
+		
+		label {
+		    font-weight: bold;
+		    margin-bottom: 6px;
+		    display: block;
+		    color: #333;
+		}
+		
+		input[type="number"],
+		input[type="password"] {
+		    width: 100%;
+		    padding: 10px;
+		    border-radius: 6px;
+		    border: 1px solid #ccc;
+		    font-size: 1rem;
+		    box-sizing: border-box;
+		    margin-bottom: 15px;
+		}
+		
+		input:focus {
+		    outline: none;
+		    border-color: #007bff;
+		}
+		
+		button {
+		    padding: 10px 20px;
+		    background-color: #414485;
+		    color: white;
+		    font-weight: bold;
+		    border: none;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    width: 100%;
+		    transition: background-color 0.2s;
+		}
+		
+		button:hover {
+		    background-color: #0056b3;
+		}
+		
+		#account-info {
+		    font-size: 14px;
+		    color: #444;
+		    margin: -10px 0 10px;
+		}
+		
+		#credit-status {
+		    margin-top: 15px;
+		    font-weight: bold;
+		    text-align: center;
+		}
+		
+		/* Modal style */
+		.modal {
+		    display: none;
+		    position: fixed;
+		    top: 0; left: 0;
+		    width: 100%; height: 100%;
+		    background: rgba(0,0,0,0.5);
+		    justify-content: center;
+		    align-items: center;
+		    z-index: 2000;
+		}
+		
+		.modal-content {
+		    background: white;
+		    padding: 25px;
+		    border-radius: 10px;
+		    width: 320px;
+		    text-align: center;
+		    box-shadow: 0 0 12px rgba(0,0,0,0.2);
+		}
+		
+		.modal-content h3 {
+		    color: #373962;
+		    margin-bottom: 15px;
+		}
+		
+		.modal-content input {
+		    margin-bottom: 15px;
+		}
+		
+		.modal-content button {
+		    width: auto;
+		}
     </style>
 </head>
 <body>
     <jsp:include page="LoggedInHeader.jsp" />
 
-    <div class="credit-form-container">
-        <h2>Credit Transaction</h2>
-        <form id="creditForm">
-            <label for="accountId">Account ID:</label>
-            <input type="number" id="accountId" name="accountId" required>
-
-            <div id="account-info"></div>
-
-            <button type="button" onclick="fetchAccountDetails()">Check Details</button>
-
-            <label for="amount">Amount:</label>
-            <input type="number" id="amount" name="amount" step="0.01" required>
-
-            <button type="button" onclick="openPasswordModal()">Credit</button>
-            <div id="credit-status"></div>
-        </form>
-    </div>
-
-    <!-- Password Modal -->
-    <div class="modal" id="passwordModal">
-        <div class="modal-content">
-            <h3>Confirm Password</h3>
-            <input type="password" id="confirmPassword" placeholder="Enter your password" required>
-            <br>
-            <button onclick="submitCredit()">Confirm</button>
-        </div>
-    </div>
-
-    <jsp:include page="Footer.jsp" />
+	<div class="body-wrapper">
+	    <div class="sidebar-wrapper">
+	        <jsp:include page="SideBar.jsp" />
+	    </div>
+	
+	    <div class="content-wrapper">
+	        <div class="form-box">
+	            <h2>Credit Transaction</h2>
+	            <form id="creditForm">
+	                <label for="accountId">Account ID:</label>
+	                <input type="number" id="accountId" name="accountId" required>
+	
+	                <div id="account-info"></div>
+	
+	                <button type="button" onclick="fetchAccountDetails()">Check Details</button><br><br><br>
+	
+	                <label for="amount">Amount:</label>
+	                <input type="number" id="amount" name="amount" step="0.01" required>
+	
+	                <button type="button" onclick="openPasswordModal()">Credit</button>
+	                <div id="credit-status"></div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+	
+	<!-- Password Modal -->
+	<div class="modal" id="passwordModal">
+	    <div class="modal-content">
+	        <h3>Confirm Password</h3>
+	        <input type="password" id="confirmPassword" placeholder="Enter your password" required>
+	        <br>
+	        <button onclick="submitCredit()">Confirm</button>
+	    </div>
+	</div>
+	
+	<jsp:include page="Footer.jsp" />
 
     <script>
         let accountDetails = null;

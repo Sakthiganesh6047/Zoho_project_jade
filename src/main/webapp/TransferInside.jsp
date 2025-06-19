@@ -4,142 +4,215 @@
     <title>Inside Bank Transfer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            padding: 40px;
-        }
-
-        form {
-            max-width: 600px;
-            margin: auto;
-            background: #fff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        fieldset {
-            border: none;
-            margin-bottom: 25px;
-        }
-
-        legend {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        label {
-            display: block;
-            margin: 8px 0 5px;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-        }
-
-        button {
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            padding: 12px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #004d99;
-        }
-
-        .info-box {
-            background-color: #f0f9ff;
-            padding: 10px;
-            margin-top: 8px;
-            border-left: 5px solid #007acc;
-            border-radius: 4px;
-        }
-        
-        #passwordModal {
-		    display: none;
+		    font-family: "Roboto", sans-serif;
+		    background-color: #f7f7f7;
+		    margin: 0;
+		    display: flex;
+		    flex-direction: column;
+		    min-height: 100vh;
+		}
+		
+		.body-wrapper {
+		    display: flex;
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 60px;
+		    border-radius: 0 12px 12px 0;
+		    background-color: #373962;
+		    color: white;
+		    height: 100vh;
 		    position: fixed;
-		    top: 30%;
-		    left: 50%;
-		    transform: translate(-50%, -30%);
-		    background-color: #fff;
-		    padding: 20px 30px;
-		    border-radius: 8px;
-		    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+		    left: 0;
 		    z-index: 1000;
 		}
-
-		#passwordModal input {
+		
+		.content-wrapper {
+		    margin-left: 70px;
+		    padding: 40px 20px;
+		    flex: 1;
+		    display: flex;
+		    justify-content: center;
+		    align-items: flex-start;
+		}
+		
+		form {
+		    width: 100%;
+		    max-width: 650px;
+		    background: #fff;
+		    padding: 30px;
+		    border-radius: 12px;
+		    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+		}
+		
+		h2 {
+		    text-align: center;
+		    margin-bottom: 25px;
+		    color: #373962;
+		}
+		
+		fieldset {
+		    border: none;
+		    margin-bottom: 30px;
+		    padding: 0;
+		}
+		
+		legend {
+		    font-size: 1.2rem;
+		    margin-bottom: 10px;
+		    font-weight: bold;
+		    color: #333;
+		}
+		
+		label {
+		    display: block;
 		    margin-top: 10px;
-		    margin-bottom: 15px;
+		    font-weight: 600;
+		    color: #444;
+		}
+		
+		input {
+		    width: 100%;
+		    padding: 10px;
+		    border-radius: 6px;
+		    border: 1px solid #ccc;
+		    margin-top: 5px;
+		    box-sizing: border-box;
+		}
+		
+		input:focus {
+		    border-color: #007bff;
+		    outline: none;
+		}
+		
+		button {
+		    background-color: #414485;
+		    color: white;
+		    border: none;
+		    padding: 12px;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    font-weight: bold;
+		    margin-top: 15px;
+		    width: 100%;
+		}
+		
+		button:hover {
+		    background-color: #0056b3;
+		}
+		
+		.info-box {
+		    background-color: #eef6ff;
+		    padding: 12px;
+		    margin-top: 10px;
+		    border-left: 4px solid #007acc;
+		    border-radius: 6px;
+		    font-size: 0.95rem;
+		    color: #333;
+		}
+		
+		/* Modal */
+		#passwordModal {
+		    display: none;
+		    position: fixed;
+		    top: 50%; left: 50%;
+		    transform: translate(-50%, -50%);
+		    background-color: #fff;
+		    padding: 25px;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+		    z-index: 1001;
+		    width: 320px;
+		    text-align: center;
+		}
+		
+		#passwordModal input {
+		    width: 100%;
+		    padding: 10px;
+		    margin: 15px 0;
+		    border: 1px solid #ccc;
+		    border-radius: 6px;
+		}
+		
+		#modalBackdrop {
+		    display: none;
+		    position: fixed;
+		    top: 0; left: 0;
+		    width: 100%; height: 100%;
+		    background: rgba(0,0,0,0.5);
+		    z-index: 1000;
+		}
+		
+		.error {
+		    color: red;
+		    font-weight: bold;
 		}
 
-        .error {
-            color: red;
-        }
     </style>
 
 </head>
 <body>
 
 	<jsp:include page="LoggedInHeader.jsp" />
-	    
-    <h2>Inside Bank Transfer</h2>
-    <form id="transferForm" method="post" action="jadebank/transfer">
-        <input type="hidden" name="transaction.transactionType" value="3" />
 
-        <!-- Sender Section -->
-        <fieldset>
-            <legend>Sender Details</legend>
-            <label for="senderAccountId">Your Account ID:</label>
-            <input type="number" name="transaction.accountId" id="senderAccountId" required onblur="fetchSenderDetails()" />
-
-            <div id="infoDiv" class="info-box"></div>
-
-            <label for="transaction.amount">Amount:</label>
-            <input type="number" step="0.01" name="transaction.amount" id="amount" required />
-
-            <label for="transaction.description">Description:</label>
-            <input type="text" name="transaction.description" id="description" />
-        </fieldset>
-
-        <!-- Receiver Section -->
-        <fieldset>
-            <legend>Receiver Details</legend>
-            <label for="receiverAccount1">Receiver Account Number:</label>
-            <input type="number" id="receiverAccount1" name="beneficiary.accountNumber" required />
-
-            <label for="receiverAccount2">Confirm Account Number:</label>
-            <input type="number" id="receiverAccount2" required />
-
-            <button type="button" onclick="checkReceiverDetails()">Check Receiver Details</button>
-            <div id="receiverDetails" class="info-box"></div>
-        </fieldset>
-
-        <div id="passwordModal" style="display:none;">
-		    <p>Confirm Password:</p>
-		    <input type="password" id="confirmPassword" />
+		<div class="body-wrapper">
+		    <div class="sidebar-wrapper">
+		        <jsp:include page="SideBar.jsp" />
+		    </div>
+		
+		    <div class="content-wrapper">
+		        <form id="transferForm" method="post" action="jadebank/transfer">
+		            <h2>Inside Bank Transfer</h2>
+		
+		            <input type="hidden" name="transaction.transactionType" value="3" />
+		
+		            <!-- Sender Section -->
+		            <fieldset>
+		                <legend>Sender Details</legend>
+		
+		                <label for="senderAccountId">Sender Account ID:</label>
+		                <input type="number" name="transaction.accountId" id="senderAccountId" required onblur="fetchSenderDetails()" />
+		
+		                <div id="infoDiv" class="info-box"></div>
+		
+		                <label for="amount">Amount:</label>
+		                <input type="number" step="0.01" name="transaction.amount" id="amount" required />
+		
+		                <label for="description">Description:</label>
+		                <input type="text" name="transaction.description" id="description" />
+		            </fieldset>
+		
+		            <!-- Receiver Section -->
+		            <fieldset>
+		                <legend>Receiver Details</legend>
+		
+		                <label for="receiverAccount1">Receiver Account Number:</label>
+		                <input type="number" id="receiverAccount1" name="beneficiary.accountNumber" required />
+		
+		                <label for="receiverAccount2">Confirm Account Number:</label>
+		                <input type="number" id="receiverAccount2" required />
+		
+		                <button type="button" onclick="checkReceiverDetails()">Check Receiver Details</button>
+		                <div id="receiverDetails" class="info-box"></div>
+		            </fieldset>
+		
+		            <button type="button" onclick="showPasswordModal()">Transfer</button>
+		        </form>
+		    </div>
+		</div>
+		
+		<!-- Modal for Password -->
+		<div id="modalBackdrop"></div>
+		<div id="passwordModal">
+		    <p><strong>Confirm Password:</strong></p>
+		    <input type="password" id="confirmPassword" placeholder="Enter your password">
 		    <button type="button" onclick="submitTransfer()">Confirm</button>
 		    <button type="button" onclick="closeModal()">Cancel</button>
 		</div>
-		<div id="modalBackdrop" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#00000080; z-index:999;"></div>
-
-
-        <button type="button" onclick="showPasswordModal()">Transfer</button>
-    </form>
+		
+		<jsp:include page="Footer.jsp" />
     
     <script>
 	    let senderDetails = null;
@@ -274,8 +347,6 @@
 	        });
 	    }
 	</script>
-
-	<jsp:include page="Footer.jsp" />
 	    
 </body>
 </html>

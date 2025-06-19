@@ -4,54 +4,101 @@
     <title>View Transactions</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Roboto", sans-serif;
             background: #f5f7fa;
-            padding: 30px;
+            margin: 0;
         }
 
-        form {
-            background: white;
-            padding: 20px;
+        .body-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar-wrapper {
+            width: 60px;
+            background-color: #373962;
+            color: white;
+            position: fixed;
+            height: 100%;
+            border-radius: 0 12px 12px 0;
+            z-index: 1000;
+        }
+
+        .main-wrapper {
+            margin-left: 70px;
+            padding: 30px;
+            flex: 1;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .search-section {
             max-width: 600px;
-            margin: auto;
+            margin: 0 auto 30px auto;
+            padding: 20px;
+            background: white;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
-        label {
+        .search-section label {
+            font-weight: bold;
             display: block;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        input, button, select {
-            padding: 8px;
+        .search-section input,
+        .search-section button {
             width: 100%;
+            padding: 10px;
             margin-top: 5px;
-            margin-bottom: 15px;
-            border-radius: 5px;
+            border-radius: 6px;
             border: 1px solid #ccc;
         }
 
-        button {
-            background-color: #007acc;
+        .search-section button {
+            background-color: #414485;
             color: white;
+            font-weight: bold;
             border: none;
+            margin-top: 20px;
         }
 
-        button:hover {
+        .search-section button:hover {
             background-color: #005fa3;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .search-box {
+            max-width: 300px;
+            margin: 0 auto 20px auto;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
         }
 
         table {
             width: 95%;
-            margin: 20px auto;
+            margin: 0 auto 30px auto;
             border-collapse: collapse;
             background: #fff;
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
         }
 
         th, td {
-            padding: 10px 12px;
+            padding: 12px;
             border: 1px solid #ddd;
             text-align: center;
         }
@@ -59,64 +106,88 @@
         th {
             background-color: #e6f2ff;
         }
-        
-    	.credit { color: green; font-weight: bold; }
-    	.debit { color: red; font-weight: bold; }
-        
-        .error {
-            color: red;
+
+        .credit { color: green; font-weight: bold; }
+        .debit { color: red; font-weight: bold; }
+
+        .pagination {
             text-align: center;
+            margin-bottom: 40px;
         }
 
-        .search-box {
-            max-width: 300px;
-            margin: 10px auto;
+        .pagination button {
+            padding: 8px 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #414485;
+            color: white;
+            margin: 0 10px;
         }
 
+        .pagination button:hover {
+            background-color: #005fa3;
+        }
+
+        #pageInfo {
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <jsp:include page="LoggedInHeader.jsp" />
 
-<form id="searchForm">
-    <h2>View Transactions</h2>
+<div class="body-wrapper">
+    <div class="sidebar-wrapper">
+        <jsp:include page="SideBar.jsp" />
+    </div>
 
-    <label for="accountId">Account ID:</label>
-    <input type="number" id="accountId" placeholder="Enter Account ID" required />
+    <div class="main-wrapper">
+        <h2>View Transactions</h2>
 
-    <label for="limit">Limit:</label>
-    <input type="number" id="limit" value="10" min="1" />
+        <div style="max-width: 700px; margin: 0 auto 20px;">
+		    <div style="display: flex; gap: 20px; align-items: flex-end;">
+		        <div style="flex: 1;">
+		            <label for="accountId"><strong>Account ID:</strong></label>
+		            <input type="number" id="accountId" placeholder="Enter Account ID" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+		        </div>
+		        <div style="width: 100px;">
+		            <label for="limit"><strong>Limit:</strong></label>
+		            <input type="number" id="limit" value="10" min="1" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
+		        </div>
+		        <div>
+		            <button type="button" onclick="fetchTransactions(true)" style="padding: 10px 16px; background-color: #414485; color: white; border: none; border-radius: 6px;">Fetch</button>
+		        </div>
+		    </div>
+		    <div id="errorMsg" class="error" style="margin-top: 10px;"></div>
+		</div>
 
-    <div id="errorMsg" class="error" style="color: red;"></div>
+        <div class="search-box">
+            <input type="text" id="localSearch" placeholder="Search in table..." onkeyup="filterTable()" />
+        </div>
 
-    <button type="button" onclick="fetchTransactions()">Fetch Transactions</button>
-</form>
+        <table id="transactionTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Account</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Beneficiary</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="transactionBody"></tbody>
+        </table>
 
-<div class="search-box" style="margin-top: 10px;">
-    <input type="text" id="localSearch" placeholder="Search in table..." onkeyup="filterTable()" />
-</div>
-
-<table id="transactionTable" style="display: none; margin-top: 20px;" border="1" cellpadding="10">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Date</th>
-        <th>Account</th>
-        <th>Amount</th>
-        <th>Type</th>
-        <th>Beneficiary</th>
-        <th>Description</th>
-        <th>Status</th>
-    </tr>
-    </thead>
-    <tbody id="transactionBody"></tbody>
-</table>
-
-<div style="text-align: center; margin-top: 20px;">
-    <button onclick="prevPage()">Previous</button>
-    <span id="pageInfo" style="margin: 0 15px;">Page 1</span>
-    <button onclick="nextPage()">Next</button>
+        <div class="pagination">
+            <button onclick="prevPage()">Previous</button>
+            <span id="pageInfo">Page 1</span>
+            <button onclick="nextPage()">Next</button>
+        </div>
+    </div>
 </div>
 
 <jsp:include page="Footer.jsp" />
@@ -125,7 +196,7 @@
     let currentOffset = 0;
     const pageSize = 10;
 
-    function fetchTransactions() {
+    function fetchTransactions(resetPage = false) {
         const accountId = parseInt(document.getElementById("accountId").value.trim());
         const limit = parseInt(document.getElementById("limit").value.trim());
         const errorMsg = document.getElementById("errorMsg");
@@ -133,6 +204,10 @@
         if (!accountId || limit < 1) {
             errorMsg.textContent = "Please enter a valid Account ID and Limit.";
             return;
+        }
+
+        if (resetPage) {
+            currentOffset = 0; // Reset to first page
         }
 
         errorMsg.textContent = "";
@@ -155,13 +230,12 @@
 
             data.forEach(txn => {
                 const row = document.createElement("tr");
-                const color = txn.transactionType === 1 ? "green" : (txn.transactionType === 2 ? "red" : "black");
                 const statusText = txn.transactionStatus === 1 ? "Success" : (txn.transactionStatus === 2 ? "Failure" : "Unknown");
 
                 row.innerHTML =
-                	"<td>" + txn.transactionId + "</td>" +
-                	"<td>" + formatDate(txn.transactionDate) + "</td>" +
-                	"<td>" + txn.accountId + "</td>" +
+                    "<td>" + txn.transactionId + "</td>" +
+                    "<td>" + formatDate(txn.transactionDate) + "</td>" +
+                    "<td>" + txn.accountId + "</td>" +
                     "<td>" + txn.amount + "</td>" +
                     "<td>" + getTypeLabel(txn.transactionType) + "</td>" +
                     "<td>" + (txn.beneficiaryAccount || "-") + "</td>" +
@@ -171,7 +245,7 @@
             });
 
             document.getElementById("transactionTable").style.display = "table";
-            document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / pageSize) + 1);
+            document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / limit) + 1);
         })
         .catch(err => {
             errorMsg.textContent = "Error: " + err;
@@ -180,13 +254,15 @@
     }
 
     function nextPage() {
-        currentOffset += pageSize;
+        const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
+        currentOffset += limit;
         fetchTransactions();
     }
 
     function prevPage() {
-        if (currentOffset >= pageSize) {
-            currentOffset -= pageSize;
+        const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
+        if (currentOffset >= limit) {
+            currentOffset -= limit;
             fetchTransactions();
         }
     }
@@ -217,5 +293,4 @@
 </script>
 
 </body>
-
 </html>

@@ -5,111 +5,190 @@
     <title>Open New Account</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f5f5;
-        }
-
-        .main-wrapper {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 30px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.1);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        input[type="text"], input[type="number"], select {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            background-color: #007BFF;
-            color: white;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .btn:disabled {
-            background-color: #888;
-        }
-
-        .error {
-            color: red;
-            font-weight: bold;
-        }
-
-        .success {
-            color: green;
-            font-weight: bold;
-        }
+		    font-family: 'Roboto', sans-serif;
+		    background-color: #f5f5f5;
+		    margin: 0; 
+		    display: flex; 
+		    flex-direction: column; 
+		    min-height: 100vh;
+		}
+		
+		.body-wrapper {
+		    display: flex; 
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 60px;
+		    border-radius: 0 12px 12px 0;
+		    background-color: #373962;
+		    color: white;
+		    height: 100vh;
+		    position: fixed;
+		    left: 0;
+		    z-index: 1000;
+		}
+		
+		.content-wrapper {
+		    margin-left: 70px;
+		    flex: 1;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    padding: 40px 20px;
+		}
+		
+		.form-box {
+		    background: white;
+		    padding: 30px;
+		    border-radius: 10px;
+		    max-width: 600px;
+		    width: 100%;
+		    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+		}
+		
+		h2 {
+		    text-align: center;
+		    color: #373962;
+		    margin-bottom: 25px;
+		}
+		
+		.form-group {
+		    margin-bottom: 20px;
+		}
+		
+		label {
+		    display: block;
+		    font-weight: bold;
+		    margin-bottom: 8px;
+		    color: #333;
+		}
+		
+		input[type="text"], input[type="number"], select {
+		    width: 100%;
+		    padding: 10px;
+		    border-radius: 6px;
+		    border: 1px solid #ccc;
+		    font-size: 1rem;
+		    background-color: #fff;
+		    box-sizing: border-box;
+		}
+		
+		input[readonly], input[disabled] {
+		    background-color: #e9ecef;
+		}
+		
+		input:focus, select:focus {
+		    outline: none;
+		    border-color: #007bff;
+		}
+		
+		.phone-search-group {
+		    display: flex;
+		    gap: 10px;
+		    align-items: center;
+		}
+		
+		.btn {
+		    padding: 10px 20px;
+		    border: none;
+		    background-color: #414485;
+		    color: white;
+		    border-radius: 6px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    transition: background-color 0.2s;
+		}
+		
+		.btn:hover {
+		    background-color: #0056b3;
+		}
+		
+		.btn:disabled {
+		    background-color: #888;
+		    cursor: not-allowed;
+		}
+		
+		.error {
+		    color: red;
+		    font-weight: bold;
+		    margin-bottom: 10px;
+		    text-align: center;
+		}
+		
+		.success {
+		    color: green;
+		    font-weight: bold;
+		    margin-bottom: 10px;
+		    text-align: center;
+		}
     </style>
 </head>
 <body>
     <jsp:include page="LoggedInHeader.jsp" />
 
-    <div class="main-wrapper">
-        <h2>Open New Account</h2>
+	<div class="body-wrapper">
+	    <div class="sidebar-wrapper">
+	        <jsp:include page="SideBar.jsp" />
+	    </div>
+	
+	    <div class="content-wrapper">
+	        <div class="form-box">
+	            <h2>Open New Account</h2>
+	
+	            <div id="form-message" class="error"></div>
+	
+	            <form id="open-account-form">
+	                <div class="form-group phone-search-group">
+	                    <div style="flex: 1;">
+	                        <label for="phone">Customer Phone Number:</label>
+	                        <input type="text" id="phone" name="phone" pattern="[0-9]{10}" required>
+	                    </div>
+	                    <div>
+	                        <label>&nbsp;</label>
+	                        <button type="button" id="search-btn" class="btn">Search</button>
+	                    </div>
+	                </div>
+	
+	                <div class="form-group">
+	                    <label for="customerIdDisplay">Customer ID:</label>
+	                    <input type="text" id="customerIdDisplay" readonly disabled>
+	                </div>
+	
+	                <div class="form-group">
+	                    <label for="branchId">Select Branch:</label>
+	                    <select id="branchId" name="branchId" required>
+	                        <option value="">-- Select Branch --</option>
+	                    </select>
+	                </div>
+	
+	                <div class="form-group">
+	                    <label for="accountType">Account Type:</label>
+	                    <select id="accountType" name="accountType" required>
+	                        <option value="">-- Select Type --</option>
+	                        <option value="1">Savings</option>
+	                        <option value="2">Current</option>
+	                    </select>
+	                </div>
+	
+	                <div class="form-group">
+	                    <label for="balance">Initial Balance:</label>
+	                    <input type="number" id="balance" name="balance" required min="0">
+	                </div>
+	
+	                <input type="hidden" id="customerId" name="customerId">
+	
+	                <div class="form-group" style="text-align: center;">
+	                    <button type="submit" class="btn">Open Account</button>
+	                </div>
+	            </form>
+	        </div>
+	    </div>
+	</div>
+	
+	<jsp:include page="Footer.jsp" />
 
-        <div id="form-message" class="error"></div>
-
-        <form id="open-account-form">
-            <!-- Phone number to fetch customerId -->
-            <div class="form-group">
-                <label for="phone">Customer Phone Number:</label>
-                <input type="text" id="phone" name="phone" pattern="[0-9]{10}" required>
-                <button type="button" id="search-btn" class="btn">Search</button>
-            </div>
-            
-            <div class="form-group">
-			    <label for="customerId">Customer ID:</label>
-			    <input type="text" id="customerIdDisplay" readonly disabled style="background-color: #e9ecef;">
-			</div>
-            
-
-            <div class="form-group">
-                <label for="branchId">Select Branch:</label>
-                <select id="branchId" name="branchId" required>
-                    <option value="">-- Select Branch --</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="accountType">Account Type:</label>
-                <select id="accountType" name="accountType" required>
-                    <option value="">-- Select Type --</option>
-                    <option value="1">Savings</option>
-                    <option value="2">Current</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="balance">Initial Balance:</label>
-                <input type="number" id="balance" name="balance" required min="0">
-            </div>
-
-            <input type="hidden" id="customerId" name="customerId">
-
-            <button type="submit" class="btn">Open Account</button>
-        </form>
-    </div>
-
-    <jsp:include page="Footer.jsp" />
 
     <script>
         const contextPath = "<%= request.getContextPath() %>";

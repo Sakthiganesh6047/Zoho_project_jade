@@ -7,9 +7,37 @@
     <style>
     
     	body {
-			font-family: Roboto Flex, sans-serif;
-			background-color: #f;
-			margin: 0;
+			margin: 0; 
+		    display: flex; 
+		    flex-direction: column; 
+		    min-height: 100vh;
+		    font-family: 'Roboto Flex', sans-serif;
+		}
+		
+		.body-wrapper {
+		    display: flex; 
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 60px;
+		    border-radius: 0 12px 12px 0;
+		    background-color: #373962; /* Dark sidebar */
+		    color: white;
+		    height: 100vh;
+		    position: fixed;
+		    left: 0;
+		    z-index: 1000;
+		}
+		
+		.main-wrapper {
+		    margin-left: 70px; /* Push content away from sidebar */
+		    padding: 20px;
+		    flex: 1;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
 		}
 		
 		.form-container {
@@ -18,17 +46,6 @@
     		align-items: center;
     		padding: 0px 40px 0px 40px;
 		}
-		
-		 .main-wrapper {
-        	display: flex;
-        	justify-content: center;
-		    height: 86.3vh;
-		    align-content: center;
-		    flex-wrap: wrap;
-		    flex-direction: column;
-    		align-content: center;
-    		align-items: center;
-        }
         
         .container-wrapper {
         	display: flex;
@@ -188,204 +205,213 @@
 </head>
 <body>
 	<jsp:include page="LoggedInHeader.jsp" />
-	<div class=main-wrapper>
 	
-		<div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
-		<div class=container-wrapper>
+	<div class="body-wrapper">
+	
+		<div class="sidebar-wrapper">
+			<jsp:include page="SideBar.jsp" />
+		</div>
 		
-			<div class=signuppage-container>
-				<div class=clipart-container>
-		    		<img src="contents/signup_page.png" alt="Sign-Up Page Image" class=signup-clipart>
-		    	</div>
-		    	
-				<div class=form-container>
-					<h3>Create an User Account</h3><br>
-				    <form 
-				    		id="signup-form"
-    						class="signup-form">
-    						
-						<input type="hidden" id="userId" name="user.userId">
-				    	
-				    	<div class=field-container>
-					    	<label>Full Name:<span class="required">*</span></label>
-					        <input type="text" name="user.fullName" maxlength="50" required>
-				    	</div>
-				        
-				        <div class=field-container>
-					        <label>Email:<span class="required">*</span></label>
-					        <input type="email" name="user.email" maxlength="70" required>
-				        </div>
-				        
-				        <div class="gender-container">
-					        <label>Gender:<span class="required">*</span></label>
-					        <input type="radio" id="male" name="user.gender" value="Male">
-					        <label for="male">Male</label>
+		<div class=main-wrapper>
+		
+			<div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
+			<div class=container-wrapper>
+			
+				<div class=signuppage-container>
+					<div class=clipart-container>
+			    		<img src="contents/signup_page.png" alt="Sign-Up Page Image" class=signup-clipart>
+			    	</div>
+			    	
+					<div class=form-container>
+						<h3>Create an User Account</h3><br>
+					    <form 
+					    		id="signup-form"
+	    						class="signup-form">
+	    						
+							<input type="hidden" id="userId" name="user.userId">
+					    	
+					    	<div class=field-container>
+						    	<label>Full Name:<span class="required">*</span></label>
+						        <input type="text" name="user.fullName" maxlength="50" required>
+					    	</div>
 					        
-					        <input type="radio" id="female" name="user.gender" value="Female">
-					        <label for="female">Female</label>
-					
-					        <input type="radio" id="other" name="user.gender" value="Others">
-					        <label for="other">Others</label>
-					    </div>
-					    
-					    <div>
-					    	<label for="dob">Date of Birth:<span class="required">*</span></label>
-				        	<input type="date" id="dob" name="user.dob" required>
-					    </div>
-					    
-					    <div class=field-container>
-							<label for="phone">Phone Number:<span class="required">*</span></label>
-							<input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
-					    </div>
-					    
-						<div class=proof-container>
-						    <div class=field-container>
-								<label for="phone">Aadhar Card Number:<span class="required">*</span></label>
-								<input type="tel" id="aadhar" name="customerDetails.aadharNumber" pattern="[0-9]{12}" inputmode="numeric" maxlength="12" required>
+					        <div class=field-container>
+						        <label>Email:<span class="required">*</span></label>
+						        <input type="email" name="user.email" maxlength="70" required>
+					        </div>
+					        
+					        <div class="gender-container">
+						        <label>Gender:<span class="required">*</span></label>
+						        <input type="radio" id="male" name="user.gender" value="Male">
+						        <label for="male">Male</label>
+						        
+						        <input type="radio" id="female" name="user.gender" value="Female">
+						        <label for="female">Female</label>
+						
+						        <input type="radio" id="other" name="user.gender" value="Others">
+						        <label for="other">Others</label>
+						    </div>
+						    
+						    <div>
+						    	<label for="dob">Date of Birth:<span class="required">*</span></label>
+					        	<input type="date" id="dob" name="user.dob" required>
 						    </div>
 						    
 						    <div class=field-container>
-						        <label>PAN Card Number:<span class="required">*</span></label>
-						        <input type="text" name="customerDetails.panId" maxlength="10" required>
-					        </div>
-						</div>
-					    
-					    <div class=field-container>
-					    	<label for="address">Address:<span class="required">*</span></label>
-				        	<textarea id="address" name="customerDetails.address" rows="3" maxlength="50" required></textarea>
-				        </div>
-				        
-				        <div id="password-section" class=password-container>
-					        <div class=field-container>
-						        <label>Password:<span class="required">*</span></label>
-						        <input type="password" name="user.passwordHash" maxlength="50" required>
+								<label for="phone">Phone Number:<span class="required">*</span></label>
+								<input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
+						    </div>
+						    
+							<div class=proof-container>
+							    <div class=field-container>
+									<label for="phone">Aadhar Card Number:<span class="required">*</span></label>
+									<input type="tel" id="aadhar" name="customerDetails.aadharNumber" pattern="[0-9]{12}" inputmode="numeric" maxlength="12" required>
+							    </div>
+							    
+							    <div class=field-container>
+							        <label>PAN Card Number:<span class="required">*</span></label>
+							        <input type="text" name="customerDetails.panId" maxlength="10" required>
+						        </div>
+							</div>
+						    
+						    <div class=field-container>
+						    	<label for="address">Address:<span class="required">*</span></label>
+					        	<textarea id="address" name="customerDetails.address" rows="3" maxlength="50" required></textarea>
 					        </div>
 					        
-					        <div class=field-container>
-								<label>Confirm Password:<span class="required">*</span></label>
-								<input type="password" name="confirmPassword" maxlength="50" required>
+					        <div id="password-section" class=password-container>
+						        <div class=field-container>
+							        <label>Password:<span class="required">*</span></label>
+							        <input type="password" name="user.passwordHash" maxlength="50" required>
+						        </div>
+						        
+						        <div class=field-container>
+									<label>Confirm Password:<span class="required">*</span></label>
+									<input type="password" name="confirmPassword" maxlength="50" required>
+						        </div>
+							</div><br>
+					        
+					        <div>
+					        	<button type="submit" class="btn">Register</button>
 					        </div>
-						</div><br>
-				        
-				        <div>
-				        	<button type="submit" class="btn">Register</button>
-				        </div>
-				        
-				    </form>
-				    
-				    <script>
-						document.addEventListener("DOMContentLoaded", async function () {
-						    const urlParams = new URLSearchParams(window.location.search);
-						    const userId = urlParams.get("userId");
-						
-						    if (userId) {
-						        // Edit Mode: Remove password section
-						        const pwdSection = document.getElementById("password-section");
-						        document.querySelector(".btn").textContent = "Update";
-						        if (pwdSection) pwdSection.remove();
-						
-						        try {
-						            const response = await fetch(`${pageContext.request.contextPath}/jadebank/user/id`, {
-						                method: "POST",
-						                headers: {
-						                    "Content-Type": "application/json"
-						                },
-						                body: JSON.stringify({ userId: Number(userId) })
-						            });
-						
-						            if (!response.ok) throw new Error("Failed to fetch user details");
-						
-						            const data = await response.json();
-						            const user = data.user || {};
-						            const customer = data.customerDetails || {};
-						
-						            // Fill form fields
-						            document.querySelector('input[name="user.fullName"]').value = user.fullName || "";
-						            document.querySelector('input[name="user.email"]').value = user.email || "";
-						            document.querySelector('input[name="user.phone"]').value = user.phone || "";
-						            document.querySelector('input[name="user.dob"]').value = user.dob || "";
-						
-						            const genderInput = document.querySelector(`input[name="user.gender"][value="${user.gender}"]`);
-						            if (genderInput) genderInput.checked = true;
-						
-						            document.querySelector('input[name="customerDetails.aadharNumber"]').value = customer.aadharNumber || "";
-						            document.querySelector('input[name="customerDetails.panId"]').value = customer.panId || "";
-						            document.querySelector('textarea[name="customerDetails.address"]').value = customer.address || "";
-						
-						        } catch (err) {
-						            document.getElementById("signup-error").textContent = "Error loading data: " + err.message;
-						        }
-						    }
-						
-						    // Form Submit Handler
-						    document.getElementById("signup-form").addEventListener("submit", function (e) {
-						        e.preventDefault(); // prevent normal form submission
-						
-						        const password = document.querySelector('input[name="user.passwordHash"]')?.value;
-						        const confirmPassword = document.querySelector('input[name="confirmPassword"]')?.value;
-						
-						        if (!userId && password !== confirmPassword) {
-						            document.getElementById("signup-error").textContent = "Passwords do not match.";
-						            return;
-						        }
-						
-						        const userData = {
-						            fullName: document.querySelector('input[name="user.fullName"]').value,
-						            email: document.querySelector('input[name="user.email"]').value,
-						            phone: document.querySelector('input[name="user.phone"]').value,
-						            dob: document.querySelector('input[name="user.dob"]').value,
-						            gender: document.querySelector('input[name="user.gender"]:checked')?.value,
-						            userType: 1
-						        };
-						
-						        if (!userId) {
-						            userData.passwordHash = password;
-						        } else {
-						            userData.userId = Number(userId);
-						        }
-						
-						        const data = {
-						            user: userData,
-						            customerDetails: {
-						                aadharNumber: document.querySelector('input[name="customerDetails.aadharNumber"]').value,
-						                panId: document.querySelector('input[name="customerDetails.panId"]').value,
-						                address: document.querySelector('textarea[name="customerDetails.address"]').value
-						            }
-						        };
-						
-						        const endpoint = userId
-						            ? `${pageContext.request.contextPath}/jadebank/user/update`
-						            : `${pageContext.request.contextPath}/jadebank/user/new`;
-						
-						        fetch(endpoint, {
-						            method: "POST",
-						            headers: {
-						                "Content-Type": "application/json"
-						            },
-						            body: JSON.stringify(data)
-						        })
-						        .then(async response => {
-								    if (response.ok) {
-								        const successMsg = userId ? "User updated successfully." : "User created successfully.";
-								        document.getElementById("signup-error").style.color = "green";
-								        document.getElementById("signup-error").textContent = successMsg;
-								    } else {
-								        const errorData = await response.json();
-								        const errorMsg = errorData.error || "Operation failed.";
-								        document.getElementById("signup-error").style.color = "red";
-								        document.getElementById("signup-error").textContent = errorMsg;
-								    }
-								})
-						        .catch(err => {
-						            document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
-						        });
-						    });
-						});
-					</script>
-			    </div>
+					        
+					    </form>
+				    </div>
+				</div>
 			</div>
 		</div>
 	</div>
+	
 	<jsp:include page="Footer.jsp" />
+	
+	<script>
+		document.addEventListener("DOMContentLoaded", async function () {
+		    const urlParams = new URLSearchParams(window.location.search);
+		    const userId = urlParams.get("userId");
+		
+		    if (userId) {
+		        // Edit Mode: Remove password section
+		        const pwdSection = document.getElementById("password-section");
+		        document.querySelector(".btn").textContent = "Update";
+		        if (pwdSection) pwdSection.remove();
+		
+		        try {
+		            const response = await fetch(`${pageContext.request.contextPath}/jadebank/user/id`, {
+		                method: "POST",
+		                headers: {
+		                    "Content-Type": "application/json"
+		                },
+		                body: JSON.stringify({ userId: Number(userId) })
+		            });
+		
+		            if (!response.ok) throw new Error("Failed to fetch user details");
+		
+		            const data = await response.json();
+		            const user = data.user || {};
+		            const customer = data.customerDetails || {};
+		
+		            // Fill form fields
+		            document.querySelector('input[name="user.fullName"]').value = user.fullName || "";
+		            document.querySelector('input[name="user.email"]').value = user.email || "";
+		            document.querySelector('input[name="user.phone"]').value = user.phone || "";
+		            document.querySelector('input[name="user.dob"]').value = user.dob || "";
+		
+		            const genderInput = document.querySelector(`input[name="user.gender"][value="${user.gender}"]`);
+		            if (genderInput) genderInput.checked = true;
+		
+		            document.querySelector('input[name="customerDetails.aadharNumber"]').value = customer.aadharNumber || "";
+		            document.querySelector('input[name="customerDetails.panId"]').value = customer.panId || "";
+		            document.querySelector('textarea[name="customerDetails.address"]').value = customer.address || "";
+		
+		        } catch (err) {
+		            document.getElementById("signup-error").textContent = "Error loading data: " + err.message;
+		        }
+		    }
+		
+		    // Form Submit Handler
+		    document.getElementById("signup-form").addEventListener("submit", function (e) {
+		        e.preventDefault(); // prevent normal form submission
+		
+		        const password = document.querySelector('input[name="user.passwordHash"]')?.value;
+		        const confirmPassword = document.querySelector('input[name="confirmPassword"]')?.value;
+		
+		        if (!userId && password !== confirmPassword) {
+		            document.getElementById("signup-error").textContent = "Passwords do not match.";
+		            return;
+		        }
+		
+		        const userData = {
+		            fullName: document.querySelector('input[name="user.fullName"]').value,
+		            email: document.querySelector('input[name="user.email"]').value,
+		            phone: document.querySelector('input[name="user.phone"]').value,
+		            dob: document.querySelector('input[name="user.dob"]').value,
+		            gender: document.querySelector('input[name="user.gender"]:checked')?.value,
+		            userType: 1
+		        };
+		
+		        if (!userId) {
+		            userData.passwordHash = password;
+		        } else {
+		            userData.userId = Number(userId);
+		        }
+		
+		        const data = {
+		            user: userData,
+		            customerDetails: {
+		                aadharNumber: document.querySelector('input[name="customerDetails.aadharNumber"]').value,
+		                panId: document.querySelector('input[name="customerDetails.panId"]').value,
+		                address: document.querySelector('textarea[name="customerDetails.address"]').value
+		            }
+		        };
+		
+		        const endpoint = userId
+		            ? `${pageContext.request.contextPath}/jadebank/user/update`
+		            : `${pageContext.request.contextPath}/jadebank/user/new`;
+		
+		        fetch(endpoint, {
+		            method: "POST",
+		            headers: {
+		                "Content-Type": "application/json"
+		            },
+		            body: JSON.stringify(data)
+		        })
+		        .then(async response => {
+				    if (response.ok) {
+				        const successMsg = userId ? "User updated successfully." : "User created successfully.";
+				        document.getElementById("signup-error").style.color = "green";
+				        document.getElementById("signup-error").textContent = successMsg;
+				    } else {
+				        const errorData = await response.json();
+				        const errorMsg = errorData.error || "Operation failed.";
+				        document.getElementById("signup-error").style.color = "red";
+				        document.getElementById("signup-error").textContent = errorMsg;
+				    }
+				})
+		        .catch(err => {
+		            document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
+		        });
+		    });
+		});
+	</script>
 </body>
 </html>

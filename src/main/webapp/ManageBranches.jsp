@@ -8,6 +8,7 @@
 		    display: flex; 
 		    flex-direction: column; 
 		    min-height: 100vh;
+		    font-family: 'Segoe UI', sans-serif;
 		}
 		
 		.body-wrapper {

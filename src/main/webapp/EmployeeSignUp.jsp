@@ -7,15 +7,34 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: "Roboto Flex", sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+            margin: 0; 
+		    display: flex; 
+		    flex-direction: column; 
+		    min-height: 100vh;
+		    font-family: 'Roboto Flex', sans-serif;
         }
 
         .main-wrapper {
             padding: 20px;
+            margin-left: 70px; 
+            flex: 1;
         }
+        
+        .body-wrapper {
+		    display: flex; 
+		    flex: 1;
+		    min-height: 70vh;
+		}
+		
+		.sidebar-wrapper {
+		    width: 70px;
+		    background-color: #373962; /* Dark sidebar */
+		    color: white;
+		    height: 100vh;
+		    position: fixed;
+		    left: 0;
+		}
+
 
         .container-wrapper {
             max-width: 900px;
@@ -80,7 +99,7 @@
         }
 
         .btn {
-            background-color: #1976d2;
+            background-color: #414485;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -94,78 +113,85 @@
     </style>
 </head>
 <body>
-<jsp:include page="LoggedInHeader.jsp" />
-<div class="main-wrapper">
-    <div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
-    <div class="container-wrapper">
-        <div class="signuppage-container">
-            <div class="clipart-container">
-                <img src="contents/signup_page.png" alt="Sign-Up Page Image" class="signup-clipart">
-            </div>
-            <div class="form-container">
-                <h3 id="form-title">New Employee Creation</h3><br>
-                <form id="signup-form" class="signup-form">
-                    <input type="hidden" name="user.userId" id="userId">
-
-                    <div class="field-container">
-                        <label>Full Name:<span class="required">*</span></label>
-                        <input type="text" name="user.fullName" maxlength="50" required>
-                    </div>
-                    <div class="field-container">
-                        <label>Email:<span class="required">*</span></label>
-                        <input type="email" name="user.email" maxlength="70" required>
-                    </div>
-                    <div class="gender-container">
-                        <label>Gender:<span class="required">*</span></label>
-                        <input type="radio" id="male" name="user.gender" value="male"><label for="male">Male</label>
-                        <input type="radio" id="female" name="user.gender" value="female"><label for="female">Female</label>
-                        <input type="radio" id="other" name="user.gender" value="others"><label for="other">Others</label>
-                    </div>
-                    <div class="field-container">
-                        <label for="dob">Date of Birth:<span class="required">*</span></label>
-                        <input type="date" id="dob" name="user.dob" required>
-                    </div>
-                    <div class="field-container">
-                        <label for="phone">Phone Number:<span class="required">*</span></label>
-                        <input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" maxlength="10" required>
-                    </div>
-                    <div class="proof-container">
-                        <div class="field-container">
-                            <label for="role">Role<span class="required">*</span></label>
-                            <select id="role" name="employeeDetails.role" required>
-                                <option value="">-- Select Role --</option>
-                                <option value="1">Clerk</option>
-                                <option value="2">Manager</option>
-                                <option value="3">General Manager</option>
-                            </select>
-                        </div>
-                        <div class="field-container">
-                            <label for="branchId">Branch<span class="required">*</span></label>
-                            <select id="branchId" name="employeeDetails.branchId" required>
-                                <option value="">-- Select Branch --</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="password-container">
-                        <div class="field-container" style="padding-right: 10px">
-                            <label>Password:<span class="required">*</span></label>
-                            <input type="password" name="user.passwordHash" maxlength="50" required>
-                        </div>
-                        <div class="field-container">
-                            <label>Confirm Password:<span class="required">*</span></label>
-                            <input type="password" name="confirmPassword" maxlength="50" required>
-                        </div>
-                    </div><br>
-                    <div>
-                        <button type="submit" class="btn" id="form-submit-btn">Register</button>
-                    </div>
-                    <br>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<jsp:include page="Footer.jsp" />
+	<jsp:include page="LoggedInHeader.jsp" />
+	<div class = "body-wrapper">
+	
+		<div class="sidebar wrapper">
+			<jsp:include page="SideBar.jsp" />
+		</div>
+		<div class="main-wrapper">
+		    <div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
+		    <div class="container-wrapper">
+		        <div class="signuppage-container">
+		            <div class="clipart-container">
+		                <img src="contents/signup_page.png" alt="Sign-Up Page Image" class="signup-clipart">
+		            </div>
+		            <div class="form-container">
+		                <h3 id="form-title">New Employee Creation</h3><br>
+		                <form id="signup-form" class="signup-form">
+		                    <input type="hidden" name="user.userId" id="userId">
+		
+		                    <div class="field-container">
+		                        <label>Full Name:<span class="required">*</span></label>
+		                        <input type="text" name="user.fullName" maxlength="50" required>
+		                    </div>
+		                    <div class="field-container">
+		                        <label>Email:<span class="required">*</span></label>
+		                        <input type="email" name="user.email" maxlength="70" required>
+		                    </div>
+		                    <div class="gender-container">
+		                        <label>Gender:<span class="required">*</span></label>
+		                        <input type="radio" id="male" name="user.gender" value="male"><label for="male">Male</label>
+		                        <input type="radio" id="female" name="user.gender" value="female"><label for="female">Female</label>
+		                        <input type="radio" id="other" name="user.gender" value="others"><label for="other">Others</label>
+		                    </div>
+		                    <div class="field-container">
+		                        <label for="dob">Date of Birth:<span class="required">*</span></label>
+		                        <input type="date" id="dob" name="user.dob" required>
+		                    </div>
+		                    <div class="field-container">
+		                        <label for="phone">Phone Number:<span class="required">*</span></label>
+		                        <input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" maxlength="10" required>
+		                    </div>
+		                    <div class="proof-container">
+		                        <div class="field-container">
+		                            <label for="role">Role<span class="required">*</span></label>
+		                            <select id="role" name="employeeDetails.role" required>
+		                                <option value="">-- Select Role --</option>
+		                                <option value="1">Clerk</option>
+		                                <option value="2">Manager</option>
+		                                <option value="3">General Manager</option>
+		                            </select>
+		                        </div>
+		                        <div class="field-container">
+		                            <label for="branchId">Branch<span class="required">*</span></label>
+		                            <select id="branchId" name="employeeDetails.branchId" required>
+		                                <option value="">-- Select Branch --</option>
+		                            </select>
+		                        </div>
+		                    </div>
+		                    <div class="password-container">
+		                        <div class="field-container" style="padding-right: 10px">
+		                            <label>Password:<span class="required">*</span></label>
+		                            <input type="password" name="user.passwordHash" maxlength="50" required>
+		                        </div>
+		                        <div class="field-container">
+		                            <label>Confirm Password:<span class="required">*</span></label>
+		                            <input type="password" name="confirmPassword" maxlength="50" required>
+		                        </div>
+		                    </div><br>
+		                    <div>
+		                        <button type="submit" class="btn" id="form-submit-btn">Register</button>
+		                    </div>
+		                    <br>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+		
+	</div>
+	<jsp:include page="Footer.jsp" />
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
