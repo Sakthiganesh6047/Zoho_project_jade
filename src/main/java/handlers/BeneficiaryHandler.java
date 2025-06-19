@@ -82,12 +82,13 @@ public class BeneficiaryHandler {
 		ValidationsUtil.isNull(role, "User Role");
 		ValidationsUtil.checkUserRole(role);
 		
+		Beneficiary beneficiary = beneficiaryDAO.getBeneficiaryById(beneficiarId);
+		
 		if (role == 0) {
-			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiarId)) {
+			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId())) {
 				throw new CustomException("Unauthorized Access, Deletion Failed");
 			}
 		}
-		Beneficiary beneficiary = beneficiaryDAO.getBeneficiaryById(beneficiarId);
 		beneficiary.setCreatedBy((long) 1);
 		int results = beneficiaryDAO.updateBeneficiary(beneficiary);
 		return Results.respondJson(Map.of("Rows Affected", results));

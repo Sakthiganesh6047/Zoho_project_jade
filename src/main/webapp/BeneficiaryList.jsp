@@ -231,7 +231,7 @@
     function deleteBeneficiary(beneficiaryId) {
         if (!confirm("Are you sure you want to delete this beneficiary?")) return;
 
-        fetch(`${pageContext.request.contextPath}/jadebank/beneficiary/id/${beneficiaryId}`, {
+        fetch("${pageContext.request.contextPath}/jadebank/beneficiary/id/" + beneficiaryId, {
             method: "POST"
         })
         .then(async res => {
