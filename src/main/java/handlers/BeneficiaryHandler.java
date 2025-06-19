@@ -30,10 +30,10 @@ public class BeneficiaryHandler {
 		
 		beneficiary.setCreatedBy(userId);
 		beneficiary.setModifiedOn(Instant.now().toEpochMilli());
-		beneficiary.setModifiedBy(0L);
+		beneficiary.setModifiedBy(userId);
 		
-		int result = beneficiaryDAO.insertBeneficiary(beneficiary);
-		return Results.respondJson(Map.of("Status", "Created", "BeneficiaryId", result));
+		Long result = beneficiaryDAO.insertBeneficiary(beneficiary);
+		return Results.respondJson(Map.of("BeneficiaryId", result));
 	}
 	
 	@Route(path = "beneficiary/update", method = "POST")
@@ -66,14 +66,14 @@ public class BeneficiaryHandler {
 		ValidationsUtil.checkUserRole(role);
 		
 		if (role == 0) {
-			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId())) {
+			if(!(AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId()))) {
 				throw new CustomException("You can't access this account's beneficiary list");
 			}
 		}
 		return Results.respondJson(beneficiaryDAO.getBeneficiariesByAccountId(beneficiary.getAccountId(), userId, limit, offset));	
 	}
 	
-	@Route(path = "beneficiary/id/{beneficiarId}", method = "DELETE")
+	@Route(path = "beneficiary/id/{beneficiarId}", method = "POST")
 	public String deleteBeneficiary(@FromPath("beneficiarId") Long beneficiarId, @FromSession("userId") Long userId,
 									@FromSession("role") Integer role) throws CustomException {
 		
@@ -87,8 +87,10 @@ public class BeneficiaryHandler {
 				throw new CustomException("Unauthorized Access, Deletion Failed");
 			}
 		}
-		int results = beneficiaryDAO.deleteBeneficiary(beneficiarId);
-		return Results.respondJson(Map.of("Status", "Deleted", "Rows Affected", results));
+		Beneficiary beneficiary = beneficiaryDAO.getBeneficiaryById(beneficiarId);
+		beneficiary.setCreatedBy((long) 1);
+		int results = beneficiaryDAO.updateBeneficiary(beneficiary);
+		return Results.respondJson(Map.of("Rows Affected", results));
 	}
 	
 //	@Route(path = "beneficiary/list", method = "GET")

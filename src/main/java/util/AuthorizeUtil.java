@@ -46,7 +46,8 @@ public class AuthorizeUtil {
 		AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
 	    List<Account> accounts = accountDAO.getAccNosByCustomerId(customerId);
 	    for (Account account : accounts) {
-	        if (account.getAccountId() == accountId) {
+	        if (account.getAccountId().equals(accountId)) {
+	        	System.out.print(account.getAccountId());
 	            return true;
 	        }
 	    }

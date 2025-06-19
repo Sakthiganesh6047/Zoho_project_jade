@@ -25,12 +25,12 @@ public class BeneficiaryDAO {
 		return BeneficiaryDAOHelper.INSTANCE;
 	}
 
-	public int insertBeneficiary(Beneficiary benefiaciary) throws CustomException {
+	public Long insertBeneficiary(Beneficiary benefiaciary) throws CustomException {
 		QueryBuilder queryBuilder = new QueryBuilder(Beneficiary.class);
 		QueryResult insertQuery = queryBuilder.insert(benefiaciary).build();
         System.out.println("Insert Query: " + insertQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (int) executor.executeQuery(insertQuery, Beneficiary.class);
+        return (Long) executor.executeQuery(insertQuery, Beneficiary.class);
 	}
 	
 	public long addAsBeneficiary(Beneficiary benefiaciary, Connection connection) throws CustomException {

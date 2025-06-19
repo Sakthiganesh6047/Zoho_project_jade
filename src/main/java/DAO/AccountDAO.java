@@ -60,8 +60,8 @@ public class AccountDAO {
     public List<Account> getAccountsByCustomerId(long customerId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
-                .where("customer_id", "=", customerId)
-                .build();
+                						.where("customer_id", "=", customerId)
+                						.build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Account.class));
     }

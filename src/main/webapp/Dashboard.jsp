@@ -75,7 +75,8 @@
             <a href="Transfer.jsp" class="btn">Transfer Money</a>
             <a href="ViewBalance.jsp" class="btn">View Balance</a>
             <a href="Transactions.jsp" class="btn">View Transactions</a>
-            <a href="Beneficiaries.jsp" class="btn">Manage Beneficiaries</a>
+            <a href="AddBeneficiary.jsp" class="btn">Add Beneficiary</a>
+            <a href="BeneficiaryList.jsp" class="btn">Manage Beneficiaries</a>
 
         <%-- Employee --%>
         <% } else if (role == 1) { %>

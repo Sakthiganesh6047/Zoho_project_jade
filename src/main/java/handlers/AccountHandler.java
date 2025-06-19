@@ -46,7 +46,7 @@ public class AccountHandler {
     	return Results.respondJson(Map.of("Account Id", accountId));
     }
     
-    @Route(path = "account/id", method = "GET")
+    @Route(path = "account/id", method = "POST")
     public String getCustomerAccounts(@FromBody User user, @FromSession("userId") Long sessionId, 
     								@FromSession("role") Integer role) throws CustomException {
     	
