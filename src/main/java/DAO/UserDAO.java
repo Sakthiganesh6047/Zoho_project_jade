@@ -56,7 +56,7 @@ public class UserDAO {
     
     public int updatePassword(User user) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(User.class);
-        QueryResult updateQuery = queryBuilder.update(user, "passwordHash")
+        QueryResult updateQuery = queryBuilder.update(user, "passwordHash", "modifiedBy", "modifiedOn")
                          .where("user_id", "=", user.getUserId())
                          .build();
         System.out.println("Update Query: " + updateQuery);

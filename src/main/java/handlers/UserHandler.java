@@ -344,12 +344,15 @@ public class UserHandler {
     		throw new CustomException("Wrong Password!");
     	}
     	
-    	if(!(Password.verifyPassword(credential.getNewPassword(), fetchedUser.getPasswordHash()))){
+    	if(Password.verifyPassword(credential.getNewPassword(), fetchedUser.getPasswordHash())){
     		throw new CustomException("Your Old password cannot be your New password!");
     	}
     	
+    	fetchedUser.setModifiedBy(userId);
+    	fetchedUser.setModifiedOn(Instant.now().toEpochMilli());
     	fetchedUser.setPasswordHash(Password.hashPassword(credential.getNewPassword()));
-    	return Results.respondJson(userDAO.updatePassword(fetchedUser));
+    	userDAO.updatePassword(fetchedUser);
+    	return Results.respondJson(Map.of("status", "success"));
     }
     
     @Route(path = "user/employeelist", method = "GET")

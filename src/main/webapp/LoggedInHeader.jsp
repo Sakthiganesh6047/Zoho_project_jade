@@ -115,6 +115,43 @@
     .profile-box a.logout-link {
         color: red;
     }
+    
+    .modal {
+	    display: none;
+	    position: fixed;
+	    z-index: 2000;
+	    left: 0;
+	    top: 0;
+	    width: 100%;
+	    height: 100%;
+	    background-color: rgba(0,0,0,0.5);
+	}
+	
+	.modal-content {
+	    background-color: #fff;
+	    margin: 10% auto;
+	    padding: 20px;
+	    border-radius: 10px;
+	    max-width: 400px;
+	}
+	.modal-content input {
+	    width: 100%;
+	    padding: 10px;
+	    margin-top: 6px;
+	    margin-bottom: 10px;
+	    border: 1px solid #ccc;
+	    border-radius: 6px;
+	}
+	.modal-content button {
+	    width: 100%;
+	    padding: 10px;
+	    background-color: #414485;
+	    color: white;
+	    border: none;
+	    border-radius: 6px;
+	    font-weight: bold;
+	}
+    
 </style>
 
 <!-- Header Section -->
@@ -138,12 +175,31 @@
 				    <div class="profile-info" id="profileEmail">email@example.com</div>
 				    <div class="profile-info" id="profilePhone">+91-9876543210</div>
 				    
-				    <a href="ChangePassword.jsp" class="profile-action">
-				        <i class="fa-solid fa-key"></i> Change Password
-				    </a>
+				    <a href="javascript:void(0)" class="profile-action" onclick="showPasswordChangeModal()">
+					    <i class="fa-solid fa-key"></i> Change Password
+					</a>
 				    <a href="Logout.jsp" class="logout-link">
 				        <i class="fa-solid fa-right-from-bracket"></i> Logout
 				    </a>
+				</div>
+				<!-- Change Password Modal -->
+				<div id="passwordModal" class="modal">
+				    <div class="modal-content">
+				        <h3 style="text-align:center;">Change Password</h3>
+				        <label for="oldPassword">Old Password:</label>
+				        <input type="password" id="oldPassword" required />
+				
+				        <label for="newPassword">New Password:</label>
+				        <input type="password" id="newPassword" required />
+				
+				        <label for="confirmPassword">Confirm Password:</label>
+				        <input type="password" id="confirmPassword" required />
+				
+				        <button onclick="submitPasswordChange()">Submit</button>
+				        <button onclick="closePasswordModal()" style="background-color: #ccc; margin-top: 10px;">Cancel</button>
+				
+				        <div id="passwordStatus" style="margin-top: 10px; text-align: center; font-weight: bold;"></div>
+				    </div>
 				</div>
             </div>
         </div>
@@ -182,4 +238,62 @@
 	    .catch(err => {
 	        console.error("Error loading profile:", err);
 	    });
+    
+ // Open and close modal
+    function showPasswordChangeModal() {
+        document.getElementById("passwordModal").style.display = "block";
+        document.getElementById("passwordStatus").textContent = "";
+    }
+
+    function closePasswordModal() {
+        document.getElementById("passwordModal").style.display = "none";
+        document.getElementById("oldPassword").value = "";
+        document.getElementById("newPassword").value = "";
+        document.getElementById("confirmPassword").value = "";
+    }
+
+    // Submit password change
+    function submitPasswordChange() {
+        const oldPassword = document.getElementById("oldPassword").value.trim();
+        const newPassword = document.getElementById("newPassword").value.trim();
+        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+        const statusDiv = document.getElementById("passwordStatus");
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            statusDiv.textContent = "All fields are required.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            statusDiv.textContent = "New and Confirm Password do not match.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
+        fetch(`${pageContext.request.contextPath}/jadebank/user/password`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                password: oldPassword,
+                newPassword: newPassword
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === "success") {
+                statusDiv.textContent = "Password changed successfully.";
+                statusDiv.style.color = "green";
+                setTimeout(() => closePasswordModal(), 2000);
+            } else {
+                statusDiv.textContent = data.error || "Failed to change password.";
+                statusDiv.style.color = "red";
+            }
+        })
+        .catch(err => {
+            statusDiv.textContent = "Network error: " + err.message;
+            statusDiv.style.color = "red";
+        });
+    }
+
 </script>

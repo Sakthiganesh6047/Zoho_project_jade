@@ -16,6 +16,7 @@ UserHandler:
   getUserProfileByEmail: [0, 1, 2, 3]
   getUserByPhone: [1, 2, 3]
   getUserProfileById: [0, 1, 2, 3]
+  changePassword: [0, 1, 2, 3]
   getEmployeeProfiles: [2, 3]
   deleteUser: [3]
   
