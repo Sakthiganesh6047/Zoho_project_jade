@@ -38,6 +38,7 @@
 		    display: flex;
 		    justify-content: center;
 		    align-items: center;
+		    flex-direction: column;
 		}
 		
 		.form-container {
@@ -55,7 +56,7 @@
 		.signuppage-container {
 			display: flex;
 			flex-direction: row;
-		    align-items: flex-end;
+		    align-items: center;
 		    flex-wrap: nowrap;
 		    justify-content: center;
 		    border-radius: 10px;
@@ -223,7 +224,7 @@
 			    	</div>
 			    	
 					<div class=form-container>
-						<h3>Create an User Account</h3><br>
+						<h3 id="form-title">Create an User Account</h3><br>
 					    <form 
 					    		id="signup-form"
 	    						class="signup-form">
@@ -242,13 +243,13 @@
 					        
 					        <div class="gender-container">
 						        <label>Gender:<span class="required">*</span></label>
-						        <input type="radio" id="male" name="user.gender" value="Male">
+						        <input type="radio" id="male" name="user.gender" value="male">
 						        <label for="male">Male</label>
 						        
-						        <input type="radio" id="female" name="user.gender" value="Female">
+						        <input type="radio" id="female" name="user.gender" value="female">
 						        <label for="female">Female</label>
 						
-						        <input type="radio" id="other" name="user.gender" value="Others">
+						        <input type="radio" id="other" name="user.gender" value="others">
 						        <label for="other">Others</label>
 						    </div>
 						    
@@ -292,9 +293,8 @@
 							</div><br>
 					        
 					        <div>
-					        	<button type="submit" class="btn">Register</button>
+					        	<button type="submit" class="btn" id="submit-btn">Register</button>
 					        </div>
-					        
 					    </form>
 				    </div>
 				</div>
@@ -308,13 +308,19 @@
 		document.addEventListener("DOMContentLoaded", async function () {
 		    const urlParams = new URLSearchParams(window.location.search);
 		    const userId = urlParams.get("userId");
-		
+	
+		    const titleElement = document.getElementById("form-title");
+		    const submitBtn = document.getElementById("submit-btn");
+	
 		    if (userId) {
-		        // Edit Mode: Remove password section
+		        // Set heading and button text
+		        if (titleElement) titleElement.textContent = "Update User Account";
+		        if (submitBtn) submitBtn.textContent = "Update";
+	
+		        // Remove password section in edit mode
 		        const pwdSection = document.getElementById("password-section");
-		        document.querySelector(".btn").textContent = "Update";
 		        if (pwdSection) pwdSection.remove();
-		
+	
 		        try {
 		            const response = await fetch(`${pageContext.request.contextPath}/jadebank/user/id`, {
 		                method: "POST",
@@ -323,26 +329,34 @@
 		                },
 		                body: JSON.stringify({ userId: Number(userId) })
 		            });
-		
+	
 		            if (!response.ok) throw new Error("Failed to fetch user details");
-		
+	
 		            const data = await response.json();
 		            const user = data.user || {};
 		            const customer = data.customerDetails || {};
-		
+	
 		            // Fill form fields
 		            document.querySelector('input[name="user.fullName"]').value = user.fullName || "";
 		            document.querySelector('input[name="user.email"]').value = user.email || "";
 		            document.querySelector('input[name="user.phone"]').value = user.phone || "";
 		            document.querySelector('input[name="user.dob"]').value = user.dob || "";
-		
-		            const genderInput = document.querySelector(`input[name="user.gender"][value="${user.gender}"]`);
-		            if (genderInput) genderInput.checked = true;
-		
+	
+		            const gender = (data.user.gender || "").toLowerCase();
+	            	const genderInputs = document.querySelectorAll('input[name="user.gender"]');
+
+	            	let found = false;
+	            	genderInputs.forEach(input => {
+	            	    if (input.value.toLowerCase() === gender) {
+	            	        input.checked = true;
+	            	        found = true;
+	            	    }
+	            	});
+	
 		            document.querySelector('input[name="customerDetails.aadharNumber"]').value = customer.aadharNumber || "";
 		            document.querySelector('input[name="customerDetails.panId"]').value = customer.panId || "";
 		            document.querySelector('textarea[name="customerDetails.address"]').value = customer.address || "";
-		
+	
 		        } catch (err) {
 		            document.getElementById("signup-error").textContent = "Error loading data: " + err.message;
 		        }

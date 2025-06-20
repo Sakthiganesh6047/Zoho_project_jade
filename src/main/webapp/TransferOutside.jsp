@@ -125,7 +125,6 @@
             background-color: #eef6ff;
             padding: 12px;
             margin-top: 10px;
-            border-left: 4px solid #007acc;
             border-radius: 6px;
             font-size: 0.95rem;
             color: #333;
@@ -161,6 +160,10 @@
             border: 1px solid #ccc;
             border-radius: 6px;
         }
+        
+        .hidden {
+		    display: none;
+		}
 
         .error {
             color: red;
@@ -193,7 +196,7 @@
                     <button type="button" onclick="fetchSenderDetails()">Fetch</button>
                 </div>
 
-                <div id="infoDiv" class="info-box"></div>
+                <div id="infoDiv" class="info-box hidden"></div>
 
                 <label for="amount">Amount:</label>
                 <input type="number" step="0.01" name="transaction.amount" id="amount" required />
@@ -219,7 +222,7 @@
                 <input type="text" name="beneficiary.ifscCode" id="beneficiaryIfscCode" required />
             </fieldset>
 
-            <div id="transfer-status" class="info-box"></div>
+            <div id="transfer-status" class="info-box hidden"></div>
             <button type="button" onclick="showPasswordModal()">Transfer</button>
         </form>
     </div>
@@ -251,15 +254,20 @@
         })
         .then(res => res.ok ? res.json() : Promise.reject("Fetch failed"))
         .then(data => {
+            const infoDiv = document.getElementById("infoDiv");
             if (!data || !data.fullName || !data.customerId) {
-                document.getElementById("infoDiv").textContent = "No sender data found.";
+                infoDiv.textContent = "No sender data found.";
+                infoDiv.classList.remove("hidden");
                 return;
             }
             senderDetails = data;
-            document.getElementById("infoDiv").textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
+            infoDiv.textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
+            infoDiv.classList.remove("hidden");
         })
         .catch(err => {
-            document.getElementById("infoDiv").textContent = "Account not found";
+            const infoDiv = document.getElementById("infoDiv");
+            infoDiv.textContent = "Account not found";
+            infoDiv.classList.remove("hidden");
             console.error(err);
         });
     }
@@ -279,6 +287,7 @@
         const description = document.getElementById("description").value;
         const password = document.getElementById("confirmPassword").value;
         const statusDiv = document.getElementById("transfer-status");
+        const infoDiv = document.getElementById("infoDiv");
 
         const beneficiary = {
             beneficiaryAccountNumber: document.getElementById("beneficiaryAccountNumber").value.trim(),
@@ -287,9 +296,11 @@
             ifscCode: document.getElementById("beneficiaryIfscCode").value.trim()
         };
 
+        // Validation
         if (!accountId || !amount || amount <= 0 || !password || !senderDetails) {
             statusDiv.textContent = "All fields, password, and sender fetch are required.";
             statusDiv.style.color = "red";
+            statusDiv.classList.remove("hidden");
             return;
         }
 
@@ -316,12 +327,21 @@
             closeModal();
             const result = await res.json();
 
+            statusDiv.classList.remove("hidden");
+
             if (res.ok && result.status === "success") {
                 statusDiv.textContent = "Transfer completed successfully.";
                 statusDiv.style.color = "green";
+
                 document.getElementById("transferForm").reset();
-                document.getElementById("infoDiv").textContent = "";
+                infoDiv.textContent = "";
+                infoDiv.classList.add("hidden");
                 senderDetails = null;
+
+                // Hide the status message after 5 seconds
+                setTimeout(() => {
+                    statusDiv.classList.add("hidden");
+                }, 5000);
             } else {
                 statusDiv.textContent = result.message || "Transfer failed.";
                 statusDiv.style.color = "red";
@@ -331,8 +351,10 @@
             closeModal();
             statusDiv.textContent = "Network error: " + err.message;
             statusDiv.style.color = "red";
+            statusDiv.classList.remove("hidden");
         });
     }
+
 </script>
 
 </body>

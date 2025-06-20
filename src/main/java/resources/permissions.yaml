@@ -13,6 +13,7 @@ UserHandler:
   createUser: [0, 1, 2, 3]
   publicCreateCustomer: [0, 1, 2, 3, 4]
   updateUser: [1, 2, 3]
+  updateUserProfile: [0, 1, 2, 3]
   getUserProfileByEmail: [0, 1, 2, 3]
   getUserByPhone: [1, 2, 3]
   getUserProfileById: [0, 1, 2, 3]

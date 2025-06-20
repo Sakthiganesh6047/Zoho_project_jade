@@ -107,7 +107,6 @@
 		    background-color: #eef6ff;
 		    padding: 12px;
 		    margin-top: 10px;
-		    border-left: 4px solid #007acc;
 		    border-radius: 6px;
 		    font-size: 0.95rem;
 		    color: #333;
@@ -145,6 +144,10 @@
 		    z-index: 1000;
 		}
 		
+		.hidden {
+		    display: none;
+		}
+		
 		.error {
 		    color: red;
 		    font-weight: bold;
@@ -175,7 +178,7 @@
 		                <label for="senderAccountId">Sender Account ID:</label>
 		                <input type="number" name="transaction.accountId" id="senderAccountId" required onblur="fetchSenderDetails()" />
 		
-		                <div id="infoDiv" class="info-box"></div>
+		                <div id="infoDiv" class="info-box hidden"></div>
 		
 		                <label for="amount">Amount:</label>
 		                <input type="number" step="0.01" name="transaction.amount" id="amount" required />
@@ -195,7 +198,7 @@
 		                <input type="number" id="receiverAccount2" required />
 		
 		                <button type="button" onclick="checkReceiverDetails()">Check Receiver Details</button>
-		                <div id="receiverDetails" class="info-box"></div>
+		                <div id="receiverDetails" class="info-box hidden"></div>
 		            </fieldset>
 		
 		            <button type="button" onclick="showPasswordModal()">Transfer</button>
@@ -228,17 +231,22 @@
 	        })
 	        .then(res => res.ok ? res.json() : Promise.reject("Fetch failed"))
 	        .then(data => {
-	            if (!data || !data.fullName || !data.customerId) {
-	                document.getElementById("infoDiv").textContent = "No sender data found.";
-	                return;
-	            }
-	            senderDetails = data;
-	            document.getElementById("infoDiv").textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
-	        })
-	        .catch(err => {
-	            document.getElementById("infoDiv").textContent = "Account not found";
-	            console.error(err);
-	        });
+			    const infoDiv = document.getElementById("infoDiv");
+			    if (!data || !data.fullName || !data.customerId) {
+			        infoDiv.textContent = "No sender data found.";
+			        infoDiv.classList.remove("hidden");
+			        return;
+			    }
+			    senderDetails = data;
+			    infoDiv.textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
+			    infoDiv.classList.remove("hidden");
+			})
+			.catch(err => {
+			    const infoDiv = document.getElementById("infoDiv");
+			    infoDiv.textContent = "Account not found";
+			    infoDiv.classList.remove("hidden");
+			    console.error(err);
+			});
 	    }
 	    
 	    function checkReceiverDetails() {
@@ -252,15 +260,19 @@
 	        })
 	        .then(res => res.ok ? res.json() : Promise.reject("Fetch failed"))
 	        .then(data => {
+	            const receiverDiv = document.getElementById("receiverDetails");
 	            if (!data || !data.fullName || !data.customerId) {
-	                document.getElementById("receiverDetails").textContent = "No sender data found.";
+	                receiverDiv.textContent = "No sender data found.";
+	                receiverDiv.classList.remove("hidden");
 	                return;
 	            }
-	            senderDetails = data;
-	            document.getElementById("receiverDetails").textContent = "Receiver: " + data.fullName + ", Customer ID: " + data.customerId;
+	            receiverDiv.textContent = "Receiver: " + data.fullName + ", Customer ID: " + data.customerId;
+	            receiverDiv.classList.remove("hidden");
 	        })
 	        .catch(err => {
-	            document.getElementById("receiverDetails").textContent = "Account not found";
+	            const receiverDiv = document.getElementById("receiverDetails");
+	            receiverDiv.textContent = "Account not found";
+	            receiverDiv.classList.remove("hidden");
 	            console.error(err);
 	        });
 	    }

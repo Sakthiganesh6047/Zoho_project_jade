@@ -135,6 +135,7 @@ public class AccountHandler {
     	AccountProfile accountProfile = new AccountProfile();
     	accountProfile.setFullName(user.getFullName());
     	accountProfile.setCustomerId(customerId);
+    	accountProfile.setBalance(fetchedAccount.getBalance());
     	return Results.respondJson(accountProfile);
     }
     

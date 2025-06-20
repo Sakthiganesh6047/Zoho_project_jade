@@ -8,6 +8,7 @@ import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.Results;
 
 public class CustomerDAO {
 
@@ -47,13 +48,16 @@ public class CustomerDAO {
         return (long) executor.executeInsertWithConn(query, connection, false);
     }
 
-    public Customer getCustomerById(Long customerId) throws CustomException {
+    @SuppressWarnings("unchecked")
+	public Customer getCustomerById(Long customerId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Customer.class);
         QueryResult query = queryBuilder.select("*")
                 .where("customer_id", "=", customerId)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
-        return (Customer) executor.executeQuery(query, Customer.class);
+        List<Customer> customers = (List<Customer>) executor.executeQuery(query, Customer.class);
+        Customer customer = Results.getSingleResult(customers);
+        return customer;
     }
 
     public List<Customer> getCustomersByBranchId(Long branchId) throws CustomException {

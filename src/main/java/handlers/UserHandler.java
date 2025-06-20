@@ -201,6 +201,8 @@ public class UserHandler {
             connection.setAutoCommit(false);
 
             // Validate and update user
+            user.setAge(TimeConversion.calculateAge(user.getDob()));
+            user.setStatus(1);
             ValidationsUtil.validateUser(user);
 
             // Check if password is being updated
@@ -211,7 +213,6 @@ public class UserHandler {
                 User existing = userDAO.getUserById(user.getUserId(), connection);
                 user.setPasswordHash(existing.getPasswordHash());
             }
-
             userDAO.updateUser(user, connection);
 
             // Depending on the userType, update customer or employee

@@ -254,7 +254,5 @@
     <% } else { %>
         <a href="Login.jsp"><i class="fas fa-sign-in-alt"></i><span>Login</span></a>
     <% } %>
-	<a href="profile.jsp"><i class="fa-solid fa-id-card"></i><span>My Profile</span></a>
-    <a href="Logout.jsp"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
 </div>
 

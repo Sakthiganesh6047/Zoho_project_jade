@@ -183,7 +183,7 @@
 				    </a>
 				</div>
 				<!-- Change Password Modal -->
-				<div id="passwordModal" class="modal">
+				<div id="changePasswordModal" class="modal">
 				    <div class="modal-content">
 				        <h3 style="text-align:center;">Change Password</h3>
 				        <label for="oldPassword">Old Password:</label>
@@ -193,10 +193,10 @@
 				        <input type="password" id="newPassword" required />
 				
 				        <label for="confirmPassword">Confirm Password:</label>
-				        <input type="password" id="confirmPassword" required />
+				        <input type="password" id="confirmNewPassword" required />
 				
 				        <button onclick="submitPasswordChange()">Submit</button>
-				        <button onclick="closePasswordModal()" style="background-color: #ccc; margin-top: 10px;">Cancel</button>
+				        <button onclick="closePasswordChangeModal()" style="background-color: #ccc; margin-top: 10px;">Cancel</button>
 				
 				        <div id="passwordStatus" style="margin-top: 10px; text-align: center; font-weight: bold;"></div>
 				    </div>
@@ -241,31 +241,31 @@
     
  // Open and close modal
     function showPasswordChangeModal() {
-        document.getElementById("passwordModal").style.display = "block";
+        document.getElementById("changePasswordModal").style.display = "block";
         document.getElementById("passwordStatus").textContent = "";
     }
 
-    function closePasswordModal() {
-        document.getElementById("passwordModal").style.display = "none";
+    function closePasswordChangeModal() {
+        document.getElementById("changePasswordModal").style.display = "none";
         document.getElementById("oldPassword").value = "";
         document.getElementById("newPassword").value = "";
-        document.getElementById("confirmPassword").value = "";
+        document.getElementById("confirmNewPassword").value = "";
     }
 
     // Submit password change
     function submitPasswordChange() {
         const oldPassword = document.getElementById("oldPassword").value.trim();
         const newPassword = document.getElementById("newPassword").value.trim();
-        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+        const confirmNewPassword = document.getElementById("confirmNewPassword").value.trim();
         const statusDiv = document.getElementById("passwordStatus");
 
-        if (!oldPassword || !newPassword || !confirmPassword) {
+        if (!oldPassword || !newPassword || !confirmNewPassword) {
             statusDiv.textContent = "All fields are required.";
             statusDiv.style.color = "red";
             return;
         }
 
-        if (newPassword !== confirmPassword) {
+        if (newPassword !== confirmNewPassword) {
             statusDiv.textContent = "New and Confirm Password do not match.";
             statusDiv.style.color = "red";
             return;
@@ -276,7 +276,7 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 password: oldPassword,
-                newPassword: newPassword
+                newPassword: confirmNewPassword
             })
         })
         .then(res => res.json())
