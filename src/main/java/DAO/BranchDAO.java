@@ -1,12 +1,19 @@
 package DAO;
 
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import pojos.Branch;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.DBConnection;
 import util.Results;
 
 public class BranchDAO {
@@ -115,6 +122,72 @@ public class BranchDAO {
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (int) executor.executeQuery(query, null);
+    }
+    
+    public Map<String, Integer> getAccountCountPerBranch() throws CustomException {
+	     try(Connection connection = DBConnection.getConnection()){   
+    		String sql = """
+	            SELECT
+	                b.branch_name,
+	                COUNT(a.account_id) AS account_count
+	            FROM
+	                Branch b
+	            LEFT JOIN
+	                Account a ON b.branch_id = a.branch_id
+	            GROUP BY
+	                b.branch_name
+	            ORDER BY
+	                b.branch_name
+	            """;
+	
+	        Map<String, Integer> branchAccountMap = new LinkedHashMap<>();
+	
+	        try (PreparedStatement ps = connection.prepareStatement(sql);
+	             ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                String branchName = rs.getString("branch_name");
+	                int count = rs.getInt("account_count");
+	                branchAccountMap.put(branchName, count);
+	            }
+	        }
+	
+	        return branchAccountMap;
+	     } catch(Exception e) {
+	    	 throw new CustomException(e.getMessage());
+	     }
+    }
+    
+    public Map<String, BigDecimal> getTotalBalancePerBranch() throws CustomException {
+    	try(Connection connection = DBConnection.getConnection()) {
+    		String sql = """
+	            SELECT
+	                b.branch_name,
+	                SUM(a.balance) AS total_balance
+	            FROM
+	                Branch b
+	            JOIN
+	                Account a ON b.branch_id = a.branch_id
+	            GROUP BY
+	                b.branch_id, b.branch_name
+	            ORDER BY
+	                b.branch_name
+	            """;
+	
+	        Map<String, BigDecimal> branchBalanceMap = new LinkedHashMap<>();
+	
+	        try (PreparedStatement ps = connection.prepareStatement(sql);
+	             ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                String branchName = rs.getString("branch_name");
+	                BigDecimal totalBalance = rs.getBigDecimal("total_balance");
+	                branchBalanceMap.put(branchName, totalBalance);
+	            }
+	        }
+	
+	        return branchBalanceMap;
+    	} catch(Exception e) {
+    		throw new CustomException(e.getMessage());
+    	}
     }
 
     @SuppressWarnings("unchecked")

@@ -12,7 +12,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 87vh;
         }
 
         .sidebar-wrapper {
@@ -57,7 +57,7 @@
 
         .controls button {
             padding: 10px 16px;
-            background-color: #007acc;
+            background-color: #414485;
             color: white;
             border: none;
             border-radius: 6px;
@@ -105,7 +105,7 @@
             margin: 0 5px;
             border: none;
             border-radius: 6px;
-            background-color: #007acc;
+            background-color: #414485;
             color: white;
             cursor: pointer;
         }
@@ -129,7 +129,7 @@
     </div>
 
     <div class="main-wrapper">
-        <h2>Branch Account List</h2>
+        <h2>Branch Accounts List</h2>
 
         <div class="controls">
 	        <div>

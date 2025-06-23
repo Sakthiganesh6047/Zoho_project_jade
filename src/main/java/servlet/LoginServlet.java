@@ -61,7 +61,8 @@ public class LoginServlet extends HttpServlet {
                 // Respond with 200 OK and basic user info
                 response.setContentType("application/json");
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("{\"message\":\"Login successful\"}");
+                response.setContentType("application/json");
+                response.getWriter().write("{\"message\":\"Login successful\", \"role\":" + role + "}");
             } else {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{\"error\":\"Invalid credentials\"}");

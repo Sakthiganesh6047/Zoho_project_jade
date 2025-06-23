@@ -6,6 +6,7 @@
 <html>
 <head>
     <title>Beneficiaries - JadeBank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             font-family: "Roboto", sans-serif;
@@ -46,8 +47,11 @@
         }
 
         .form-section select {
-            padding: 8px;
+            padding: 10px;
             border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            width: 100%;
         }
 
         .beneficiary-table {
@@ -57,40 +61,83 @@
             background: white;
             border-radius: 8px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .beneficiary-table th,
         .beneficiary-table td {
-            padding: 12px;
+            padding: 14px;
             text-align: left;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #eee;
+        }
+
+        .beneficiary-table th {
+            background-color: #f0f0f7;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .edit-button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #125ea8;
+        }
+
+        .del-button {
+            background-color: #e53935;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .del-button:hover {
+            background-color: #c62828;
         }
 
         .pagination {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
         }
 
         .pagination button {
             padding: 8px 16px;
-            margin: 0 5px;
             border: none;
             background-color: #414485;
             color: white;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
-        }
-        
-        .del-button{
-        	background-color:#e53935;
-			color:white;
-			border:none;
-			padding:6px 10px;
-			border-radius:4px;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
         }
 
         .pagination button:hover {
-            background-color: #388e3c;
+            background-color: #2e2f60;
+        }
+
+        #pageIndicator {
+            font-weight: bold;
+            color: #414485;
+            font-size: 15px;
         }
 
         #status {

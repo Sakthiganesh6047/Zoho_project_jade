@@ -150,34 +150,52 @@
 	    	</div>
 	    	<script>
 		    	document.getElementById("login-form").addEventListener("submit", function(e) {
-				    e.preventDefault(); // prevent normal form submission
-				
-				    const data = {
-				    	email: document.querySelector('input[name="email"]').value,
-				        password: document.querySelector('input[name="password"]').value
-				    };
-				
-				    fetch("${pageContext.request.contextPath}/login", {
-				        method: "POST",
-				        headers: {
-				            "Content-Type": "application/json"
-				        },
-				        body: JSON.stringify(data)
-				    })
-				    .then(async response => {
-				        if (response.ok) {
-				            window.location.href = "Dashboard.jsp";
-				        } else {
-				            // Parse JSON response body
-				            const errorData = await response.json();
-				            const errorMsg = errorData.error || "Login Failed";
-				            document.getElementById("login-error").textContent = errorMsg;
-				        }
-				    })
-				    .catch(err => {
-				        document.getElementById("login-error").textContent = "An error occurred: " + err.message;
-				    });
-				});
+		    	    e.preventDefault(); // prevent normal form submission
+	
+		    	    const data = {
+		    	        email: document.querySelector('input[name="email"]').value,
+		    	        password: document.querySelector('input[name="password"]').value
+		    	    };
+	
+		    	    fetch("${pageContext.request.contextPath}/login", {
+		    	        method: "POST",
+		    	        headers: {
+		    	            "Content-Type": "application/json"
+		    	        },
+		    	        body: JSON.stringify(data)
+		    	    })
+		    	    .then(async response => {
+		    	        if (response.ok) {
+		    	            const responseData = await response.json();
+		    	            const role = responseData.role;
+	
+		    	            // Redirect based on role
+		    	            switch (role) {
+		    	                case 0:
+		    	                    window.location.href = "CustomerDashboard.jsp";
+		    	                    break;
+		    	                case 1:
+		    	                    window.location.href = "ClerkDashboard.jsp";
+		    	                    break;
+		    	                case 2:
+		    	                    window.location.href = "ManagerDashboard.jsp";
+		    	                    break;
+		    	                case 3:
+		    	                    window.location.href = "AdminDashboard.jsp";
+		    	                    break;
+		    	                default:
+		    	                    window.location.href = "Dashboard.jsp"; // fallback
+		    	            }
+		    	        } else {
+		    	            const errorData = await response.json();
+		    	            const errorMsg = errorData.error || "Login Failed";
+		    	            document.getElementById("login-error").textContent = errorMsg;
+		    	        }
+		    	    })
+		    	    .catch(err => {
+		    	        document.getElementById("login-error").textContent = "An error occurred: " + err.message;
+		    	    });
+		    	});
 			</script>
 	    </div>
 	</div>

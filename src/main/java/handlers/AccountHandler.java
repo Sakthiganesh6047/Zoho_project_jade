@@ -150,14 +150,64 @@ public class AccountHandler {
     	ValidationsUtil.isNull(role, "User Role");
     	ValidationsUtil.checkUserRole(role);
     	
-    	if (role == 0) {
-    		if(customerId != modifierId) {
+    	if (role.equals(0)) {
+    		if(!(customerId.equals(modifierId))) {
     			throw new CustomException("Unauthorized Access, Check account Number");
     		}
     	}
     	account.setModifiedBy(modifierId);
     	account.setModifiedOn(Instant.now().toEpochMilli());
     	return Results.respondJson(accountDAO.updateAccount(account));
+    }
+    
+    @Route(path = "account/block", method = "POST")
+    public String blockAccount(@FromBody Account account, @FromSession("userId") Long modifierId, 
+    							@FromSession("role") Integer role) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(accountId, "AccountId");
+    	ValidationsUtil.isNull(modifierId, "User Id");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	Account fetchedAccount = accountDAO.getAccountById(accountId);
+    	
+    	if (role.equals(0)) {
+    		if(!(fetchedAccount.getCustomerId().equals(modifierId))) {
+    			throw new CustomException("Unauthorized Access, Check account Number");
+    		}
+    	}
+    	
+    	fetchedAccount.setAccountStatus(0);
+    	fetchedAccount.setModifiedBy(modifierId);
+    	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
+    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
+    }
+    
+    @Route(path = "account/unblock", method = "POST")
+    public String unblockAccount(@FromBody Account account, @FromSession("userId") Long modifierId, 
+    							@FromSession("role") Integer role) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(accountId, "AccountId");
+    	ValidationsUtil.isNull(modifierId, "User Id");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	Account fetchedAccount = accountDAO.getAccountById(accountId);
+    	
+    	if (role.equals(0)) {
+    		if(!(fetchedAccount.getCustomerId().equals(modifierId))) {
+    			throw new CustomException("Unauthorized Access, Check account Number");
+    		}
+    	}
+    	
+    	fetchedAccount.setAccountStatus(1);
+    	fetchedAccount.setModifiedBy(modifierId);
+    	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
+    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
     }
     
     @Route(path = "account/activate", method = "POST")
@@ -198,6 +248,19 @@ public class AccountHandler {
     	} else {
     		return Results.respondJson(accountDAO.getAccountsByStatus(2, limit, offset));
     	}
+    }
+    
+    @Route(path = "account/transactionchart", method = "GET")
+    public String getTransactionCount(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+ 
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.isNull(role, "User Role");
+    	
+    	if(role ==  2) {
+    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+    		return Results.respondJson(accountDAO.getCurrentWeekTransactionSplitByBranch(employee.getBranch()));
+    	}
+    	return Results.respondJson(accountDAO.getCurrentWeekTransactionSplitByDayName());
     }
     
     @Route(path = "account/close", method = "PUT")

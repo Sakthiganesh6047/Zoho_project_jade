@@ -105,6 +105,11 @@ public class BranchHandler {
 		return Results.respondJson(branchDAO.getBranchByIfsc(ifsc));
 	}
 	
+	@Route(path = "branch/accountstats", method = "GET")
+	public String getAccountsCount() throws CustomException {
+		return Results.respondJson(branchDAO.getAccountCountPerBranch());
+	}
+	
 	@Route(path = "branch/id/{branchId}", method = "GET")
 	public String getBranchById(@FromPath("branchId") long branchId) throws CustomException {
 		

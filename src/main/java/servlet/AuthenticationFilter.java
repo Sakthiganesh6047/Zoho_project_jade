@@ -33,8 +33,8 @@ public class AuthenticationFilter implements Filter {
 
         boolean isLoginRequest = uri.endsWith("/LoginServlet") || uri.endsWith("/Login.jsp") || uri.endsWith("/login");
         boolean isPublicResource = uri.startsWith("/public/") || uri.endsWith(".css") || uri.endsWith(".png") || uri.endsWith("LandingPage.jsp");
-        boolean isLogoutRequest = uri.endsWith("/logout") || uri.endsWith("Logout.jsp");
-        boolean isSignUpRequest = uri.endsWith("/signup") || uri.endsWith("SignUp.jsp");
+        boolean isLogoutRequest = uri.endsWith("/logout") || uri.endsWith("/Logout.jsp");
+        boolean isSignUpRequest = uri.endsWith("/signup") || uri.endsWith("/SignUp.jsp");
 
         boolean isLoggedIn = session != null && session.getAttribute("userId") != null;
 

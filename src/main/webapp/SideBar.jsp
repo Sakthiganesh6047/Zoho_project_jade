@@ -1,258 +1,231 @@
+<!-- Include Font Awesome for icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
 <%@ page session="true" %>
 <%
     Integer role = (Integer) session.getAttribute("role");
     if (role == null) role = -1;
-
-    String roleLabel = "Unknown";
-    switch (role) {
-        case 0: roleLabel = "Customer"; break;
-        case 1: roleLabel = "Employee"; break;
-        case 2: roleLabel = "Manager"; break;
-        case 3: roleLabel = "GM"; break;
-    }
+    String currentPage = request.getRequestURI();
 %>
 
-<head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-</head>
-
 <style>
-    .sidebar {
-        width: 60px;
-        height: 100vh;
-        position: fixed;
-        left: 0;
-        background-color: #373962;
-        border-radius: 0 12px 12px 0;
-        border-left: none;
-        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.3);
-        color: white;
-        overflow-x: hidden;
-        transition: width 0.3s ease;
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding-top:10px;
-    }
-
-    .sidebar:hover {
-        width: 240px;
-        align-items: stretch;
-    }
-
-    .mini-logo {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        margin-top: 20px;
-        font-size: 24px;
-        font-weight: bold;
-        letter-spacing: 2px;
-    }
-
-    .sidebar:hover .mini-logo {
-        display: none;
-    }
-
-    .sidebar-content {
-        display: none;
-        padding: 10px;
-    }
-
-    .sidebar:hover .sidebar-content {
-        display: block;
-    }
-
-    .sidebar h3 {
-        text-align: center;
-        font-size: 1.2em;
-        margin-bottom: 10px;
-    }
-
-    .userinfo {
-        text-align: center;
-        font-size: 0.9em;
-        color: #ccc;
-        margin-bottom: 20px;
-    }
-
-    .sidebar a {
+	.sidebar {
+	    position: fixed;
+	    left: 0;
+	    height: 100vh;
+	    width: 60px;
+	    background-color: #373962;
 	    display: flex;
-	    align-items: center;
-	    justify-content: flex-start;
-	    padding: 16px 20px;
+	    flex-direction: column;
+	    justify-content: space-between;
+	    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
+	    transition: width 0.3s ease;
+	    z-index: 1000;
+	    overflow-x: hidden;
+	    box-shadow: 6px 0 16px rgba(0, 0, 0, 0.3); /* subtle shadow */
+    	transition: width 0.3s ease, box-shadow 0.3s ease;
+	}
+	
+	.sidebar {
+	    transition: all 0.3s ease;
+	    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+	}
+	
+	.sidebar.expanded a span {
+	    font-size: 16px;
+	    transition: font-size 0.3s ease;
+	}
+	
+	.sidebar.collapsed a span {
+	    font-size: 10px;
+	    transition: font-size 0.3s ease;
+	}
+	
+	#toggleSidebar.rotate i {
+	    transform: rotate(180deg);
+	}
+	
+	.sidebar.expanded {
+	    width: 220px;
+	}
+	
+	.sidebar .nav-items {
+	    display: flex;
+	    flex-direction: column;
+	    margin-top: 20px;
+	}
+	
+	.sidebar-link {
 	    color: white;
 	    text-decoration: none;
+	    padding: 18px 10px;
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    position: relative;
+	    transition: background 0.3s ease;
+	    font-size: 16px;
+	}
+	
+	.sidebar-link i {
+	    font-size: 22px;
+	    margin-bottom: 5px;
+	}
+	
+	.sidebar.expanded .sidebar-link {
+	    flex-direction: row;
+	    align-items: center;
+	    justify-content: flex-start;
+	    padding-left: 20px;
+	}
+	
+	.sidebar.expanded .sidebar-link i {
+	    margin-right: 16px;
+	    margin-bottom: 0;
+	}
+	
+	.sidebar .label {
+	    font-size: 10px;
 	    white-space: nowrap;
-	    overflow: hidden;
-	    transition: background 0.3s, color 0.3s;
-	    margin-bottom: 5px; /* NEW: spacing between options */
 	}
 	
-	.sidebar a i {
-	    min-width: 24px;
-	    text-align: center;
-	    font-size: 22px; /* was 18px */
-	    margin-right: 12px;
+	.sidebar:not(.expanded) .label {
+	    display: block;
 	}
 	
-	.sidebar a span {
-	    display: none;
-	    transition: opacity 0.3s ease;
+	.sidebar-link:hover, .sidebar-link.active {
+	    background-color: #ffffff;
+	    color: #373962;
 	}
 	
-	.sidebar:hover a span {
-	    display: inline;
-	    opacity: 1;
+	.toggle-btn {
+	    background: #2c2e54;
+	    color: white;
+	    border: none;
+	    width: 100%;
+	    padding-top: 10px;
+	    padding-bottom: 100px;
+	    cursor: pointer;
+	    font-size: 18px;
+	    transition: transform 0.3s ease;
+	}
+	
+	/* Tooltip (custom) */
+	.sidebar:not(.expanded) .sidebar-link:hover::after {
+	    content: attr(data-tooltip);
+	    position: absolute;
+	    left: 100%;
+	    top: 50%;
+	    transform: translateY(-50%);
+	    background-color: #373962;
+	    color: white;
+	    padding: 4px 10px;
+	    border-radius: 6px;
+	    white-space: nowrap;
+	    margin-left: 10px;
+	    font-size: 12px;
+	    z-index: 999;
+	    box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
 	}
 
-    .sidebar:hover a span {
-        display: inline;
-        opacity: 1;
-    }
-
-    .sidebar a:hover {
-        background-color: white;
-        color: #373962;
-    }
-
-    .dropdown {
-        position: relative;
-    }
-
-    .dropdown-content {
-        display: none;
-        flex-direction: column;
-        background-color: white;
-        margin-left: 20px;
-        padding-left: 10px;
-        border-radius: 6px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    .sidebar:hover .dropdown:hover .dropdown-content {
-        display: flex;
-    }
-
-    .dropdown-content a {
-        padding: 10px 15px;
-        background-color: white;
-        color: #373962;
-        text-decoration: none;
-        transition: background 0.5s;
-    }
-
-    .dropdown-content a:hover {
-        background-color: #f0f0f0;
-        color: #373962;
-    }
 </style>
 
-<div class="sidebar">
-    <!-- Sidebar with always-visible icons and hover-expandable labels -->
-    <a href="Dashboard.jsp"><i class="fas fa-home"></i><span>Home</span></a>
+<div class="sidebar <%= request.getRequestURI().contains("Dashboard") ? "active" : "" %>" id="sidebar">
+    <div class="nav-items">
+        <a href="Dashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("Dashboard") ? "active" : "" %>" data-tooltip="Home">
+            <i class="fas fa-home"></i>
+            <span class="label">Home</span>
+        </a>
 
-    <% if (role > 0 && role <= 3) { %>
-        <div class="dropdown">
-            <a href="#"><i class="fas fa-money-bill-transfer"></i><span>Transact</span></a>
-            <div class="dropdown-content">
-                <a href="Credit.jsp">- Credit</a>
-                <a href="Debit.jsp">- Debit</a>
-                <a href="TransferInside.jsp">- Internal Transfer</a>
-                <a href="TransferOutside.jsp">- External Transfer</a>
-            </div>
-        </div>
-    <% } %>
+        <% if (role == 0) { %>
+            <a href="CustomerTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerTransfer") ? "active" : "" %>" data-tooltip="Transact">
+                <i class="fas fa-money-bill-transfer"></i>
+                <span class="label">Transact</span>
+            </a>
+            <a href="CustomerAccTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerAccTransactions") ? "active" : "" %>" data-tooltip="Transactions">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span class="label">Transactions</span>
+            </a>
+            <a href="BeneficiaryList.jsp" class="sidebar-link <%= request.getRequestURI().contains("Beneficiary") ? "active" : "" %>" data-tooltip="Beneficiaries">
+                <i class="fas fa-users"></i>
+                <span class="label">Beneficiaries</span>
+            </a>
 
-    <% if (role == 0) { %>
-    
-        <a href="CustomerTransfer.jsp"><i class="fas fa-money-bill-transfer"></i><span>Transact</span></a>
-        
-        <a href="QuickTransfer.jsp"><i class="fa-solid fa-money-bill-trend-up"></i><span>Instant Transfer</span></a>
-        
-        <a href="CustomerAccTransactions.jsp"><i class="fas fa-clock-rotate-left"></i><span>View Transactions</span></a>
+        <% } else if (role == 1) { %>
+            <a href="Transact.jsp" class="sidebar-link <%= request.getRequestURI().contains("Transact") ? "active" : "" %>" data-tooltip="Transact">
+                <i class="fas fa-money-bill-transfer"></i>
+                <span class="label">Transact</span>
+            </a>
+            <a href="Accounts.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+                <i class="fas fa-address-book"></i>
+                <span class="label">Accounts</span>
+            </a>
+            <a href="CustomerSignUp.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerSignUp") ? "active" : "" %>" data-tooltip="Add Customer">
+                <i class="fas fa-user-plus"></i>
+                <span class="label">Add Customer</span>
+            </a>
 
-        <div class="dropdown">
-        	<a href="#"><i class="fa-solid fa-user-plus"></i><span>Beneficiaries</span></a>
-        		<div class="dropdown-content">
-        			<a href="AddBeneficiary.jsp" class="btn">- Add Beneficiary</a>
-        			<a href="BeneficiaryList.jsp" class="btn">- Manage Beneficiaries</a>
-        		</div>
-        </div>
-        
-    <% } else if (role == 1) { %>
-    
-    	<div class="dropdown">
-        	<a href="#"><i class="fas fa-address-book"></i><span>Bank Accounts</span></a>
-        		<div class="dropdown-content">
-        			 <a href="AccountsList.jsp" class="btn">- Branch Accounts List</a>
-        			<a href="OpenAccount.jsp" class="btn">- Open New Account</a>
-        		</div>
-        </div>
-        
-        <a href="AccountTransactions.jsp"><i class="fa-solid fa-money-bill-trend-up"></i><span>View Transactions</span></a>
-        
-        <a href="CustomerSignUp.jsp"><i class="fa-solid fa-user-plus"></i><span>Add Customer</span></a>
-        
-    <% } else if (role == 2) { %>
-    
-    	<a href="ManageBranches.jsp"><i class="fa-solid fa-building-columns"></i><span>Manage Branch</span></a>
-    	
-    	<div class="dropdown">
-        	<a href="#"><i class="fa-solid fa-user-tie"></i><span>Employees</span></a>
-        		<div class="dropdown-content">
-        			<a href="ViewEmployees.jsp" class="btn">- View Employees</a>
-        			<a href="EmployeeSignUp.jsp" class="btn">- Add Employee</a>
-        		</div>
-        </div>
-        
-        <div class="dropdown">
-        	<a href="#"><i class="fas fa-address-book"></i><span>Bank Accounts</span></a>
-        		<div class="dropdown-content">
-        			 <a href="AccountsList.jsp" class="btn">- Branch Accounts List</a>
-        			<a href="OpenAccount.jsp" class="btn">- Open New Account</a>
-        		</div>
-        </div>
-        
-        <a href="AccountTransactions.jsp"><i class="fa-solid fa-money-bill-trend-up"></i><span>View Transactions</span></a>
-        
-        <a href="CustomerSignUp.jsp"><i class="fa-solid fa-user-plus"></i><span>Add Customer</span></a>
-    	
-    <% } else if (role == 3) { %>
-        
-        <div class="dropdown">
-        	<a href="#"><i class="fa-solid fa-building-columns"></i><span>Branches</span></a>
-	        	<div class="dropdown-content">
-	        		<a href="ManageBranches.jsp" class="btn">Manage Branches</a>
-	            	<a href="AddNewBranch.jsp" class="btn">Add New Branch</a>
-	        	</div>
-        </div>
-        
-        <div class="dropdown">
-        	<a href="#"><i class="fa-solid fa-user-tie"></i><span>Employees</span></a>
-        		<div class="dropdown-content">
-        			<a href="ViewEmployees.jsp" class="btn">- View Employees</a>
-        			<a href="EmployeeSignUp.jsp" class="btn">- Add Employee</a>
-        		</div>
-        </div>
-        
-        <div class="dropdown">
-        	<a href="#"><i class="fas fa-address-book"></i><span>Bank Accounts</span></a>
-        		<div class="dropdown-content">
-        			 <a href="AccountsList.jsp" class="btn">- Branch Accounts List</a>
-        			<a href="OpenAccount.jsp" class="btn">- Open New Account</a>
-        		</div>
-        </div>
-        
-        <a href="AccountTransactions.jsp"><i class="fa-solid fa-money-bill-trend-up"></i><span>View Transactions</span></a>
-        
-        <a href="CustomerSignUp.jsp"><i class="fa-solid fa-user-plus"></i><span>Add Customer</span></a>
+        <% } else if (role == 2) { %>
+            <a href="ManageBranches.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManageBranches") ? "active" : "" %>" data-tooltip="Branches">
+                <i class="fas fa-building-columns"></i>
+                <span class="label">Branches</span>
+            </a>
+            <a href="Accounts.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+                <i class="fas fa-address-book"></i>
+                <span class="label">Accounts</span>
+            </a>
+            <a href="ViewEmployees.jsp" class="sidebar-link <%= request.getRequestURI().contains("ViewEmployees") ? "active" : "" %>" data-tooltip="Employees">
+                <i class="fas fa-user-tie"></i>
+                <span class="label">Employees</span>
+            </a>
 
-    <% } else { %>
-        <a href="Login.jsp"><i class="fas fa-sign-in-alt"></i><span>Login</span></a>
-    <% } %>
+        <% } else if (role == 3) { %>
+            <a href="ManageBranches.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManageBranches") ? "active" : "" %>" data-tooltip="Branches">
+                <i class="fas fa-building-columns"></i>
+                <span class="label">Branches</span>
+            </a>
+            <a href="Accounts.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+                <i class="fas fa-address-book"></i>
+                <span class="label">Accounts</span>
+            </a>
+            <a href="ViewEmployees.jsp" class="sidebar-link <%= request.getRequestURI().contains("ViewEmployees") ? "active" : "" %>" data-tooltip="Employees">
+                <i class="fas fa-user-tie"></i>
+                <span class="label">Employees</span>
+            </a>
+            <a href="AddNewBranch.jsp" class="sidebar-link <%= request.getRequestURI().contains("AddNewBranch") ? "active" : "" %>" data-tooltip="Add Branch">
+                <i class="fas fa-plus-square"></i>
+                <span class="label">Add Branch</span>
+            </a>
+
+        <% } else { %>
+            <a href="Login.jsp" class="sidebar-link" data-tooltip="Login">
+                <i class="fas fa-sign-in-alt"></i>
+                <span class="label">Login</span>
+            </a>
+        <% } %>
+    </div>
+    <button class="toggle-btn" id="toggleSidebar" onclick="toggleSidebar()">
+	    <i class="fas fa-bars"></i>
+	</button>
+
 </div>
+
+<script>
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const bodyWrapper = document.querySelector('.body-wrapper');
+
+    sidebar.classList.toggle('expanded');
+
+    if (sidebar.classList.contains('expanded')) {
+        bodyWrapper.classList.add('sidebar-expanded');
+        bodyWrapper.classList.remove('sidebar-collapsed');
+    } else {
+        bodyWrapper.classList.remove('sidebar-expanded');
+        bodyWrapper.classList.add('sidebar-collapsed');
+    }
+}
+
+</script>
 

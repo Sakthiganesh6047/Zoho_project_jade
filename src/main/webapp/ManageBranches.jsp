@@ -9,6 +9,7 @@
 		    flex-direction: column; 
 		    min-height: 100vh;
 		    font-family: 'Segoe UI', sans-serif;
+		    background-color: #f4f6f8;
 		}
 		
 		.body-wrapper {
@@ -24,23 +25,55 @@
 		
 		.list-wrapper {
 		    width: calc(100% - 70px);
-		    padding: 20px;
+		    padding: 30px;
+		}
+		
+		h2 {
+		    color: #373962;
+		    font-size: 24px;
+		    margin-bottom: 20px;
 		}
 		
 		table { 
 		    border-collapse: collapse; 
 		    width: 100%; 
 		    margin-top: 20px; 
+		    background-color: white;
+		    border-radius: 8px;
+		    overflow: hidden;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 		}
 		
 		th, td { 
-		    border: 1px solid #ddd; 
-		    padding: 8px; 
+		    padding: 14px; 
 		    text-align: left; 
+		    border-bottom: 1px solid #ddd;
+		    font-size: 14px;
 		}
 		
 		th { 
-		    background-color: #f2f2f2; 
+		    background-color: #eaeaf1; 
+		    font-weight: 600;
+		    color: #414485;
+		}
+
+		td:last-child {
+		    text-align: center;
+		}
+
+		.edit-button {
+		    background-color: #414485;
+		    color: white;
+		    border: none;
+		    padding: 6px 12px;
+		    border-radius: 6px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    transition: background 0.3s ease;
+		}
+
+		.edit-button:hover {
+		    background-color: #2c2f5a;
 		}
 		
 		.pagination-controls { 
@@ -48,6 +81,32 @@
 		    display: flex; 
 		    gap: 10px; 
 		    align-items: center; 
+		    font-size: 14px;
+		}
+		
+		.pagination-controls label {
+		    font-weight: bold;
+		}
+		
+		.pagination-controls select {
+		    padding: 6px 10px;
+		    border-radius: 6px;
+		    border: 1px solid #ccc;
+		}
+		
+		.pagination-controls button {
+		    background-color: #414485;
+		    color: white;
+		    border: none;
+		    padding: 8px 16px;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    font-weight: bold;
+		    transition: background 0.3s ease;
+		}
+		
+		.pagination-controls button:hover {
+		    background-color: #2c2f5a;
 		}
     </style>
 </head>
@@ -97,7 +156,6 @@
         fetch('${pageContext.request.contextPath}/jadebank/branch/all?limit=' + limit + '&offset=' + offset)
             .then(response => response.json())
             .then(data => {
-                console.log("Fetched branches:", data);
                 const tbody = document.querySelector("#branch-table tbody");
                 tbody.innerHTML = "";
 
@@ -109,12 +167,12 @@
                 	        "<td>" + displayOrFallback(branch.branchName, "Unnamed") + "</td>" +
                 	        "<td>" + displayOrFallback(branch.branchDistrict, "Unknown") + "</td>" +
                 	        "<td>" + displayOrFallback(branch.ifscCode, "-") + "</td>" +
-                	        "<td><button onclick=\"editBranch(" + branch.branchId + ")\">Edit</button></td>";
+                	        "<td><button class='edit-button' onclick='editBranch(" + branch.branchId + ")'>Edit</button></td>";
                 	    tbody.appendChild(row);
                 	});
                 } else {
                     const row = document.createElement("tr");
-                    row.innerHTML = "<td colspan='4'>No branches found.</td>";
+                    row.innerHTML = "<td colspan='5' style='text-align: center;'>No branches found.</td>";
                     tbody.appendChild(row);
                 }
             })
@@ -145,23 +203,14 @@
         if (typeof value === "string") {
             return value.trim() !== "" ? value : fallback;
         } else if (value !== null && value !== undefined) {
-            return value; // for numbers or valid non-null objects
+            return value;
         }
         return fallback;
     }
     
     function editBranch(branchId) {
-        // Option 1: Redirect to an edit page
         window.location.href = "AddNewBranch.jsp?branchId=" + encodeURIComponent(branchId);
-
-        // Option 2: (if using modal or inline form)
-        // fetch(`/jadebank/branch/id?branchId=${branchId}`)
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         // Populate form fields here
-        //     });
     }
-
 
     document.getElementById("limit").addEventListener("change", () => {
         const limit = parseInt(document.getElementById("limit").value);
@@ -170,6 +219,6 @@
     });
 </script>
 
-
 </body>
 </html>
+

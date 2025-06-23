@@ -371,6 +371,35 @@ public class UserHandler {
     		return Results.respondJson(userDAO.getAllEmployeeDetails(limit, offset));
     	}
     }
+    
+    @Route(path = "user/employeecount", method = "GET")
+    public String getRoleCount(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	
+    	EmployeeDAO employeeDAO = EmployeeDAO.getEmployeeDAOInstance();
+    	if(role==2) {
+    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+    		return Results.respondJson(employeeDAO.getRoleCountsByBranch(employee.getBranch()));
+    	} else {
+    		return Results.respondJson(employeeDAO.getRoleCounts());
+    	}
+    }
+    
+    @Route(path = "user/dashboardstats", method = "GET")
+    public String getAdminStats(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+    	
+    	ValidationsUtil.isNull(userId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	
+    	if(role==2) {
+    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+    		return Results.respondJson(userDAO.getBranchStats(employee.getBranch()));
+    	} else {
+    		return Results.respondJson(userDAO.getDashboardCounts());
+    	}
+    }
 
     @Route(path = "user/delete", method = "POST")
     public String deleteUser(@FromBody User user) throws CustomException {

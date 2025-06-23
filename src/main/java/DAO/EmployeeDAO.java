@@ -1,12 +1,17 @@
 package DAO;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import pojos.Employee;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.DBConnection;
 import util.Results;
 
 public class EmployeeDAO {
@@ -93,4 +98,51 @@ public class EmployeeDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (List<Employee>) executor.executeQuery(getQuery, Employee.class);
     }
+	
+	public Map<Integer, Integer> getRoleCounts() throws CustomException {
+	    	
+    	try(Connection connection = DBConnection.getConnection()) {
+	    	
+	        String sql = "SELECT role, COUNT(*) AS total_count FROM Employee WHERE role IN (1, 2, 3) GROUP BY role";
+	        Map<Integer, Integer> roleCounts = new HashMap<>();
+	
+	        try (PreparedStatement ps = ((Connection) connection).prepareStatement(sql);
+	             ResultSet rs = ps.executeQuery()) {
+	            while (rs.next()) {
+	                int role = rs.getInt("role");
+	                int count = rs.getInt("total_count");
+	                roleCounts.put(role, count);
+	            }
+	        }
+	
+	        return roleCounts;
+    	} catch (Exception e) {
+    		throw new CustomException(e.getMessage());
+    	}
+	 }
+	
+	public Map<Integer, Integer> getRoleCountsByBranch(long branchId) throws CustomException {
+		
+		try(Connection connection = DBConnection.getConnection()) {
+		    String sql = "SELECT role, COUNT(*) AS total_count FROM Employee WHERE branch = ? AND role IN (1, 2, 3) GROUP BY role";
+		    Map<Integer, Integer> roleCounts = new HashMap<>();
+	
+		    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+		        ps.setLong(1, branchId);
+		        try (ResultSet rs = ps.executeQuery()) {
+		            while (rs.next()) {
+		                int role = rs.getInt("role");
+		                int count = rs.getInt("total_count");
+		                roleCounts.put(role, count);
+		            }
+		        }
+		    }
+	
+		    return roleCounts;
+		} catch(Exception e) {
+			throw new CustomException(e.getMessage());
+		}
+	}
+		
+
 }

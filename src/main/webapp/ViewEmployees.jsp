@@ -3,13 +3,13 @@
 <head>
     <title>View Employees - JadeBank</title>
     <style>
-        
         body { 
 		    margin: 0; 
 		    display: flex; 
 		    flex-direction: column; 
 		    min-height: 100vh;
-		    font-family: Arial, sans-serif;
+		    font-family: 'Segoe UI', sans-serif;
+		    background-color: #f4f6f8;
 		}
 		
 		.body-wrapper {
@@ -25,27 +25,56 @@
 		
 		.content-wrapper {
 		    width: calc(100% - 70px);
-		    padding: 20px;
+		    padding: 30px;
 		}
 
         h2 {
             text-align: center;
+            color: #373962;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
 
         th, td {
-            padding: 8px;
+            padding: 14px;
             text-align: left;
-            border: 1px solid #ccc;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
         }
 
         th {
-            background-color: #f0f0f0;
+            background-color: #eaeaf1;
+            font-weight: 600;
+            color: #414485;
+        }
+
+        td:last-child {
+            text-align: center;
+        }
+
+        .edit-button {
+            background-color: #414485;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #2c2f5a;
         }
 
         .pagination-controls {
@@ -53,8 +82,33 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
         }
-        
+
+        .pagination-controls label {
+            font-weight: bold;
+        }
+
+        .pagination-controls select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .pagination-controls button {
+            background-color: #414485;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .pagination-controls button:hover {
+            background-color: #2c2f5a;
+        }
     </style>
 </head>
 <body>
@@ -128,12 +182,12 @@
                             "<td>" + getRoleName(emp.employeeRole) + "</td>" +
                             "<td>" + (emp.employeeBranch || "N/A") + "</td>" +
                             "<td>" + (emp.employeeBranchName || "N/A") + "</td>" +
-                            "<td><button onclick=\"editEmployee(" + emp.employeeId + ")\">Edit</button></td>";
+                            "<td><button class='edit-button' onclick='editEmployee(" + emp.employeeId + ")'>Edit</button></td>";
                         tbody.appendChild(row);
                     });
                 } else {
                     const row = document.createElement("tr");
-                    row.innerHTML = "<td colspan='5'>No employees found.</td>";
+                    row.innerHTML = "<td colspan='7' style='text-align:center;'>No employees found.</td>";
                     tbody.appendChild(row);
                 }
             })

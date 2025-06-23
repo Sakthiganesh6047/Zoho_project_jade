@@ -94,9 +94,10 @@
 		}
 		
 		#account-info {
-		    font-size: 14px;
-		    color: #444;
+		    font-size: 18px;
+		    color: #414485;
 		    margin: -10px 0 10px;
+		    padding: 8px;
 		}
 		
 		#credit-status {

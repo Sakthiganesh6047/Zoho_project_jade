@@ -19,6 +19,8 @@ UserHandler:
   getUserProfileById: [0, 1, 2, 3]
   changePassword: [0, 1, 2, 3]
   getEmployeeProfiles: [2, 3]
+  getRoleCount: [2, 3]
+  getAdminStats: [2, 3]
   deleteUser: [3]
   
 BranchHandler:
@@ -26,6 +28,7 @@ BranchHandler:
   modifyBranch: [2, 3]
   branchList: [1, 2, 3]
   getBranchByIFSC: [1, 2, 3]
+  getAccountsCount: [3]
   getBranchById: [1, 2, 3]
   branchListForm: [1, 2, 3]
   
@@ -43,8 +46,11 @@ AccountHandler:
   getAccountDetailsForBeneficiary: [0, 1, 2, 3]
   getAccountDetails: [0, 1, 2, 3]
   updateAccount: [0, 1, 2, 3]
+  blockAccount: [0, 1, 2, 3]
+  unblockAccount: [0, 1, 2, 3]
   activateAccount: [1, 2, 3]
   getNewAccounts: [1, 2, 3]
+  getTransactionCount: [2, 3]
   closeAccount: [1, 2, 3]
   deleteAccount: [3]
   

@@ -1,7 +1,11 @@
  package DAO;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import pojos.EmployeeProfile;
 import pojos.User;
@@ -9,6 +13,7 @@ import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
 import querybuilder.QueryResult;
 import util.CustomException;
+import util.DBConnection;
 import util.Results;
 import util.ValidationsUtil;
 
@@ -231,6 +236,63 @@ public class UserDAO {
         System.out.println("Select Query: " + getQuery);
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return (List<EmployeeProfile>) executor.executeQuery(getQuery, EmployeeProfile.class);
+    }
+    
+    public Map<String, Integer> getDashboardCounts() throws CustomException {
+    	try(Connection connection = DBConnection.getConnection()){
+	        String sql = """
+	            SELECT
+	                (SELECT COUNT(*) FROM Branch) AS branch_count,
+	                (SELECT COUNT(*) FROM Employee) AS employee_count,
+	                (SELECT COUNT(*) FROM User WHERE user_type = 1) AS user_count,
+	                (SELECT COUNT(*) FROM Account) AS account_count
+	            """;
+	
+	        Map<String, Integer> counts = new HashMap<>();
+	
+	        try (PreparedStatement ps = connection.prepareStatement(sql);
+	             ResultSet rs = ps.executeQuery()) {
+	            if (rs.next()) {
+	                counts.put("branchCount", rs.getInt("branch_count"));
+	                counts.put("employeeCount", rs.getInt("employee_count"));
+	                counts.put("userCount", rs.getInt("user_count"));
+	                counts.put("accountCount", rs.getInt("account_count"));
+	            }
+	        }
+	
+	        return counts;
+    	} catch(Exception e) {
+	    	throw new CustomException(e.getMessage());
+	    }
+    }
+    
+    public Map<String, Integer> getBranchStats(long branchId) throws CustomException {
+    	
+    	try(Connection connection = DBConnection.getConnection()){
+	        String sql = """
+	            SELECT
+	                (SELECT COUNT(*) FROM Employee WHERE branch = ?) AS employee_count,
+	                (SELECT COUNT(*) FROM Account WHERE branch_id = ?) AS account_count
+	            """;
+	
+	        Map<String, Integer> counts = new HashMap<>();
+	
+	        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	            ps.setLong(1, branchId);
+	            ps.setLong(2, branchId);
+	
+	            try (ResultSet rs = ps.executeQuery()) {
+	                if (rs.next()) {
+	                    counts.put("employeeCount", rs.getInt("employee_count"));
+	                    counts.put("accountCount", rs.getInt("account_count"));
+	                }
+	            }
+	        }
+	
+	        return counts;
+    	} catch(Exception e) {
+    		throw new CustomException(e.getMessage());
+    	}
     }
 
     @SuppressWarnings("unchecked")
