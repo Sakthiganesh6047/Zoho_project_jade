@@ -12,6 +12,7 @@
 		    flex-direction: column; 
 		    min-height: 100vh;
 		    font-family: 'Roboto Flex', sans-serif;
+		    padding-top: 70px; /* same as header height */
 		}
 		
 		.body-wrapper {

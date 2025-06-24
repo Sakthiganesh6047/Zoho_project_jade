@@ -4,10 +4,10 @@
         <label for="debitAccountId">Account ID:</label>
       	<input type="number" id="debitAccountId" required onblur="fetchDebitAccountDetails()">
 
-        <div id="debit-account-info"></div>
+        <div id="debit-account-info" style="color: green;display: flex;justify-content: center;"></div>
 
         <label for="debitAmount">Amount:</label>
-        <input type="number" id="debitAmount" required>
+		<input type="number" step="0.01" name="amount" id="debitAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
         <button type="button" onclick="openDebitPasswordModal()">Debit</button>
         <div id="debit-status"></div>
@@ -26,6 +26,27 @@
 </div>
 
 <script>
+
+	function validateAmount(input) {
+	    input.value = input.value
+	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
+	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
+	
+	    if (Number(input.value) > 100000) {
+	        input.value = "100000";
+	    }
+	}
+	
+	document.getElementById("debitAmount").addEventListener("keydown", function(e) {
+	    // Disallow: e, +, -, and multiple dots
+	    if (
+	        ["e", "E", "+", "-"].includes(e.key) ||
+	        (e.key === "." && this.value.includes("."))
+	    ) {
+	        e.preventDefault();
+	    }
+	});
+
     let debitAccountDetails = null;
 
     function fetchDebitAccountDetails() {

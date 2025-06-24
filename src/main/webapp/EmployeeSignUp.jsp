@@ -10,8 +10,9 @@
             margin: 0; 
 		    display: flex; 
 		    flex-direction: column; 
-		    min-height: 100vh;
+		    min-height: 94vh;
 		    font-family: 'Roboto Flex', sans-serif;
+		    padding-top: 70px; /* same as header height */
         }
 
         .main-wrapper {
@@ -120,7 +121,7 @@
 			<jsp:include page="SideBar.jsp" />
 		</div>
 		<div class="main-wrapper">
-		    <div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
+		    <div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: center;"></div>
 		    <div class="container-wrapper">
 		        <div class="signuppage-container">
 		            <div class="clipart-container">
@@ -306,7 +307,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const isEdit = !!employeeId;
         const endpoint = isEdit ? "update" : "new";
 
-        fetch(`${pageContext.request.contextPath}/jadebank/user/${endpoint}`, {
+        fetch("${pageContext.request.contextPath}/jadebank/user/" + endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)

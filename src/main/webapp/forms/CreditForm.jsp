@@ -7,10 +7,10 @@
         <div id="credit-account-info"></div>
 
         <label for="creditAmount">Amount:</label>
-        <input type="number" id="creditAmount" name="amount" step="0.01" required>
+        <input type="number" step="0.01" name="amount" id="creditAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
         <button type="button" onclick="openCreditPasswordModal()">Credit</button>
-        <div id="credit-status"></div>
+        <div id="credit-status" style="display: flex;justify-content: center;"></div>
     </form>
 </div>
 
@@ -26,6 +26,27 @@
 </div>
 
 <script>
+
+	function validateAmount(input) {
+	    input.value = input.value
+	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
+	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
+	
+	    if (Number(input.value) > 100000) {
+	        input.value = "100000";
+	    }
+	}
+	
+	document.getElementById("creditAmount").addEventListener("keydown", function(e) {
+	    // Disallow: e, +, -, and multiple dots
+	    if (
+	        ["e", "E", "+", "-"].includes(e.key) ||
+	        (e.key === "." && this.value.includes("."))
+	    ) {
+	        e.preventDefault();
+	    }
+	});
+
     let creditAccountDetails = null;
 
     function fetchCreditAccountDetails() {

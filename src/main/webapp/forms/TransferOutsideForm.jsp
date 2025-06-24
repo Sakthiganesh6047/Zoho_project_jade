@@ -133,7 +133,7 @@
             <div id="outsideInfoDiv" class="info-box hidden"></div>
 
             <label for="outsideAmount">Amount:</label>
-            <input type="number" step="0.01" name="transaction.amount" id="outsideAmount" required>
+            <input type="number" step="0.01" name="transaction.amount" id="outsideAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
             <label for="outsideDescription">Description:</label>
             <input type="text" name="transaction.description" id="outsideDescription">
@@ -177,6 +177,27 @@
 </div>
 
 <script>
+
+	function validateAmount(input) {
+	    input.value = input.value
+	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
+	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
+	
+	    if (Number(input.value) > 100000) {
+	        input.value = "100000";
+	    }
+	}
+	
+	document.getElementById("debitAmount").addEventListener("keydown", function(e) {
+	    // Disallow: e, +, -, and multiple dots
+	    if (
+	        ["e", "E", "+", "-"].includes(e.key) ||
+	        (e.key === "." && this.value.includes("."))
+	    ) {
+	        e.preventDefault();
+	    }
+	});
+	
     let senderDetails = null;
 
     function fetchOutsideSenderDetails() {

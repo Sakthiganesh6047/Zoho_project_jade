@@ -165,18 +165,20 @@ public class UserHandler {
         // Validate creator's authority
         switch (newEmployeeRole) {
             case 2: // Manager
-                if (creatorRole != 3) { // Only GM can add Manager
+                if (!(creatorRole.equals(3))) { // Only GM can add Manager
                     throw new CustomException("Only GM can create a Manager.");
                 }
                 break;
             case 1: // Clerk
-                if (creatorRole != 2 || creatorRole != 3) {
+                if ( !(creatorRole.equals(2)) && !(creatorRole.equals(3))) {
                     throw new CustomException("Only Managers and GM can create a Clerk.");
                 }
                 // Check branch match
-                Employee manager = employeeHandler.getEmployeeDetails(creatorId);
-                if (manager.getBranch() != employee.getBranch()) {
-                    throw new CustomException("Manager can only create Clerks in their own branch.");
+                if (creatorRole.equals(2)) {
+	                Employee manager = employeeHandler.getEmployeeDetails(creatorId);
+	                if (manager.getBranch() != employee.getBranch()) {
+	                    throw new CustomException("Manager can only create Clerks in their own branch.");
+	                }
                 }
                 break;
         }

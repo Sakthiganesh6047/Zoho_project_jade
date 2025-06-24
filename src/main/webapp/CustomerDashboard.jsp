@@ -19,6 +19,7 @@
             margin: 0;
             font-family: "Segoe UI", sans-serif;
             background-color: #f4f6f8;
+            padding-top: 70px; /* same as header height */
         }
 
         .body-wrapper {
@@ -298,20 +299,20 @@
         </div>
 
         <div class="operations-panel">
-            <a href="Balance.jsp" class="dashboard-card">
-                <i class="fas fa-wallet"></i>
-                <h4>Balance</h4>
-                <p>Check your account</p>
+        	<a href="QuickTransfer.jsp" class="dashboard-card">
+        		<i class="fas fa-bolt"></i>
+        		<h4>Quick Transfer</h4>
+        		<p>Instant Transfer</p>
+        	</a>
+        	<a href="CustomerTransfer.jsp" class="dashboard-card">
+                <i class="fas fa-paper-plane"></i>
+                <h4>Transfer</h4>
+                <p>Send money</p>
             </a>
             <a href="CustomerAccTransactions.jsp" class="dashboard-card">
                 <i class="fas fa-receipt"></i>
                 <h4>Transactions</h4>
                 <p>View history</p>
-            </a>
-            <a href="CustomerTransfer.jsp" class="dashboard-card">
-                <i class="fas fa-paper-plane"></i>
-                <h4>Transfer</h4>
-                <p>Send money</p>
             </a>
             <a href="AddBeneficiary.jsp" class="dashboard-card">
                 <i class="fas fa-user-plus"></i>
@@ -420,14 +421,17 @@
 	    const transactionList = document.getElementById("transactionList");
 	    transactionList.innerHTML = "";
 	    transactions.forEach(tx => {
-	        const type = tx.type === "credit" ? "Credited" : "Debited";
+	    	const type = tx.transactionType === 1 ? "Credit" :
+	             tx.transactionType === 2 ? "Debit" :
+	             tx.transactionType === 3 ? "Transfer" :
+	             "Unknown";
 	        const amount = "₹" + tx.amount.toLocaleString();
 	        const date = formatDate(tx.transactionDate);
 
 	        const item = document.createElement("div");
 	        item.className = "transaction-item";
 	        item.style.flex = "1 1 40%";
-	        const color = tx.type === "credit" ? "green" : "red";
+	        const color = tx.transactionType === 1 ? "green" : "red";
 	        item.innerHTML = date + " - " + amount + " <strong style='color:" + color + "'>" + type + "</strong>";
 
 	        transactionList.appendChild(item);

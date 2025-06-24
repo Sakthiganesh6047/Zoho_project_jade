@@ -6,11 +6,12 @@
     <style>
         body {
 		    font-family: 'Roboto', sans-serif;
-		    background-color: #f5f5f5;
+		    background-color: white;
 		    margin: 0; 
 		    display: flex; 
 		    flex-direction: column; 
-		    min-height: 100vh;
+		    min-height: 94vh;
+		    padding-top: 70px; /* same as header height */
 		}
 		
 		.body-wrapper {

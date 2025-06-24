@@ -11,7 +11,7 @@
             <div id="insideInfoDiv" class="info-box hidden"></div>
 
             <label for="insideAmount">Amount:</label>
-            <input type="number" step="0.01" name="transaction.amount" id="insideAmount" required />
+			<input type="number" step="0.01" name="transaction.amount" id="insideAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
             <label for="insideDescription">Description:</label>
             <input type="text" name="transaction.description" id="insideDescription" />
@@ -20,11 +20,9 @@
         <!-- Receiver Section -->
         <fieldset>
             <legend>Receiver Details</legend>
-            <label for="insideReceiverAccount1">Receiver Account Number:</label>
-            <input type="number" id="insideReceiverAccount1" name="beneficiary.accountNumber" required />
 
-            <label for="insideReceiverAccount2">Confirm Account Number:</label>
-            <input type="number" id="receiverAccount2" required onblur="checkReceiverDetails()" />
+            <label for="insideReceiverAccount2">Receiver Account Number:</label>
+            <input type="number" id="insideReceiverAccount2" required onblur="checkInsideReceiverDetails()" />
 
             <div id="insideReceiverDetails" class="info-box hidden"></div>
         </fieldset>
@@ -44,6 +42,27 @@
 </div>
 
 <script>
+
+	function validateAmount(input) {
+	    input.value = input.value
+	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
+	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
+	
+	    if (Number(input.value) > 100000) {
+	        input.value = "100000";
+	    }
+	}
+	
+	document.getElementById("insideAmount").addEventListener("keydown", function(e) {
+	    // Disallow: e, +, -, and multiple dots
+	    if (
+	        ["e", "E", "+", "-"].includes(e.key) ||
+	        (e.key === "." && this.value.includes("."))
+	    ) {
+	        e.preventDefault();
+	    }
+	});
+
     let insideSenderDetails = null;
 
     function fetchInsideSenderDetails() {
@@ -64,7 +83,7 @@
                 return;
             }
             insideSenderDetails = data;
-            infoDiv.textContent = `Sender: ${data.fullName}, Customer ID: ${data.customerId}`;
+            infoDiv.textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
             infoDiv.classList.remove("hidden");
         })
         .catch(err => {
@@ -91,7 +110,7 @@
                 receiverDiv.classList.remove("hidden");
                 return;
             }
-            receiverDiv.textContent = `Receiver: ${data.fullName}, Customer ID: ${data.customerId}`;
+            receiverDiv.textContent = "Receiver: " + data.fullName + ", Customer ID: " + data.customerId;
             receiverDiv.classList.remove("hidden");
         })
         .catch(err => {
@@ -112,7 +131,6 @@
 
     function submitInsideTransfer() {
         const accountId = parseInt(document.getElementById("insideSenderAccountId").value);
-        const receiverAcc1 = document.getElementById("insideReceiverAccount1").value.trim();
         const receiverAcc2 = document.getElementById("insideReceiverAccount2").value.trim();
         const amount = parseFloat(document.getElementById("insideAmount").value);
         const description = document.getElementById("insideDescription").value;
@@ -121,12 +139,6 @@
 
         if (!accountId || !amount || amount <= 0 || !password || !insideSenderDetails) {
             statusDiv.textContent = "All fields, password, and sender check are required.";
-            statusDiv.style.color = "red";
-            return;
-        }
-
-        if (receiverAcc1 !== receiverAcc2) {
-            statusDiv.textContent = "Receiver account numbers do not match.";
             statusDiv.style.color = "red";
             return;
         }
@@ -140,7 +152,7 @@
                 transactionType: 3
             },
             beneficiary: {
-                beneficiaryAccountNumber: receiverAcc1
+                beneficiaryAccountNumber: receiverAcc2
             },
             user: {
                 passwordHash: password

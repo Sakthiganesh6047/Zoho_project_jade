@@ -7,8 +7,9 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f6f8;
+            background-color: white;
             margin: 0;
+            padding-top: 70px; /* same as header height */
         }
 
         .body-wrapper {

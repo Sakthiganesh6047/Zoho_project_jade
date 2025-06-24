@@ -13,7 +13,7 @@
 	    position: fixed;
 	    left: 0;
 	    height: 100vh;
-	    width: 60px;
+	    width: 70px;
 	    background-color: #373962;
 	    display: flex;
 	    flex-direction: column;
@@ -46,13 +46,12 @@
 	}
 	
 	.sidebar.expanded {
-	    width: 220px;
+	    width: 223px;
 	}
 	
 	.sidebar .nav-items {
 	    display: flex;
 	    flex-direction: column;
-	    margin-top: 20px;
 	}
 	
 	.sidebar-link {
@@ -104,10 +103,15 @@
 	    border: none;
 	    width: 100%;
 	    padding-top: 10px;
-	    padding-bottom: 100px;
+	    padding-bottom: 85px;
 	    cursor: pointer;
 	    font-size: 18px;
 	    transition: transform 0.3s ease;
+	}
+	
+	.toggle-btn:hover{
+		background: white;
+		color: black;
 	}
 	
 	/* Tooltip (custom) */
@@ -132,15 +136,19 @@
 
 <div class="sidebar <%= request.getRequestURI().contains("Dashboard") ? "active" : "" %>" id="sidebar">
     <div class="nav-items">
-        <a href="Dashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("Dashboard") ? "active" : "" %>" data-tooltip="Home">
-            <i class="fas fa-home"></i>
-            <span class="label">Home</span>
-        </a>
 
         <% if (role == 0) { %>
+        	<a href="CustomerDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("Dashboard") ? "active" : "" %>" data-tooltip="Home">
+	            <i class="fas fa-home"></i>
+	            <span class="label">Home</span>
+	        </a>
             <a href="CustomerTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerTransfer") ? "active" : "" %>" data-tooltip="Transact">
                 <i class="fas fa-money-bill-transfer"></i>
                 <span class="label">Transact</span>
+            </a>
+            <a href="QuickTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("QuickTransfer") ? "active" : "" %>" data-tooltip="Quick Transfer">
+               	<i class="fas fa-bolt"></i>
+                <span class="label">Quick Transfer</span>
             </a>
             <a href="CustomerAccTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerAccTransactions") ? "active" : "" %>" data-tooltip="Transactions">
                 <i class="fas fa-clock-rotate-left"></i>
@@ -152,6 +160,10 @@
             </a>
 
         <% } else if (role == 1) { %>
+        	<a href="ClerkDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("ClerkDashboard") ? "active" : "" %>" data-tooltip="Home">
+	            <i class="fas fa-home"></i>
+	            <span class="label">Home</span>
+	        </a>
             <a href="Transact.jsp" class="sidebar-link <%= request.getRequestURI().contains("Transact") ? "active" : "" %>" data-tooltip="Transact">
                 <i class="fas fa-money-bill-transfer"></i>
                 <span class="label">Transact</span>
@@ -166,6 +178,10 @@
             </a>
 
         <% } else if (role == 2) { %>
+        	<a href="ManagerDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManagerDashboard") ? "active" : "" %>" data-tooltip="Home">
+	            <i class="fas fa-home"></i>
+	            <span class="label">Home</span>
+	        </a>
             <a href="ManageBranches.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManageBranches") ? "active" : "" %>" data-tooltip="Branches">
                 <i class="fas fa-building-columns"></i>
                 <span class="label">Branches</span>
@@ -180,11 +196,15 @@
             </a>
 
         <% } else if (role == 3) { %>
+        	<a href="AdminDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("AdminDashboard") ? "active" : "" %>" data-tooltip="Home">
+	            <i class="fas fa-home"></i>
+	            <span class="label">Home</span>
+	        </a>
             <a href="ManageBranches.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManageBranches") ? "active" : "" %>" data-tooltip="Branches">
                 <i class="fas fa-building-columns"></i>
                 <span class="label">Branches</span>
             </a>
-            <a href="Accounts.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+            <a href="AccountsList.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
                 <i class="fas fa-address-book"></i>
                 <span class="label">Accounts</span>
             </a>
@@ -192,10 +212,11 @@
                 <i class="fas fa-user-tie"></i>
                 <span class="label">Employees</span>
             </a>
-            <a href="AddNewBranch.jsp" class="sidebar-link <%= request.getRequestURI().contains("AddNewBranch") ? "active" : "" %>" data-tooltip="Add Branch">
-                <i class="fas fa-plus-square"></i>
-                <span class="label">Add Branch</span>
+            <a href="UnifiedTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerTransfer") ? "active" : "" %>" data-tooltip="Transact">
+                <i class="fas fa-money-bill-transfer"></i>
+                <span class="label">Transact</span>
             </a>
+            
 
         <% } else { %>
             <a href="Login.jsp" class="sidebar-link" data-tooltip="Login">

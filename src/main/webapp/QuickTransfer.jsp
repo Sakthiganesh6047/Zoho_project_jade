@@ -9,8 +9,9 @@
     <style>
         body {
             font-family: "Roboto", sans-serif;
-            background-color: #f5f7fa;
+            background-color: white;
             margin: 0;
+            padding-top: 70px; /* same as header height */
         }
 
         .body-wrapper {
@@ -50,7 +51,7 @@
         }
 
         input, select {
-            width: 100%;
+            width: 95%;
             padding: 10px;
             margin-bottom: 16px;
             border: 1px solid #ccc;
@@ -130,7 +131,7 @@
                 <input type="text" id="ifscCode" required>
 
                 <label for="amount">Amount:</label>
-                <input type="number" id="amount" min="1" required>
+                <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
                 <label for="description">Description:</label>
                 <input type="text" id="description" placeholder="Reason for transfer..." required>
@@ -156,6 +157,27 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
+
+	function validateAmount(input) {
+	    input.value = input.value
+	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
+	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
+	
+	    if (Number(input.value) > 100000) {
+	        input.value = "100000";
+	    }
+	}
+	
+	document.getElementById("amount").addEventListener("keydown", function(e) {
+	    // Disallow: e, +, -, and multiple dots
+	    if (
+	        ["e", "E", "+", "-"].includes(e.key) ||
+	        (e.key === "." && this.value.includes("."))
+	    ) {
+	        e.preventDefault();
+	    }
+	});
+
     const userId = <%= userId != null ? userId : "null" %>;
 
     window.onload = function () {

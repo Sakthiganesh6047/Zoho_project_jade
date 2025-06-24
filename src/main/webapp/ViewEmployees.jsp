@@ -1,32 +1,46 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*" %>
+<%@ page import="javax.servlet.*" %>
+<%@ page import="javax.servlet.http.*" %>
+<%@ page import="javax.servlet.jsp.*" %>
+<%
+    Long userId = (Long) session.getAttribute("userId");
+%>
 <html>
 <head>
     <title>View Employees - JadeBank</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <style>
-        body { 
-		    margin: 0; 
-		    display: flex; 
-		    flex-direction: column; 
-		    min-height: 100vh;
-		    font-family: 'Segoe UI', sans-serif;
-		    background-color: #f4f6f8;
-		}
-		
-		.body-wrapper {
-		    display: flex; 
-		    flex: 1;
-		    min-height: 70vh;
-		}
-		
-		.sidebar-wrapper {
-		    width: 70px;
-		    color: white;
-		}
-		
-		.content-wrapper {
-		    width: calc(100% - 70px);
-		    padding: 30px;
-		}
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding-top: 70px;
+        }
+
+        .body-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar-wrapper {
+            width: 70px;
+            background-color: transparent;
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .main-wrapper {
+            margin-left: 70px;
+            padding: 30px;
+            flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.expanded ~ .main-wrapper {
+            margin-left: 220px;
+        }
 
         h2 {
             text-align: center;
@@ -34,124 +48,167 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
+        
+        .list-header{
+        	display: flex;
+        	justify-content: space-between;
+		    align-items: center;
+		    margin-left: 45%;
+		    margin-right: 2%;
+        }
+        
+        .add-buttonwrap{
+        }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
             overflow: hidden;
+            font-size: 15px;
         }
 
-        th, td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #eaeaf1;
-            font-weight: 600;
-            color: #414485;
-        }
-
-        td:last-child {
-            text-align: center;
-        }
-
-        .edit-button {
+        thead {
             background-color: #414485;
             color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .edit-button:hover {
-            background-color: #2c2f5a;
-        }
-
-        .pagination-controls {
-            margin-top: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 14px;
-        }
-
-        .pagination-controls label {
             font-weight: bold;
         }
 
-        .pagination-controls select {
+        th, td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: #f4f4fb;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tbody tr:hover {
+            background-color: #eef1f8;
+        }
+
+        .edit-button {
+            display: none;
+            background-color: #414485;
+            color: white;
+            border: none;
             padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        tr:hover .edit-button {
+            display: inline-block;
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 20px;
         }
 
         .pagination-controls button {
             background-color: #414485;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 16px;
             cursor: pointer;
-            font-weight: bold;
-            transition: background 0.3s ease;
         }
 
         .pagination-controls button:hover {
             background-color: #2c2f5a;
         }
+
+        .limit-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .limit-container label {
+            font-weight: bold;
+        }
+
+        .limit-container select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .add-btn {
+            background-color: #414485;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 20px;
+            padding: 6px 8px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-	<jsp:include page="LoggedInHeader.jsp" />
-	
-	<div class="body-wrapper">
-		
-		<div class="sidebar-wrapper">
-			<jsp:include page="SideBar.jsp" />
+<jsp:include page="LoggedInHeader.jsp" />
+
+<div class="body-wrapper">
+    <div class="sidebar-wrapper">
+        <jsp:include page="SideBar.jsp" />
+    </div>
+
+    <div class="main-wrapper">
+    	<div class="list-header">
+	        <h2>Employee List</h2>
+			<div class="add-buttonwrap">
+		        <button class="add-btn" onclick="window.location.href='EmployeeSignUp.jsp'">
+		            <i class="fas fa-plus"></i>
+		        </button>
+		    </div>
 		</div>
-	
-		<div class="content-wrapper">
-			<h2>Employee List</h2>
-			
-			<div class="pagination-controls">
-			    <label for="limit">Rows per page:</label>
-			    <select id="limit">
-			        <option value="5">5</option>
-			        <option value="10" selected>10</option>
-			        <option value="20">20</option>
-			    </select>
-			    <button onclick="previousPage()">Previous</button>
-			    <button onclick="nextPage()">Next</button>
-			</div>
-			
-			<table id="employee-table">
-			    <thead>
-			        <tr>
-			            <th>ID</th>
-			            <th>Name</th>
-			            <th>Email</th>
-			            <th>Role</th>
-			            <th>Branch Id</th>
-			            <th>Branch Name</th>
-			            <th>Actions</th>
-			        </tr>
-			    </thead>
-			    <tbody></tbody>
-			</table>
-		</div>
-	</div>
-	<jsp:include page="Footer.jsp" />
+
+        <table id="employee-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Branch Id</th>
+                    <th>Branch Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <div class="pagination-controls">
+            <button onclick="previousPage()"><i class="fas fa-angle-left"></i></button>
+            <span id="pageInfo">Page 1</span>
+            <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+
+            <div class="limit-container">
+                <label for="limit">Rows:</label>
+                <select id="limit">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<jsp:include page="Footer.jsp" />
 
 <script>
     let offset = 0;
@@ -182,7 +239,7 @@
                             "<td>" + getRoleName(emp.employeeRole) + "</td>" +
                             "<td>" + (emp.employeeBranch || "N/A") + "</td>" +
                             "<td>" + (emp.employeeBranchName || "N/A") + "</td>" +
-                            "<td><button class='edit-button' onclick='editEmployee(" + emp.employeeId + ")'>Edit</button></td>";
+                            "<td><button class='edit-button' onclick='editEmployee(" + emp.employeeId + ")'><i class='fas fa-edit'></i></button></td>";
                         tbody.appendChild(row);
                     });
                 } else {
@@ -196,7 +253,7 @@
                 alert("Error loading employee list.");
             });
     }
-    
+
     function editEmployee(employeeId) {
         window.location.href = "EmployeeSignUp.jsp?employeeId=" + encodeURIComponent(employeeId);
     }
@@ -213,16 +270,29 @@
         fetchEmployees(limit, offset);
     }
 
-    window.onload = function () {
-        const limit = parseInt(document.getElementById("limit").value);
-        fetchEmployees(limit, offset);
-    };
-
     document.getElementById("limit").addEventListener("change", () => {
         offset = 0;
         const limit = parseInt(document.getElementById("limit").value);
         fetchEmployees(limit, offset);
     });
+
+    window.onload = function () {
+        const limit = parseInt(document.getElementById("limit").value);
+        fetchEmployees(limit, offset);
+    };
+    
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.querySelector('.main-wrapper');
+
+        sidebar.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('expanded')) {
+            mainWrapper.style.marginLeft = "220px";
+        } else {
+            mainWrapper.style.marginLeft = "70px";
+        }
+    }
 </script>
 
 </body>

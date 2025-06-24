@@ -10,6 +10,7 @@
 			font-family: Roboto Flex, sans-serif;
 			background-color: #f;
 			margin: 0;
+			padding-top: 70px; /* same as header height */
 		}
 		
 		.form-container {

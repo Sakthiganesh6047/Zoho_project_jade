@@ -19,6 +19,7 @@
             font-family: "Segoe UI", sans-serif;
             margin: 0;
             background-color: #f4f6f8;
+            padding-top: 70px; /* same as header height */
         }
         .dashboard-wrapper {
             max-width: 1200px;

@@ -1,7 +1,7 @@
 <style>
 .footer {
-	        background-color: #373962;
-	        color: white;
+	        background-color: white;
+	        color: black;
 	        text-align: center;
 	        padding: 5px;
 	        font-size: 14px;

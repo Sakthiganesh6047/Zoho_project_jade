@@ -156,7 +156,7 @@
     }
 
     .modal-content input {
-        width: 100%;
+        width: 94%;
         padding: 10px;
         margin-top: 6px;
         margin-bottom: 10px;

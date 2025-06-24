@@ -414,13 +414,17 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/dashboardstats`)
 fetch(`${pageContext.request.contextPath}/jadebank/account/transactionchart`)
     .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions chart"))
     .then(data => {
-        const lineChart = new Chart(document.getElementById('transactionBarChart').getContext('2d'), {
+        const labels = Object.keys(data);
+        const counts = Object.values(data);
+
+        const ctx = document.getElementById('transactionBarChart').getContext('2d');
+        const lineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.labels || [],
+                labels: labels,
                 datasets: [{
                     label: 'Transactions',
-                    data: data.counts || [],
+                    data: counts,
                     backgroundColor: 'rgba(65, 68, 133, 0.2)',
                     borderColor: '#414485',
                     fill: true,

@@ -10,13 +10,14 @@
     <style>
         body {
             font-family: "Roboto", sans-serif;
-            background-color: #f5f7fa;
+            background-color: white;
             margin: 0;
+            padding-top: 70px; /* same as header height */
         }
 
         .body-wrapper {
             display: flex;
-            min-height: 87vh;
+            min-height: 89vh;
         }
 
         .sidebar-wrapper {
@@ -30,10 +31,11 @@
         }
 
         .main-wrapper {
-            margin-left: 70px;
-            padding: 30px;
-            flex: 1;
-        }
+		    margin-left: 70px; /* default collapsed sidebar width */
+		    padding: 30px;
+		    flex: 1;
+		    transition: margin-left 0.3s ease;
+		}
 
         .form-section {
             max-width: 600px;
@@ -55,32 +57,100 @@
         }
 
         .beneficiary-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .beneficiary-table th,
-        .beneficiary-table td {
-            padding: 14px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .beneficiary-table th {
-            background-color: #f0f0f7;
-            color: #333;
-            font-weight: bold;
-        }
+		    width: 100%;
+		    border-collapse: separate;
+		    border-spacing: 0;
+		    background: #ffffff;
+		    border-radius: 12px;
+		    overflow: hidden;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+		    font-size: 15px;
+		}
+		
+		.beneficiary-table thead {
+		    background-color: #414485;
+		    color: white;
+		    font-weight: bold;
+		}
+		
+		.beneficiary-table th, 
+		.beneficiary-table td {
+		    padding: 14px 18px;
+		    text-align: left;
+		    border-bottom: 1px solid #f0f0f0;
+		}
+		
+		.beneficiary-table tbody tr:nth-child(even) {
+		    background-color: #f4f4fb;
+		}
+		
+		.beneficiary-table tbody tr:hover {
+		    background-color: #eef1f8;
+		}
+		
+		.beneficiary-table th:first-child,
+		.beneficiary-table td:first-child {
+		    border-top-left-radius: 12px;
+		}
+		
+		.beneficiary-table th:last-child,
+		.beneficiary-table td:last-child {
+		    border-top-right-radius: 12px;
+		}
 
         .action-buttons {
             display: flex;
             gap: 10px;
         }
+        
+        .action-wrapper {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    opacity: 0;
+		    transition: opacity 0.2s ease;
+		}
+		
+		.beneficiary-table tr:hover .action-wrapper {
+		    opacity: 1;
+		}
+		
+		.beneficiary-table td {
+		    position: relative;
+		}
+		
+		.icon-button {
+		    background: none;
+		    border: none;
+		    color: #e53935;
+		    cursor: pointer;
+		    font-size: 16px;
+		    padding: 5px;
+		    border-radius: 50%;
+		    transition: background-color 0.2s ease;
+		}
+		
+		.icon-button:hover {
+		    background-color: rgba(229, 57, 53, 0.1);
+		}
+		
+		.beneficiary-table td:last-child {
+		    width: 40px;
+		}
+		
+		.action-wrapper {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    visibility: hidden;
+		    opacity: 0;
+		    transition: visibility 0.2s ease, opacity 0.2s ease;
+		}
+		
+		.beneficiary-table tr:hover .action-wrapper {
+		    visibility: visible;
+		    opacity: 1;
+		}
 
         .edit-button {
             background-color: #1976d2;
@@ -133,6 +203,38 @@
         .pagination button:hover {
             background-color: #2e2f60;
         }
+        
+        .icon-button {
+		    background-color: #414485;
+		    color: white;
+		    border: none;
+		    padding: 10px;
+		    border-radius: 50%;
+		    cursor: pointer;
+		    font-size: 16px;
+		    transition: background-color 0.2s ease, transform 0.2s ease;
+		}
+		
+		.icon-button:hover {
+		    background-color: #2e2f60;
+		    transform: scale(1.1);
+		}
+		
+		.del-button {
+		    background-color: #e53935;
+		}
+		
+		.del-button:hover {
+		    background-color: #c62828;
+		}
+		
+		.add-button {
+		    background-color: #414485;
+		}
+		
+		.add-button:hover {
+		    background-color: #125ea8;
+		}
 
         #pageIndicator {
             font-weight: bold;
@@ -163,7 +265,13 @@
                 <option value="">-- Select Account --</option>
             </select>
         </div>
-
+        
+        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
+		    <button class="icon-button add-button" onclick="window.location.href='AddBeneficiary.jsp'" title="Add Beneficiary">
+		        <i class="fas fa-plus"></i>
+		    </button>
+		</div>
+        
         <table class="beneficiary-table" id="beneficiaryTable" style="display: none;">
             <thead>
 			    <tr>
@@ -171,7 +279,7 @@
 			        <th>Bank</th>
 			        <th>Account Number</th>
 			        <th>IFSC Code</th>
-			        <th>Actions</th>
+			        <th> </th>
 			    </tr>
 			</thead>
             <tbody id="beneficiaryTableBody"></tbody>
@@ -180,10 +288,10 @@
         <div id="status"></div>
 
         <div class="pagination">
-            <button onclick="prevPage()">Previous</button>
-            <span id="pageIndicator">Page 1</span>
-            <button onclick="nextPage()">Next</button>
-        </div>
+		    <button onclick="prevPage()" class="icon-button"><i class="fas fa-angle-left"></i></button>
+		    <span id="pageIndicator">Page 1</span>
+		    <button onclick="nextPage()" class="icon-button"><i class="fas fa-angle-right"></i></button>
+		</div>
     </div>
 </div>
 
@@ -254,14 +362,20 @@
                 return;
             }
 
-            beneficiaries.forEach(b => {
+            beneficiaries.forEach(function(b) {
                 const row = document.createElement("tr");
-                row.innerHTML = 
+                row.innerHTML =
                     "<td>" + b.beneficiaryName + "</td>" +
                     "<td>" + b.bankName + "</td>" +
                     "<td>" + b.beneficiaryAccountNumber + "</td>" +
                     "<td>" + b.ifscCode + "</td>" +
-                    "<td><button class=\"del-button\" onclick=\"deleteBeneficiary(" + b.beneficiaryId + ")\">Delete</button></td>";
+                    "<td>" +
+                        "<div class='action-wrapper'>" +
+                            "<button class='icon-button del-button' onclick='deleteBeneficiary(" + b.beneficiaryId + ")'>" +
+                                "<i class='fas fa-trash-alt'></i>" +
+                            "</button>" +
+                        "</div>" +
+                    "</td>";
                 tbody.appendChild(row);
             });
 
@@ -308,6 +422,19 @@
         if (currentPage > 0) {
             currentPage--;
             loadBeneficiaries();
+        }
+    }
+    
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.querySelector('.main-wrapper');
+
+        sidebar.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('expanded')) {
+            mainWrapper.style.marginLeft = "220px"; // match expanded width
+        } else {
+            mainWrapper.style.marginLeft = "70px";  // collapsed width
         }
     }
 </script>

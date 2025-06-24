@@ -6,6 +6,7 @@
         body {
             font-family: 'Segoe UI', sans-serif;
             background-color: #f4f7f9;
+            padding-top: 70px; /* same as header height */
         }
 
         .container {

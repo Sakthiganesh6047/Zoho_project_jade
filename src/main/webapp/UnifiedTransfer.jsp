@@ -6,12 +6,13 @@
         body {
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            background-color: #f4f6fb;
+            background-color: white;
+            padding-top: 70px; /* same as header height */
         }
 
         .body-wrapper {
             display: flex;
-            min-height: 88vh;
+            min-height: 89vh;
         }
 
         .content-wrapper {
@@ -59,7 +60,7 @@
 		}
 		
 		.tab-bar div:hover {
-		    background-color: #dfe6f1;
+		    background-color: black;
 		}
 		
 		.tab-bar .active {

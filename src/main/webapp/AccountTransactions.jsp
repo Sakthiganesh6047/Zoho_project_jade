@@ -7,6 +7,7 @@
             font-family: "Roboto", sans-serif;
             background: #f5f7fa;
             margin: 0;
+			padding-top: 70px; /* same as header height */
         }
 
         .body-wrapper {

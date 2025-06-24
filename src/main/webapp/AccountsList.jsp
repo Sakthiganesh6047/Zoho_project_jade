@@ -3,69 +3,91 @@
 <html>
 <head>
     <title>Branch Accounts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         body {
             font-family: "Roboto", sans-serif;
-            background-color: #f5f7fa;
+            background-color: white;
             margin: 0;
+            padding-top: 70px;
         }
 
         .body-wrapper {
             display: flex;
-            min-height: 87vh;
-        }
-
-        .sidebar-wrapper {
-            width: 60px;
-            background-color: #373962;
-            color: white;
-            position: fixed;
-            height: 100%;
-            border-radius: 0 12px 12px 0;
-            z-index: 1000;
+            min-height: 89vh;
         }
 
         .main-wrapper {
             margin-left: 70px;
             padding: 30px;
             flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.expanded ~ .main-wrapper {
+            margin-left: 220px;
         }
 
         h2 {
             text-align: center;
             margin-bottom: 25px;
+            position: relative;
+        }
+
+        .add-account-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #414485;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .add-account-btn:hover {
+            background: #2a2d63;
         }
 
         .controls {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             background: #fff;
             padding: 15px 20px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 1000px;
+            max-width: 500px;
             margin: 0 auto 20px auto;
         }
 
-        .controls select,
-        .controls input {
+        .controls label {
+            margin-right: 10px;
+        }
+
+        .controls select {
             padding: 10px;
             border-radius: 6px;
             border: 1px solid #ccc;
         }
 
         .controls button {
-            padding: 10px 16px;
+            margin-left: 10px;
+            padding: 10px;
             background-color: #414485;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
+            font-size: 16px;
         }
 
         .controls button:hover {
-            background-color: #005fa3;
+            background-color: #2a2d63;
         }
 
         .message {
@@ -76,42 +98,72 @@
         }
 
         table {
-            width: 95%;
-            margin: auto;
+            width: 100%;
             border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-            border-radius: 10px;
+            background: #ffffff;
+            border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin: 0 auto 30px auto;
+            font-size: 15px;
+        }
+
+        thead {
+            background-color: #414485;
+            color: white;
+            font-weight: bold;
         }
 
         th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 14px 18px;
             text-align: center;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        th {
-            background-color: #e6f2ff;
+        tbody tr:nth-child(odd) {
+            background-color: #f4f4fb;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tbody tr:hover {
+            background-color: #eef1f8;
         }
 
         .pagination {
-            text-align: center;
-            margin: 20px auto 40px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 40px;
         }
 
         .pagination button {
-            padding: 8px 16px;
-            margin: 0 5px;
-            border: none;
-            border-radius: 6px;
             background-color: #414485;
             color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 10px 12px;
+            font-size: 16px;
             cursor: pointer;
         }
 
         .pagination button:hover {
-            background-color: #005fa3;
+            background-color: #2a2d63;
+        }
+
+        .page-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .page-controls select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
         }
 
         .hidden {
@@ -124,36 +176,22 @@
 <jsp:include page="LoggedInHeader.jsp" />
 
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
+    <jsp:include page="SideBar.jsp" />
 
     <div class="main-wrapper">
-        <h2>Branch Accounts List</h2>
+        <h2>
+            Branch Accounts List
+            <button class="add-account-btn" title="Add Account" onclick="window.location.href='OpenAccount.jsp'">
+                <i class="fas fa-plus"></i>
+            </button>
+        </h2>
 
         <div class="controls">
-	        <div>
-			    <label for="pageLimit">Rows per page:</label>
-			    <select id="pageLimit" onchange="changePageSize()">
-			        <option value="5" selected>5</option>
-			        <option value="10">10</option>
-			        <option value="20">20</option>
-			        <option value="50">50</option>
-			    </select>
-			</div>
-            <div>
-                <label for="branchId">Select Branch:</label>
-                <select id="branchId">
-                    <option value="">-- Select --</option>
-                </select>
-                <button onclick="loadAccounts(0)">Load</button>
-            </div>
-
-            <div class="search-box">
-                <label for="searchInput">Search:</label>
-                <input type="text" id="searchInput" oninput="filterAccounts()" placeholder="Search ID, Customer, Type...">
-            </div>
-        </div>
+		    <label for="branchId">Select Branch:</label>
+		    <select id="branchId" onchange="loadAccounts(0)">
+		        <option value="">-- Select --</option>
+		    </select>
+		</div>
 
         <div id="statusMessage" class="message"></div>
 
@@ -171,10 +209,20 @@
         </table>
 
         <div class="pagination">
-		    <button onclick="prevPage()">Previous</button>
-		    <span id="pageInfo">Page 1</span>
-		    <button onclick="nextPage()">Next</button>
-		</div>
+            <button onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
+            <span id="pageInfo">Page 1</span>
+            <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+
+            <div class="page-controls">
+                <label for="pageLimit">Rows:</label>
+                <select id="pageLimit" onchange="changePageSize()">
+                    <option value="5" selected>5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -227,7 +275,7 @@
             .then(accounts => {
                 if (!Array.isArray(accounts) || accounts.length === 0) {
                     if (currentPage > 0) {
-                        currentPage--; // Step back to last valid page
+                        currentPage--;
                         lastPageReached = true;
                         updatePageInfo();
                     } else {
@@ -283,6 +331,19 @@
             currentPage--;
             lastPageReached = false;
             loadAccounts();
+        }
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainWrapper = document.querySelector('.main-wrapper');
+
+        sidebar.classList.toggle('expanded');
+
+        if (sidebar.classList.contains('expanded')) {
+            mainWrapper.style.marginLeft = "220px";
+        } else {
+            mainWrapper.style.marginLeft = "70px";
         }
     }
 </script>

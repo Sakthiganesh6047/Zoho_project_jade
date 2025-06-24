@@ -5,32 +5,47 @@
 %>
 <head>
     <title>View Transactions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <style>
         body {
             font-family: "Roboto", sans-serif;
-            background: #f5f7fa;
+            background: white;
             margin: 0;
+            padding-top: 70px;
         }
 
         .body-wrapper {
             display: flex;
-            min-height: 87vh;
+            min-height: 89vh;
         }
 
         .sidebar-wrapper {
-            width: 60px;
-            background-color: #373962;
+            width: 70px;
+            background-color: transparent;
             color: white;
             position: fixed;
             height: 100%;
             border-radius: 0 12px 12px 0;
             z-index: 1000;
         }
+        
+        .main-wrapper {
+		    margin-left: 70px; /* for collapsed mode */
+		    transition: margin-left 0.3s ease;
+		    padding: 30px;
+		    flex: 1;
+		}
+		
+		/* When sidebar is expanded */
+		.sidebar.expanded ~ .main-wrapper {
+		    margin-left: 220px; /* match expanded width */
+		}
 
         .main-wrapper {
-            margin-left: 70px;
+            margin-left: 100px;
             padding: 30px;
             flex: 1;
+            transition: margin-left 0.3s ease;
         }
 
         h2 {
@@ -39,7 +54,7 @@
         }
 
         .search-section {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 30px auto;
             padding: 20px;
             background: white;
@@ -54,24 +69,12 @@
         }
 
         .search-section input,
-        .search-section button {
+        .search-section select {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
             border-radius: 6px;
             border: 1px solid #ccc;
-        }
-
-        .search-section button {
-            background-color: #414485;
-            color: white;
-            font-weight: bold;
-            border: none;
-            margin-top: 20px;
-        }
-
-        .search-section button:hover {
-            background-color: #005fa3;
         }
 
         .error {
@@ -93,42 +96,114 @@
         }
 
         table {
-            width: 95%;
-            margin: 0 auto 30px auto;
+            width: 100%;
             border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin: 0 auto 30px auto;
+            font-size: 15px;
+        }
+
+        thead {
+            background-color: #414485;
+            color: white;
+            font-weight: bold;
         }
 
         th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        th {
-            background-color: #e6f2ff;
+        tbody tr:nth-child(odd) {
+            background-color: #f4f4fb;
         }
 
-        .credit { color: green; font-weight: bold; }
-        .debit { color: red; font-weight: bold; }
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tbody tr:hover {
+            background-color: #eef1f8;
+        }
+
+        th:first-child, td:first-child {
+            border-top-left-radius: 12px;
+        }
+
+        th:last-child, td:last-child {
+            border-top-right-radius: 12px;
+        }
+
+        .credit { color: #2e7d32; font-weight: bold; }
+        .debit { color: #c62828; font-weight: bold; }
 
         .pagination {
             text-align: center;
             margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
         }
 
         .pagination button {
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 10px;
+            border-radius: 50%;
             border: none;
             background-color: #414485;
             color: white;
-            margin: 0 10px;
+            font-size: 16px;
         }
 
         .pagination button:hover {
             background-color: #005fa3;
+        }
+
+        .limit-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Type colors */
+		.type-credit {
+			color: green;
+			font-weight: bold;
+		}
+		
+		.type-debit {
+			color: red;
+			font-weight: bold;
+		}
+		
+		.type-transfer {
+			color: orange;
+			font-weight: bold;
+		}
+		
+		/* Status colors */
+		.status-success {
+			color: green;
+			font-weight: bold;
+		}
+		
+		.status-failure {
+			color: red;
+			font-weight: bold;
+		}
+		
+		.status-unknown {
+			color: gray;
+			font-style: italic;
+		}
+        
+        #limit {
+            width: 60px;
+            padding: 8px;
         }
 
         #pageInfo {
@@ -148,28 +223,14 @@
     <div class="main-wrapper">
         <h2>View Transactions</h2>
 
-        <div style="max-width: 700px; margin: 0 auto 20px;">
-		    <div style="display: flex; gap: 20px; align-items: flex-end;">
-		        <div style="flex: 1;">
-		            <label for="accountId"><strong>Account ID:</strong></label>
-		            <select id="accountId" required style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-					    <option value="">-- Select Account --</option>
-					    <option value="ALL">All Accounts</option>
-					</select>
-		        </div>
-		        <div style="width: 100px;">
-		            <label for="limit"><strong>Limit:</strong></label>
-		            <input type="number" id="limit" value="10" min="1" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-		        </div>
-		        <div>
-		            <button type="button" onclick="fetchTransactions(true)" style="padding: 10px 16px; background-color: #414485; color: white; border: none; border-radius: 6px;">Fetch</button>
-		        </div>
-		    </div>
-		    <div id="errorMsg" class="error" style="margin-top: 10px;"></div>
-		</div>
+        <div class="search-section">
+            <label for="accountId">Account ID:</label>
+            <select id="accountId" onchange="fetchTransactions(true)">
+                <option value="">-- Select Account --</option>
+                <option value="ALL">All Accounts</option>
+            </select>
 
-        <div class="search-box">
-            <input type="text" id="localSearch" placeholder="Search in table..." onkeyup="filterTable()" />
+            <div id="errorMsg" class="error"></div>
         </div>
 
         <table id="transactionTable" style="display: none;">
@@ -178,8 +239,9 @@
                     <th>ID</th>
                     <th>Date</th>
                     <th>Account</th>
-                    <th>Amount</th>
                     <th>Type</th>
+                    <th>Amount</th>
+                    <th>Closing Balance</th>
                     <th>Beneficiary</th>
                     <th>Description</th>
                     <th>Status</th>
@@ -189,9 +251,13 @@
         </table>
 
         <div class="pagination">
-            <button onclick="prevPage()">Previous</button>
+            <button onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
             <span id="pageInfo">Page 1</span>
-            <button onclick="nextPage()">Next</button>
+            <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+            <div class="limit-container">
+                <label for="limit">Limit:</label>
+                <input type="number" id="limit" value="10" min="1" onchange="fetchTransactions(true)" />
+            </div>
         </div>
     </div>
 </div>
@@ -199,145 +265,161 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
-
-	document.addEventListener("DOMContentLoaded", () => {
-	    const userId = <%= userId != null ? userId : "null" %>;
-	
-	    if (userId) {
-	        fetch(`${pageContext.request.contextPath}/jadebank/account/id`, {
-	            method: "POST",
-	            headers: { "Content-Type": "application/json" },
-	            body: JSON.stringify({ userId: userId })
-	        })
-	        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch accounts"))
-	        .then(accounts => {
-	            const dropdown = document.getElementById("accountId");
-	            accounts.forEach(acc => {
-	                const option = document.createElement("option");
-	                option.value = acc.accountId;
-	                option.textContent = "ID: " + acc.accountId + " | Type: " + (acc.accountType === 1 ? "Savings" : "Current");
-	                dropdown.appendChild(option);
-	            });
-	        })
-	        .catch(err => {
-	            document.getElementById("errorMsg").textContent = "Failed to load account list.";
-	            console.error(err);
-	        });
-	    }
-	});
-
-    let currentOffset = 0;
-    const pageSize = 10;
-
-    function fetchTransactions(resetPage = false) {
-        const selectedValue = document.getElementById("accountId").value;
-        const limit = parseInt(document.getElementById("limit").value.trim());
-        const errorMsg = document.getElementById("errorMsg");
-
-        if (!selectedValue || limit < 1) {
-            errorMsg.textContent = "Please select an account or All Accounts, and enter a valid Limit.";
-            return;
-        }
-
-        if (resetPage) {
-            currentOffset = 0;
-        }
-
-        errorMsg.textContent = "";
-
-        let fetchUrl = "";
-        let fetchBody = {};
-
-        if (selectedValue === "ALL") {
-            fetchUrl = "${pageContext.request.contextPath}/jadebank/transactions/customer?limit=" + limit + "&offset=" + currentOffset;
-            fetchBody = { customerId: <%= userId != null ? userId : "null" %> };
-        } else {
-            fetchUrl = "${pageContext.request.contextPath}/jadebank/transactions/account?limit=" + limit + "offset=" + currentOffset;
-            fetchBody = { accountId: parseLong(selectedValue) };
-        }
-
-        fetch(fetchUrl, {
+document.addEventListener("DOMContentLoaded", function() {
+    var userId = <%= userId != null ? userId : "null" %>;
+    if (userId) {
+        fetch("<%= request.getContextPath() %>/jadebank/account/id", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(fetchBody)
+            body: JSON.stringify({ userId: userId })
         })
-        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions"))
-        .then(data => {
-            const tbody = document.getElementById("transactionBody");
-            tbody.innerHTML = "";
-
-            if (!Array.isArray(data) || data.length === 0) {
-                errorMsg.textContent = "No transactions found.";
-                document.getElementById("transactionTable").style.display = "none";
-                return;
-            }
-
-            data.forEach(txn => {
-                const row = document.createElement("tr");
-                const statusText = txn.transactionStatus === 1 ? "Success" :
-                                   txn.transactionStatus === 2 ? "Failure" : "Unknown";
-
-                row.innerHTML =
-                    "<td>" + txn.transactionId + "</td>" +
-                    "<td>" + formatDate(txn.transactionDate) + "</td>" +
-                    "<td>" + txn.accountId + "</td>" +
-                    "<td>" + txn.amount + "</td>" +
-                    "<td>" + getTypeLabel(txn.transactionType) + "</td>" +
-                    "<td>" + (txn.beneficiaryAccount || "-") + "</td>" +
-                    "<td>" + (txn.description || "") + "</td>" +
-                    "<td>" + statusText + "</td>";
-
-                tbody.appendChild(row);
+        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch accounts"))
+        .then(accounts => {
+            var dropdown = document.getElementById("accountId");
+            accounts.forEach(function(acc) {
+                var option = document.createElement("option");
+                option.value = acc.accountId;
+                option.textContent = "ID: " + acc.accountId + " | " + (acc.accountType === 1 ? "Savings" : "Current");
+                dropdown.appendChild(option);
             });
-
-            document.getElementById("transactionTable").style.display = "table";
-            document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / limit) + 1);
         })
-        .catch(err => {
-            errorMsg.textContent = "Error: " + err;
+        .catch(function(err) {
+            document.getElementById("errorMsg").textContent = "Failed to load account list.";
             console.error(err);
         });
     }
+});
 
+var currentOffset = 0;
 
-    function nextPage() {
-        const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
-        currentOffset += limit;
+function fetchTransactions(resetPage) {
+    if (resetPage) currentOffset = 0;
+
+    var selected = document.getElementById("accountId").value;
+    var limit = parseInt(document.getElementById("limit").value);
+    var errorMsg = document.getElementById("errorMsg");
+
+    if (!selected || limit < 1) {
+        errorMsg.textContent = "Select a valid account and limit.";
+        return;
+    }
+
+    var url = "";
+    var body = {};
+
+    if (selected === "ALL") {
+        url = "<%= request.getContextPath() %>/jadebank/transactions/customer?limit=" + limit + "&offset=" + currentOffset;
+        body = { customerId: <%= userId %> };
+    } else {
+        url = "<%= request.getContextPath() %>/jadebank/transactions/account?limit=" + limit + "&offset=" + currentOffset;
+        body = { accountId: parseInt(selected) };
+    }
+
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    })
+    .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions"))
+    .then(function(data) {
+        var tbody = document.getElementById("transactionBody");
+        tbody.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+            errorMsg.textContent = "No transactions found.";
+            document.getElementById("transactionTable").style.display = "none";
+            return;
+        }
+
+        data.forEach(function(txn) {
+            var row = document.createElement("tr");
+
+            // Set type label and class
+            let typeLabel = getTypeLabel(txn.transactionType);
+            let typeClass = "";
+            switch (txn.transactionType) {
+                case 1: typeClass = "type-credit"; break;
+                case 2: typeClass = "type-debit"; break;
+                case 3: typeClass = "type-transfer"; break;
+                default: typeClass = "";
+            }
+
+            // Set status text and class
+            let statusText = "Unknown";
+            let statusClass = "status-unknown";
+            if (txn.transactionStatus === 1) {
+                statusText = "Success";
+                statusClass = "status-success";
+            } else if (txn.transactionStatus === 2) {
+                statusText = "Failure";
+                statusClass = "status-failure";
+            }
+
+            row.innerHTML =
+                "<td>" + txn.transactionId + "</td>" +
+                "<td>" + formatDate(txn.transactionDate) + "</td>" +
+                "<td>" + txn.accountId + "</td>" +
+                `<td class="${typeClass}">` + typeLabel + "</td>" +
+                "<td>" + txn.amount + "</td>" +
+                "<td>" + txn.closingBalance + "</td>" +
+                "<td>" + (txn.beneficiaryAccount || "-") + "</td>" +
+                "<td>" + (txn.description || "") + "</td>" +
+                `<td class="${statusClass}">` + statusText + "</td>";
+
+            tbody.appendChild(row);
+        });
+
+        document.getElementById("transactionTable").style.display = "table";
+        document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / limit) + 1);
+    })
+    .catch(function(err) {
+        errorMsg.textContent = "Error: " + err;
+        console.error(err);
+    });
+}
+
+function formatDate(timestamp) {
+    var date = new Date(Number(timestamp));
+    return date.toLocaleString("en-IN");
+}
+
+function nextPage() {
+    var limit = parseInt(document.getElementById("limit").value);
+    currentOffset += limit;
+    fetchTransactions();
+}
+
+function prevPage() {
+    var limit = parseInt(document.getElementById("limit").value);
+    if (currentOffset >= limit) {
+        currentOffset -= limit;
         fetchTransactions();
     }
+}
 
-    function prevPage() {
-        const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
-        if (currentOffset >= limit) {
-            currentOffset -= limit;
-            fetchTransactions();
-        }
+function getTypeLabel(type) {
+    switch (type) {
+        case 1: return "Credit";
+        case 2: return "Debit";
+        case 3: return "Transfer";
+        default: return "Unknown";
     }
+}
 
-    function getTypeLabel(type) {
-        switch (type) {
-            case 1: return "Credit";
-            case 2: return "Debit";
-            case 3: return "Transfer";
-            default: return "Unknown";
-        }
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainWrapper = document.querySelector('.main-wrapper');
+
+    sidebar.classList.toggle('expanded');
+
+    if (sidebar.classList.contains('expanded')) {
+        mainWrapper.style.marginLeft = "220px";
+    } else {
+        mainWrapper.style.marginLeft = "70px";
     }
+}
 
-    function formatDate(timestamp) {
-        const date = new Date(Number(timestamp));
-        return date.toLocaleString("en-IN");
-    }
 
-    function filterTable() {
-        const input = document.getElementById("localSearch").value.toLowerCase();
-        const rows = document.getElementById("transactionBody").getElementsByTagName("tr");
-
-        for (let row of rows) {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(input) ? "" : "none";
-        }
-    }
 </script>
-
 </body>
 </html>

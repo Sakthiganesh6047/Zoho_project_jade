@@ -3,6 +3,7 @@
 <html>
 <head>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>JadeBank-Login</title>
     <style>
     
@@ -25,12 +26,12 @@
 		    align-content: center;
 		    justify-content: center;
 		    align-items: center;
-		    height: 70vh;
+		    height: 95vh;
 		    gap: 3%;
         }
         
         .main-wrapper {
-        	height: 86.3vh;
+        	height: 95vh;
         	display: flex;
     		flex-direction: column;
     		align-content: center;
@@ -64,11 +65,11 @@
         	font-size: 30px;
         }
         	
-       .login-form {
-		    max-width: 320px;
-		    display: flex;
-		    flex-direction: column;
-		    gap: 25px;
+       .login-form input,
+		.login-form .input-group {
+			max-width: 100%;
+			width: 100%;
+			box-sizing: border-box;
 		}
 		
 		.login-form label {
@@ -81,6 +82,39 @@
 			display: flex;
 			flex-direction: column;
     		gap: 10px;
+    		margin-bottom: 20px;
+		}
+		
+		.password-container{
+			display: flex;
+			flex-direction: column;
+    		gap: 10px;
+    		margin-bottom: 20px;
+		}
+		
+		.input-group {
+			position: relative;
+		}
+		.input-group input {
+			width: 100%;
+			padding: 10px 38px 10px 10px; /* Leave space for the eye icon */
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			background: #f8f9fa;
+			transition: border-color 0.3s;
+		}
+		.input-group input:focus {
+			border-color: #414485;
+			background: #fff;
+			outline: none;
+		}
+		.input-group .toggle-password {
+			position: absolute;
+			right: 10px;
+			top: 50%;
+			transform: translateY(-50%);
+			cursor: pointer;
+			color: #888;
 		}
 		
 		.login-form input {
@@ -117,9 +151,6 @@
     </style>
 </head>
 <body>
-	<div>
-		<jsp:include page="Header.jsp" />
-	</div>
     
     <div class=main-wrapper>
     
@@ -136,9 +167,12 @@
 						<label for="email">Email</label>
 				    	<input type="email" id="email" name="email" placeholder="Enter your email" maxlength=100 required>
 					</div>
-					<div class=email-container>
+					<div class="password-container">
 						<label for="password">Password</label>
-				    	<input type="password" id="password" name="password" placeholder="Enter your password" maxlength=70 required>
+						<div class="input-group">
+							<input type="password" id="password" name="password" placeholder="Enter your password" maxlength="70" required>
+							<i class="fas fa-eye toggle-password" id="togglePassword"></i>
+						</div>
 					</div>
 					<div>
 						<button type="submit" class="btn">Login</button>
@@ -149,6 +183,18 @@
 				</div>
 	    	</div>
 	    	<script>
+	    	
+		    	// Password toggle
+				const togglePassword = document.getElementById("togglePassword");
+				const passwordInput = document.getElementById("password");
+	
+				togglePassword.addEventListener("click", function () {
+					const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+					passwordInput.setAttribute("type", type);
+					this.classList.toggle("fa-eye");
+					this.classList.toggle("fa-eye-slash");
+				});
+	    	
 		    	document.getElementById("login-form").addEventListener("submit", function(e) {
 		    	    e.preventDefault(); // prevent normal form submission
 	

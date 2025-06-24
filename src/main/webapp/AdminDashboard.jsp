@@ -214,7 +214,7 @@
             background-color: white;
             padding: 16px 20px;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
             color: #373962;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -309,7 +309,7 @@
 				            </div>
 				        </div>
 				        <div class="info-card">
-				            <i class="fas fa-user-circle"></i>
+				            <i class="fa-solid fa-file-invoice-dollar"></i>
 				            <div>
 				                <h4>Accounts</h4>
 				                <p>8000</p>
@@ -334,20 +334,35 @@
         </div>
 
         <div class="operations-panel">
-            <a href="ManageBranches.jsp" class="dashboard-card">
-                <i class="fas fa-building-columns"></i>
-                <h4>Manage Branches</h4>
-                <p>Update & edit branches</p>
+            <a href="AddNewBranch.jsp" class="dashboard-card">
+                <i class="fa-solid fa-building-columns"></i>
+                <h4>Add New Branch</h4>
+                <p>New Jade Branch</p>
+            </a>
+            <a href="EmployeeSignUp.jsp" class="dashboard-card">
+                <i class="fas fa-user-plus"></i>
+                <h4>Add Employee</h4>
+                <p>Register new staff</p>
             </a>
             <a href="ViewEmployees.jsp" class="dashboard-card">
                 <i class="fas fa-users"></i>
-                <h4>Employees</h4>
-                <p>Clerks, Managers</p>
+                <h4>View Employees</h4>
+                <p>Employee records</p>
             </a>
-            <a href="Accounts.jsp" class="dashboard-card">
-                <i class="fas fa-wallet"></i>
-                <h4>Accounts</h4>
-                <p>All account data</p>
+            <a href="AccountsList.jsp" class="dashboard-card">
+                <i class="fa-regular fa-address-book"></i>
+                <h4>View Bank Accounts</h4>
+                <p>Accounts List</p>
+            </a>
+            <a href="CustomerSignUp.jsp" class="dashboard-card">
+                <i class="fa-solid fa-user-plus"></i>
+                <h4>Add Customer</h4>
+                <p>Create User Account</p>
+            </a>
+            <a href="OpenAccount.jsp" class="dashboard-card">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <h4>New Bank Account</h4>
+                <p>Create Bank Account</p>
             </a>
         </div>
     </div>
@@ -422,13 +437,17 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/dashboardstats`)
 fetch(`${pageContext.request.contextPath}/jadebank/account/transactionchart`)
     .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions chart"))
     .then(data => {
-        const lineChart = new Chart(document.getElementById('transactionBarChart').getContext('2d'), {
+        const labels = Object.keys(data);
+        const counts = Object.values(data);
+
+        const ctx = document.getElementById('transactionBarChart').getContext('2d');
+        const lineChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.labels || [],
+                labels: labels,
                 datasets: [{
                     label: 'Transactions',
-                    data: data.counts || [],
+                    data: counts,
                     backgroundColor: 'rgba(65, 68, 133, 0.2)',
                     borderColor: '#414485',
                     fill: true,

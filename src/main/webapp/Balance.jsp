@@ -19,6 +19,7 @@
             background-color: #f4f6f8;
             margin: 0;
             padding: 0;
+            padding-top: 70px; /* same as header height */
         }
 
         .main-wrapper {

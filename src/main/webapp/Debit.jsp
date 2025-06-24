@@ -11,6 +11,7 @@
 		    display: flex;
 		    flex-direction: column;
 		    min-height: 100vh;
+		    padding-top: 70px; /* same as header height */
 		}
 		
 		.body-wrapper {
