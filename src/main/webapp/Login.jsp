@@ -11,6 +11,10 @@
         	font-family: "Roboto Flex", sans-serif; 
         	text-align: center; 
         	margin: 0px;
+        	background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
         }
         form { 
 			width: 400px;
@@ -36,6 +40,15 @@
     		flex-direction: column;
     		align-content: center;
    			justify-content: center;
+        }
+        
+        .content-container{
+        	display: flex;
+        	gap: 30px;
+		    padding: 20px;
+		    background: white;
+		    border-radius: 20px;
+		    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .clipart-container {
@@ -154,33 +167,38 @@
     
     <div class=main-wrapper>
     
-    	<div id="login-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
 	    <div class=main-container>
-	    	<div class=clipart-container>
-	    		<img src="contents/login_page_clipart.png" alt="Login Page Clipart" class=login-clipart>
-	    	</div>
-	    
-	    	<div class=logindetails-container>
-	    		<h2>Login</h2>
-				<form id="login-form" class="login-form">
-					<div class=email-container>
-						<label for="email">Email</label>
-				    	<input type="email" id="email" name="email" placeholder="Enter your email" maxlength=100 required>
-					</div>
-					<div class="password-container">
-						<label for="password">Password</label>
-						<div class="input-group">
-							<input type="password" id="password" name="password" placeholder="Enter your password" maxlength="70" required>
-							<i class="fas fa-eye toggle-password" id="togglePassword"></i>
+	    	<div>
+	    		<div>
+	    			<div id="login-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
+	    		</div>
+	    		<div class="content-container">
+			    	<div class=clipart-container>
+			    		<img src="contents/login_page_clipart.png" alt="Login Page Clipart" class=login-clipart>
+			    	</div>
+			    	<div class=logindetails-container>
+			    		<h2>Login</h2>
+						<form id="login-form" class="login-form">
+							<div class=email-container>
+								<label for="email">Email</label>
+						    	<input type="email" id="email" name="email" placeholder="Enter your email" maxlength=100 required>
+							</div>
+							<div class="password-container">
+								<label for="password">Password</label>
+								<div class="input-group">
+									<input type="password" id="password" name="password" placeholder="Enter your password" maxlength="70" required>
+									<i class="fas fa-eye toggle-password" id="togglePassword"></i>
+								</div>
+							</div>
+							<div>
+								<button type="submit" class="btn">Login</button>
+							</div>
+						</form>
+						<div>
+							<p>Don't have an account? <a href="SignUp.jsp">Sign up here</a></p>
 						</div>
-					</div>
-					<div>
-						<button type="submit" class="btn">Login</button>
-					</div>
-				</form>
-				<div>
-					<p>Don't have an account? <a href="SignUp.jsp">Sign up here</a></p>
-				</div>
+			    	</div>
+			    </div>
 	    	</div>
 	    	<script>
 	    	

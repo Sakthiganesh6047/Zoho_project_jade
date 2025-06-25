@@ -13,7 +13,10 @@
             justify-content: center;
             height: 100vh;
             text-align: center;
-            background: #fff;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
         }
 
         .container {

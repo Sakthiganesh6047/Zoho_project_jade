@@ -16,7 +16,10 @@
     <style>
         body {
             font-family: "Segoe UI", sans-serif;
-            background-color: #f4f6f8;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             margin: 0;
             padding: 0;
             padding-top: 70px; /* same as header height */

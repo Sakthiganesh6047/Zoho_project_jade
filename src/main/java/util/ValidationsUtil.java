@@ -25,7 +25,7 @@ public class ValidationsUtil {
 	}
 
 	public static void checkLimitAndOffset(int limit, int offset) throws CustomException {
-		if (limit <= 0 || offset < 0)
+		if (limit <= 0 || offset < 0 || limit > 101)
 			throw new CustomException("Invalid pagination values");
 	}
 	

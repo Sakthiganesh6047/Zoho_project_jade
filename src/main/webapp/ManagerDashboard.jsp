@@ -19,7 +19,10 @@
         body {
             margin: 0;
             font-family: "Segoe UI", sans-serif;
-            background-color: #f4f6f8;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             padding-top: 70px; /* same as header height */
         }
 
@@ -326,20 +329,25 @@
         </div>
 
         <div class="operations-panel">
-            <a href="ManageBranches.jsp" class="dashboard-card">
-                <i class="fas fa-building-columns"></i>
-                <h4>Manage Branches</h4>
-                <p>Update & edit branches</p>
+            <a href="EmployeeSignUp.jsp" class="dashboard-card">
+                <i class="fas fa-user-plus"></i>
+                <h4>Add Employee</h4>
+                <p>Register new staff</p>
+            </a>
+            <a href="CustomerSignUp.jsp" class="dashboard-card">
+                <i class="fa-solid fa-user-plus"></i>
+                <h4>Add Customer</h4>
+                <p>Create User Account</p>
+            </a>
+            <a href="OpenAccount.jsp" class="dashboard-card">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <h4>New Bank Account</h4>
+                <p>Create Bank Account</p>
             </a>
             <a href="ViewEmployees.jsp" class="dashboard-card">
                 <i class="fas fa-users"></i>
                 <h4>Employees</h4>
                 <p>Clerks, Managers</p>
-            </a>
-            <a href="Accounts.jsp" class="dashboard-card">
-                <i class="fas fa-wallet"></i>
-                <h4>Accounts</h4>
-                <p>All account data</p>
             </a>
         </div>
     </div>

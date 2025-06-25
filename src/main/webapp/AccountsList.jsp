@@ -6,8 +6,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         body {
+        	transition: opacity 0.2s ease-in;
             font-family: "Roboto", sans-serif;
-            background-color: white;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             margin: 0;
             padding-top: 70px;
         }
@@ -61,8 +65,9 @@
             padding: 15px 20px;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            max-width: 500px;
+            max-width: 700px;
             margin: 0 auto 20px auto;
+            gap: 30px;
         }
 
         .controls label {
@@ -90,6 +95,11 @@
             background-color: #2a2d63;
         }
 
+		.filter-wrapper {
+			display: flex;
+			align-items: center;
+		}
+		
         .message {
             text-align: center;
             font-weight: bold;
@@ -187,10 +197,30 @@
         </h2>
 
         <div class="controls">
-		    <label for="branchId">Select Branch:</label>
-		    <select id="branchId" onchange="loadAccounts(0)">
-		        <option value="">-- Select --</option>
-		    </select>
+        	<div class="filter-wrapper">
+			    <label for="branchId">Select Branch:</label>
+			    <select id="branchId" onchange="loadAccounts(0)">
+			        <option value="">-- Select --</option>
+			    </select>
+			</div>
+			<div class = "filter-wrpper">
+			    <label for="accountType">Type:</label>
+			    <select id="accountType" onchange="loadAccounts(0)">
+			        <option value="">-- All --</option>
+			        <option value="savings">Savings</option>
+			        <option value="current">Current</option>
+			    </select>
+			</div>
+			<div class="filter-wrapper">
+			    <label for="accountStatus">Status:</label>
+			    <select id="accountStatus" onchange="loadAccounts(0)">
+			        <option value="">-- All --</option>
+			        <option value="new">New</option>
+			        <option value="active">Active</option>
+			        <option value="blocked">Blocked</option>
+			    </select>
+			</div>
+		    
 		</div>
 
         <div id="statusMessage" class="message"></div>
@@ -202,6 +232,7 @@
                     <th>Customer ID</th>
                     <th>Account Type</th>
                     <th>Balance</th>
+                    <th>Status</th>
                     <th>Created Date</th>
                 </tr>
             </thead>
@@ -256,6 +287,8 @@
 
     function loadAccounts() {
         const branchId = document.getElementById("branchId").value;
+        const accountType = document.getElementById("accountType").value;
+        const accountStatus = document.getElementById("accountStatus").value;
         const offset = currentPage * pageSize;
         const statusMessage = document.getElementById("statusMessage");
         const tbody = document.getElementById("accountTableBody");
@@ -270,7 +303,18 @@
             return;
         }
 
-        fetch("${pageContext.request.contextPath}/jadebank/accounts/list/" + branchId + "?limit=" + pageSize + "&offset=" + offset)
+        // Use JSP expression to get context path
+        let url = "<%= request.getContextPath() %>" + "/jadebank/accounts/list/" + branchId + "?limit=" + pageSize + "&offset=" + offset;
+
+        if (accountType) {
+            url += "&type=" + accountType;
+        }
+
+        if (accountStatus) {
+            url += "&status=" + accountStatus;
+        }
+
+        fetch(url)
             .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch"))
             .then(accounts => {
                 if (!Array.isArray(accounts) || accounts.length === 0) {
@@ -308,6 +352,7 @@
                 "<td>" + acc.customerId + "</td>" +
                 "<td>" + (acc.accountType == 1 ? "Savings" : "Current") + "</td>" +
                 "<td>" + acc.balance.toFixed(2) + "</td>" +
+                "<td>" + (acc.accountStatus == 1 ? "Active" : "Inactive") + "</td>" +
                 "<td>" + dateStr + "</td>";
             tbody.appendChild(row);
         });

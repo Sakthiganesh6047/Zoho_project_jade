@@ -30,6 +30,16 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>src/main/webapp/contents/background.png</name>
+			<type>1</type>
+			<location>/home/sakthi-23682/Downloads/background.png</location>
+		</link>
+		<link>
+			<name>src/main/webapp/contents/login_background.png</name>
+			<type>1</type>
+			<location>/home/sakthi-23682/Downloads/login_background.png</location>
+		</link>
+		<link>
 			<name>src/main/webapp/contents/man_6997551.png</name>
 			<type>1</type>
 			<location>/home/sakthi-23682/Downloads/man_6997551.png</location>

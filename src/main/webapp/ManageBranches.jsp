@@ -5,8 +5,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         body {
+        	transition: opacity 0.2s ease-in;
             font-family: "Roboto", sans-serif;
-            background-color: white;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             margin: 0;
             padding-top: 70px;
         }
@@ -144,7 +148,7 @@
     <!-- Main Content -->
     <div class="main-wrapper">
         <div class="table-header">
-            <h2>Branch List</h2>
+            <h2>Branches</h2>
             <div class="add-buttonwrap">
 	            <button class="icon-button add-button" onclick="window.location.href='AddNewBranch.jsp'" title="Add Branch">
 	                <i class="fas fa-plus"></i>

@@ -4,9 +4,13 @@
     <title>Transaction Center - JadeBank</title>
     <style>
         body {
+        	transition: opacity 0.2s ease-in;
             font-family: 'Segoe UI', sans-serif;
             margin: 0;
-            background-color: white;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             padding-top: 70px; /* same as header height */
         }
 

@@ -17,9 +17,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
+        	transition: opacity 0.2s ease-in;
             margin: 0;
             font-family: "Segoe UI", sans-serif;
-            background-color: #f4f6f8;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             padding-top: 70px; /* same as header height */
         }
 
@@ -344,16 +348,6 @@
                 <h4>Add Employee</h4>
                 <p>Register new staff</p>
             </a>
-            <a href="ViewEmployees.jsp" class="dashboard-card">
-                <i class="fas fa-users"></i>
-                <h4>View Employees</h4>
-                <p>Employee records</p>
-            </a>
-            <a href="AccountsList.jsp" class="dashboard-card">
-                <i class="fa-regular fa-address-book"></i>
-                <h4>View Bank Accounts</h4>
-                <p>Accounts List</p>
-            </a>
             <a href="CustomerSignUp.jsp" class="dashboard-card">
                 <i class="fa-solid fa-user-plus"></i>
                 <h4>Add Customer</h4>
@@ -363,6 +357,16 @@
                 <i class="fa-solid fa-file-invoice-dollar"></i>
                 <h4>New Bank Account</h4>
                 <p>Create Bank Account</p>
+            </a>
+            <a href="AccountsList.jsp" class="dashboard-card">
+                <i class="fa-regular fa-address-book"></i>
+                <h4>View Bank Accounts</h4>
+                <p>Accounts List</p>
+            </a>
+            <a href="ViewEmployees.jsp" class="dashboard-card">
+                <i class="fas fa-users"></i>
+                <h4>View Employees</h4>
+                <p>Employee records</p>
             </a>
         </div>
     </div>
@@ -384,7 +388,7 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
     .catch(err => console.error("Profile fetch error:", err));
 
 function redirectToEditProfile() {
-    window.location.href = `AdminSignUp.jsp?userId=${userId}`;
+    window.location.href = `EmployeeSignUp.jsp?userId=${userId}`;
 }
 
 // 2. Load Employee Role Distribution

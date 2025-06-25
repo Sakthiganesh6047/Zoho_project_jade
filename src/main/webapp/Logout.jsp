@@ -5,7 +5,10 @@
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f9f9f9;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             display: flex;
             justify-content: center;
             align-items: center;

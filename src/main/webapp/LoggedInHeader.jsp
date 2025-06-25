@@ -3,6 +3,7 @@
 
 <style>
     .header {
+    	transition: opacity 0.2s ease-in;
     	display: flex;
 	    align-items: center;
 	    height: 70px;

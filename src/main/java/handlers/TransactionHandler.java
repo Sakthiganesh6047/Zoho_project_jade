@@ -150,8 +150,12 @@ public class TransactionHandler {
             Beneficiary beneficiary = transferWrapper.getBeneficiary();
             ValidationsUtil.ValidateTransactions(transaction);
             
+            Account account = AuthorizeUtil.getAccountDetails(transaction.getAccountId());
+            if (account.getAccountStatus().equals(0)) {
+            	throw new CustomException("Account blocked");
+            }
+            
             if(userRole.equals(0)) {
-            	System.out.println(beneficiary.getBankName().toLowerCase());
             	if(beneficiary.getBankName().equalsIgnoreCase("jade bank")) {
             		transaction.setTransactionType(3);
             	} else {
@@ -484,51 +488,5 @@ public class TransactionHandler {
     		throw new CustomException("Error while adding failed statement in Transaction", e);
     	}
     }
-    
-    
-    
-//    public String newTransaction(Transaction transaction, long userId, int role) throws CustomException {
-//        Connection connection = null;
-//
-//        try {
-//            connection = DBConnection.getConnection();
-//            connection.setAutoCommit(false);
-//
-//            int type = transaction.getTransactionType(); // "1 - credit", "2 - debit", or "3 - transfer"
-//            //double amount = transaction.getAmount();
-//
-//            switch (type) {
-//                case 1:
-//                    handleCredit(transaction, userId, role, connection);
-//                    break;
-//                case 2:
-//                    handleDebit(transaction, userId, role, connection);
-//                    break;
-//                default:
-//                    throw new CustomException("Invalid transaction type: " + type);
-//            }
-//
-//            connection.commit();
-//            return Results.respondJson(Map.of("status", "success"));
-//        } catch (Exception e) {
-//            if (connection != null) {
-//                try {
-//                    connection.rollback();
-//                } catch (SQLException ex) {
-//                    throw new CustomException("transaction failed", ex);
-//                }
-//            }
-//            e.printStackTrace();
-//            return Results.respondJson(Map.of("status", "failed", "message", e.getMessage()));
-//        } finally {
-//            if (connection != null) {
-//                try {
-//                    connection.close();
-//                } catch (SQLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
 
 }

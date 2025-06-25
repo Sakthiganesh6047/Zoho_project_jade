@@ -2,33 +2,33 @@
 <html>
 <head>
     <title>View Transactions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <style>
         body {
+        	transition: opacity 0.2s ease-in;
             font-family: "Roboto", sans-serif;
-            background: #f5f7fa;
+            background-image: url("contents/background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             margin: 0;
-			padding-top: 70px; /* same as header height */
+            padding-top: 70px;
         }
 
         .body-wrapper {
             display: flex;
-            min-height: 87vh;
-        }
-
-        .sidebar-wrapper {
-            width: 60px;
-            background-color: #373962;
-            color: white;
-            position: fixed;
-            height: 100%;
-            border-radius: 0 12px 12px 0;
-            z-index: 1000;
+            min-height: 89vh;
         }
 
         .main-wrapper {
             margin-left: 70px;
             padding: 30px;
             flex: 1;
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.expanded ~ .main-wrapper {
+            margin-left: 220px;
         }
 
         h2 {
@@ -37,12 +37,22 @@
         }
 
         .search-section {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 30px auto;
             padding: 20px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+        }
+
+        .search-row div {
+            flex: 1;
         }
 
         .search-section label {
@@ -51,25 +61,12 @@
             margin-top: 15px;
         }
 
-        .search-section input,
-        .search-section button {
-            width: 100%;
+        .search-section input {
+            width: 80%;
             padding: 10px;
             margin-top: 5px;
             border-radius: 6px;
             border: 1px solid #ccc;
-        }
-
-        .search-section button {
-            background-color: #414485;
-            color: white;
-            font-weight: bold;
-            border: none;
-            margin-top: 20px;
-        }
-
-        .search-section button:hover {
-            background-color: #005fa3;
         }
 
         .error {
@@ -82,6 +79,12 @@
             max-width: 300px;
             margin: 0 auto 20px auto;
         }
+        
+        .search-wrapper{
+        	display: flex;
+        	justify-content: center;
+        	gap: 10px;
+        }
 
         .search-box input {
             width: 100%;
@@ -91,46 +94,83 @@
         }
 
         table {
-            width: 95%;
-            margin: 0 auto 30px auto;
+            width: 100%;
             border-collapse: collapse;
-            background: #fff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin: 0 auto 30px auto;
+            font-size: 15px;
+        }
+
+        thead {
+            background-color: #414485;
+            color: white;
+            font-weight: bold;
         }
 
         th, td {
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 14px 18px;
             text-align: center;
+            border-bottom: 1px solid #f0f0f0;
         }
 
-        th {
-            background-color: #e6f2ff;
+        tbody tr:nth-child(odd) {
+            background-color: #f4f4fb;
         }
 
-        .credit { color: green; font-weight: bold; }
-        .debit { color: red; font-weight: bold; }
+        tbody tr:nth-child(even) {
+            background-color: #ffffff;
+        }
+
+        tbody tr:hover {
+            background-color: #eef1f8;
+        }
+
+        .credit { color: #2e7d32; font-weight: bold; }
+        .debit { color: #c62828; font-weight: bold; }
 
         .pagination {
-            text-align: center;
-            margin-bottom: 40px;
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    gap: 30px;
+		    margin-bottom: 40px;
+		}
+
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .pagination button {
-            padding: 8px 16px;
-            border-radius: 5px;
-            border: none;
             background-color: #414485;
             color: white;
-            margin: 0 10px;
+            border: none;
+            border-radius: 50%;
+            padding: 10px 12px;
+            font-size: 16px;
+            cursor: pointer;
         }
 
         .pagination button:hover {
-            background-color: #005fa3;
+            background-color: #2a2d63;
         }
 
-        #pageInfo {
-            font-weight: bold;
+        .limit-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .limit-container input {
+            width: 60px;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
         }
     </style>
 </head>
@@ -139,33 +179,21 @@
 <jsp:include page="LoggedInHeader.jsp" />
 
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
+    <jsp:include page="SideBar.jsp" />
 
     <div class="main-wrapper">
         <h2>View Transactions</h2>
 
-        <div style="max-width: 700px; margin: 0 auto 20px;">
-		    <div style="display: flex; gap: 20px; align-items: flex-end;">
-		        <div style="flex: 1;">
-		            <label for="accountId"><strong>Account ID:</strong></label>
-		            <input type="number" id="accountId" placeholder="Enter Account ID" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-		        </div>
-		        <div style="width: 100px;">
-		            <label for="limit"><strong>Limit:</strong></label>
-		            <input type="number" id="limit" value="10" min="1" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-		        </div>
-		        <div>
-		            <button type="button" onclick="fetchTransactions(true)" style="padding: 10px 16px; background-color: #414485; color: white; border: none; border-radius: 6px;">Fetch</button>
-		        </div>
-		    </div>
-		    <div id="errorMsg" class="error" style="margin-top: 10px;"></div>
-		</div>
-
-        <div class="search-box">
-            <input type="text" id="localSearch" placeholder="Search in table..." onkeyup="filterTable()" />
+        <div class="search-section">
+            <div class="search-row">
+                <div class="search-wrapper">
+                    <label for="accountId">Account ID:</label>
+                    <input type="number" id="accountId" placeholder="Enter Account ID"
+                           onblur="fetchTransactions(true)" />
+                </div>
+            </div>
         </div>
+        <div class="error" id="errorMsg"></div>
 
         <table id="transactionTable" style="display: none;">
             <thead>
@@ -183,11 +211,18 @@
             <tbody id="transactionBody"></tbody>
         </table>
 
-        <div class="pagination">
-            <button onclick="prevPage()">Previous</button>
-            <span id="pageInfo">Page 1</span>
-            <button onclick="nextPage()">Next</button>
-        </div>
+        <div class="pagination" style="justify-content: center;">
+		    <div class="pagination-controls">
+		        <button onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
+		        <span id="pageInfo">Page 1</span>
+		        <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+		        <div class="limit-container">
+		            <label for="limit">Limit:</label>
+		            <input type="number" id="limit" value="10" min="1" onchange="fetchTransactions(true)" />
+		        </div>
+		    </div>
+</div>
+
     </div>
 </div>
 
@@ -195,30 +230,34 @@
 
 <script>
     let currentOffset = 0;
-    const pageSize = 10;
 
-    function fetchTransactions(resetPage = false) {
+    function fetchTransactions(resetPage) {
         const accountId = parseInt(document.getElementById("accountId").value.trim());
-        const limit = parseInt(document.getElementById("limit").value.trim());
+        let limit = parseInt(document.getElementById("limit").value.trim());
         const errorMsg = document.getElementById("errorMsg");
+        
+        if (limit > 100) {
+            limit = 100;
+            document.getElementById("limit").value = 100; // reset input visually too
+        }
 
         if (!accountId || limit < 1) {
             errorMsg.textContent = "Please enter a valid Account ID and Limit.";
             return;
         }
 
-        if (resetPage) {
-            currentOffset = 0; // Reset to first page
-        }
-
+        if (resetPage) currentOffset = 0;
         errorMsg.textContent = "";
 
-        fetch("${pageContext.request.contextPath}/jadebank/transactions/account?limit=" + limit + "&offset=" + currentOffset, {
+        const ctxPath = "<%= request.getContextPath() %>";
+        const url = ctxPath + "/jadebank/transactions/account?limit=" + limit + "&offset=" + currentOffset;
+
+        fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ accountId: accountId })
         })
-        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch"))
+        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions"))
         .then(data => {
             const tbody = document.getElementById("transactionBody");
             tbody.innerHTML = "";
@@ -231,8 +270,8 @@
 
             data.forEach(txn => {
                 const row = document.createElement("tr");
-                const statusText = txn.transactionStatus === 1 ? "Success" : (txn.transactionStatus === 2 ? "Failure" : "Unknown");
-
+                const statusText = txn.transactionStatus === 1 ? "Success"
+                                 : txn.transactionStatus === 2 ? "Failure" : "Unknown";
                 row.innerHTML =
                     "<td>" + txn.transactionId + "</td>" +
                     "<td>" + formatDate(txn.transactionDate) + "</td>" +

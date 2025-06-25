@@ -176,6 +176,10 @@
                 <i class="fas fa-user-plus"></i>
                 <span class="label">Add Customer</span>
             </a>
+            <a href="AccountTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("AccountTransactions") ? "active" : "" %>" data-tooltip="Past Transactions">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span class="label">Transactions</span>
+            </a>
 
         <% } else if (role == 2) { %>
         	<a href="ManagerDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManagerDashboard") ? "active" : "" %>" data-tooltip="Home">
@@ -193,6 +197,10 @@
             <a href="ViewEmployees.jsp" class="sidebar-link <%= request.getRequestURI().contains("ViewEmployees") ? "active" : "" %>" data-tooltip="Employees">
                 <i class="fas fa-user-tie"></i>
                 <span class="label">Employees</span>
+            </a>
+            <a href="AccountTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("AccountTransactions") ? "active" : "" %>" data-tooltip="Past Transactions">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span class="label">Transactions</span>
             </a>
 
         <% } else if (role == 3) { %>
@@ -215,6 +223,10 @@
             <a href="UnifiedTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerTransfer") ? "active" : "" %>" data-tooltip="Transact">
                 <i class="fas fa-money-bill-transfer"></i>
                 <span class="label">Transact</span>
+            </a>
+            <a href="AccountTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("AccountTransactions") ? "active" : "" %>" data-tooltip="Past Transactions">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span class="label">Transactions</span>
             </a>
             
 

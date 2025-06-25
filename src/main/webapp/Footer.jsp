@@ -1,6 +1,6 @@
 <style>
 .footer {
-	        background-color: white;
+	        background-color: transparent;
 	        color: black;
 	        text-align: center;
 	        padding: 5px;

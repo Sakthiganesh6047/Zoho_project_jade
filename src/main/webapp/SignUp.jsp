@@ -8,7 +8,10 @@
     
     	body {
 			font-family: Roboto Flex, sans-serif;
-			background-color: #f;
+			background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
 			margin: 0;
 			padding-top: 70px; /* same as header height */
 		}
@@ -188,7 +191,6 @@
     </style>
 </head>
 <body>
-	<jsp:include page="Header.jsp" />
 	<div class=main-wrapper>
 	
 		<div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>

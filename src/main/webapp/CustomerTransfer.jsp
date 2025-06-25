@@ -9,7 +9,10 @@
     <style>
         body {
             font-family: "Roboto", sans-serif;
-            background-color: white;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             margin: 0;
             padding-top: 70px; /* same as header height */
         }
@@ -127,7 +130,7 @@
                 <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
                 <label for="description">Description:</label>
-				<input type="text" id="description" placeholder="Reason for transfer..." required>
+				<input type="text" id="description" placeholder="Reason for transfer...">
 
                 <button type="button" onclick="showPasswordModal()">Submit Transfer</button>
 
@@ -246,7 +249,7 @@
         const statusDiv = document.getElementById("status");
         const modal = document.getElementById("passwordModal");
 
-        if (!accountId || !beneficiaryJSON || !amount || !description || !password) {
+        if (!accountId || !beneficiaryJSON || !amount || !password) {
             statusDiv.textContent = "All fields are required.";
             statusDiv.style.color = "red";
             return;

@@ -5,7 +5,10 @@
     <style>
         body {
 		    font-family: "Roboto", sans-serif;
-		    background-color: #f7f7f7;
+		    background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
 		    margin: 0;
 		    display: flex;
 		    flex-direction: column;

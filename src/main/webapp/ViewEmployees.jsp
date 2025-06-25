@@ -12,8 +12,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <style>
         body {
+			opacity: 0;
+			transition: opacity 0.5 ease-in;
             font-family: 'Segoe UI', sans-serif;
-            background-color: #f4f6f8;
+            background-image: url("contents/background.png"); /* Replace with your actual path */
+		    background-size: cover;        /* Scales the image to cover the whole screen */
+		    background-repeat: no-repeat;  /* Prevents tiling */
+		    background-position: center;
             margin: 0;
             padding-top: 70px;
         }
@@ -168,7 +173,7 @@
 
     <div class="main-wrapper">
     	<div class="list-header">
-	        <h2>Employee List</h2>
+	        <h2>Employees</h2>
 			<div class="add-buttonwrap">
 		        <button class="add-btn" onclick="window.location.href='EmployeeSignUp.jsp'">
 		            <i class="fas fa-plus"></i>
@@ -185,7 +190,7 @@
                     <th>Role</th>
                     <th>Branch Id</th>
                     <th>Branch Name</th>
-                    <th>Actions</th>
+                    <th> </th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -211,6 +216,11 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
+
+window.addEventListener('DOMContentLoaded', () => {
+    document.body.style.opacity = 1;
+});
+
     let offset = 0;
 
     function getRoleName(roleId) {

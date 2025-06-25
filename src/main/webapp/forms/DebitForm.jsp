@@ -10,7 +10,7 @@
 		<input type="number" step="0.01" name="amount" id="debitAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
         <button type="button" onclick="openDebitPasswordModal()">Debit</button>
-        <div id="debit-status"></div>
+        <div id="debit-status" style="display: flex;justify-content: center;"></div>
     </form>
 </div>
 

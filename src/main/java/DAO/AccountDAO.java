@@ -83,11 +83,57 @@ public class AccountDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Account.class));
     }
+    
+    public List<Account> getAccountsFiltered(Long branchId, String status, String type, int limit, int offset) throws CustomException {
+        QueryBuilder queryBuilder = new QueryBuilder(Account.class)
+            .select("*")
+            .where("branch_id", "=", branchId);
 
-    public List<Account> getAccountsByBranchId(long branchId) throws CustomException {
+        if (type != null && !type.isEmpty()) {
+            Integer typeCode = getAccountTypeCode(type); // e.g., savings → 1, current → 2
+            if (typeCode != null) {
+                queryBuilder.where("accountType", "=", typeCode);
+            }
+        }
+
+        if (status != null && !status.isEmpty()) {
+        	Integer statusCode = getAccountStatusCode(status);
+        	if(statusCode != null) {
+        		queryBuilder.where("accountStatus", "=", statusCode); // assuming it's a string column
+        	}
+        }
+
+        queryBuilder.limit(limit).offset(offset);
+
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        QueryResult query = queryBuilder.build();
+        return castResult(executor.executeQuery(query, Account.class));
+    }
+    
+    private Integer getAccountTypeCode(String type) {
+        switch (type.toLowerCase()) {
+            case "savings": return 1;
+            case "current": return 2;
+            default: return null;
+        }
+    }
+    
+    private Integer getAccountStatusCode(String status) {
+    	switch(status.toLowerCase()) {
+	    	case "active": return 1;
+	    	case "blocked": return 0;
+	    	case "new": return 2;
+	    	default: return null;
+    	}
+    }
+    
+    public List<Account> getAccountsByStatus(Long branchId, int status, int limit, int offset) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
-                .where("branch_id", "=", branchId)
+                .where("account_status", "=", status) //1 - active, 2 - new, 0 - closed
+                .where("branchId", "=", branchId)
+                .limit(limit)
+                .offset(offset)
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Account.class));
@@ -136,6 +182,15 @@ public class AccountDAO {
     public int updateAccount(Account account) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.update(account, "balance", "modifiedBy", "modifiedOn")
+                .where("account_id", "=", account.getAccountId())
+                .build();
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (int) executor.executeQuery(query, null);
+    }
+    
+    public int blockAccount(Account account) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
+        QueryResult query = queryBuilder.update(account, "accountStatus", "modifiedBy", "modifiedOn")
                 .where("account_id", "=", account.getAccountId())
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();

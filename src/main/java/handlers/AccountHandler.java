@@ -78,9 +78,33 @@ public class AccountHandler {
     		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
     		return Results.respondJson(accountDAO.getAccountsList(employee.getBranch()));
     	} else {
-    		return Results.respondJson(accountDAO.getAccountsByBranchId(branchId));
+    		return Results.respondJson(accountDAO.getAccountsList(branchId));
     	}
     }
+    
+    @Route(path = "accounts/list/{branchId}", method = "GET")
+    public String getAccountsList(
+            @FromPath("branchId") Long branchId,
+            @FromQuery("limit") int limit,
+            @FromQuery("offset") int offset,
+            @FromQuery("status") String status,           // e.g., "new", "active", "blocked"
+            @FromQuery("type") String type,               // e.g., "savings", "current"
+            @FromSession("userId") Long userId,
+            @FromSession("role") Integer role
+    ) throws CustomException {
+
+        ValidationsUtil.isNull(userId, "UserId");
+        ValidationsUtil.isNull(role, "User Role");
+        ValidationsUtil.checkLimitAndOffset(limit, offset);
+        ValidationsUtil.checkUserRole(role);
+
+        if (role <= 2) {
+            Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+            branchId = employee.getBranch(); // override with own branch
+        }
+        return Results.respondJson(accountDAO.getAccountsFiltered(branchId, status, type, limit, offset));
+    }
+
     
     @Route(path = "account/beneficiarydetail", method = "POST")
     public String getAccountDetailsForBeneficiary(@FromBody Account account, @FromSession("userId") Long userId, 
@@ -182,7 +206,7 @@ public class AccountHandler {
     	fetchedAccount.setAccountStatus(0);
     	fetchedAccount.setModifiedBy(modifierId);
     	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
+    	return Results.respondJson(accountDAO.blockAccount(fetchedAccount));
     }
     
     @Route(path = "account/unblock", method = "POST")
@@ -207,7 +231,7 @@ public class AccountHandler {
     	fetchedAccount.setAccountStatus(1);
     	fetchedAccount.setModifiedBy(modifierId);
     	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
+    	return Results.respondJson(accountDAO.blockAccount(fetchedAccount));
     }
     
     @Route(path = "account/activate", method = "POST")
