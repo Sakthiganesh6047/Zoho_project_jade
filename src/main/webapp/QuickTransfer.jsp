@@ -33,7 +33,6 @@
         }
 
         .main-wrapper {
-            margin-left: 70px;
             padding: 40px 20px;
             flex: 1;
         }
@@ -105,12 +104,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
 
     <div class="main-wrapper">
         <div class="form-container">

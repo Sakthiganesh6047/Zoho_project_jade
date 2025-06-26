@@ -33,7 +33,6 @@
         }
         
         .main-wrapper {
-		    margin-left: 70px; /* for collapsed mode */
 		    transition: margin-left 0.3s ease;
 		    padding: 30px;
 		    flex: 1;
@@ -216,12 +215,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
 
     <div class="main-wrapper">
         <h2>View Transactions</h2>

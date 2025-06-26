@@ -34,7 +34,6 @@
         }
 
         .main-wrapper {
-		    margin-left: 70px; /* default collapsed sidebar width */
 		    padding: 30px;
 		    flex: 1;
 		    transition: margin-left 0.3s ease;
@@ -254,12 +253,8 @@
     </style>
 </head>
 <body>
-<jsp:include page="LoggedInHeader.jsp" />
 
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
 
     <div class="main-wrapper">
         <div class="form-section">

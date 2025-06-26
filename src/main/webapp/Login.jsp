@@ -236,19 +236,19 @@
 		    	            // Redirect based on role
 		    	            switch (role) {
 		    	                case 0:
-		    	                    window.location.href = "CustomerDashboard.jsp";
+		    	                    window.location.href = "DashboardShell.jsp?page=CustomerDashboard.jsp";
 		    	                    break;
 		    	                case 1:
-		    	                    window.location.href = "ClerkDashboard.jsp";
+		    	                    window.location.href = "DashboardShell.jsp?page=ClerkDashboard.jsp";
 		    	                    break;
 		    	                case 2:
-		    	                    window.location.href = "ManagerDashboard.jsp";
+		    	                    window.location.href = "DashboardShell.jsp?page=ManagerDashboard.jsp";
 		    	                    break;
 		    	                case 3:
-		    	                    window.location.href = "AdminDashboard.jsp";
+		    	                    window.location.href = "DashboardShell.jsp?page=AdminDashboard.jsp";
 		    	                    break;
 		    	                default:
-		    	                    window.location.href = "Dashboard.jsp"; // fallback
+		    	                    window.location.href = "DashboardShell.jsp"; // fallback
 		    	            }
 		    	        } else {
 		    	            const errorData = await response.json();

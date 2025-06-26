@@ -25,7 +25,7 @@
 	    display: flex;
 	    align-items: center;
 	    z-index: 1;
-	    padding-left: 20px;
+	    padding-left: 15px;
     }
 
     .header-left img {
@@ -36,12 +36,12 @@
     .header-left::after {
         content: '';
 	    position: absolute;
-	    right: -20px;
+	    right: -9px;
 	    top: 0;
 	    width: 50px;
 	    height: 100%;
 	    background: white;
-	    transform: skewX(-25deg);
+	    /*transform: skewX(-25deg);*/
 	    z-index: 0;
     }
 

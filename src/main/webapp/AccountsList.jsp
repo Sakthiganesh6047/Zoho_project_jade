@@ -183,10 +183,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <jsp:include page="SideBar.jsp" />
 
     <div class="main-wrapper">
         <h2>

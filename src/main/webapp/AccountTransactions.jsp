@@ -5,7 +5,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <style>
         body {
-        	transition: opacity 0.2s ease-in;
             font-family: "Roboto", sans-serif;
             background-image: url("contents/background.png");
             background-size: cover;
@@ -176,10 +175,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <jsp:include page="SideBar.jsp" />
 
     <div class="main-wrapper">
         <h2>View Transactions</h2>

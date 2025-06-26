@@ -33,7 +33,6 @@
         }
 
         .main-wrapper {
-            margin-left: 70px;
             padding: 40px 20px;
             flex: 1;
         }
@@ -105,12 +104,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
 
     <div class="main-wrapper">
         <div class="form-container">
@@ -205,7 +199,7 @@
         const select = document.getElementById("beneficiaryId");
         select.innerHTML = '<option value="">-- Select Beneficiary --</option>';
 
-        fetch(`${pageContext.request.contextPath}/jadebank/beneficiary/id?limit=1000&offset=0`, {
+        fetch(`${pageContext.request.contextPath}/jadebank/beneficiary/id?limit=100&offset=0`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ accountId: accountId })

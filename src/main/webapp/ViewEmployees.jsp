@@ -28,14 +28,6 @@
             min-height: 100vh;
         }
 
-        .sidebar-wrapper {
-            width: 70px;
-            background-color: transparent;
-            position: fixed;
-            height: 100%;
-            z-index: 1000;
-        }
-
         .main-wrapper {
             margin-left: 70px;
             padding: 30px;
@@ -164,12 +156,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
 
     <div class="main-wrapper">
     	<div class="list-header">

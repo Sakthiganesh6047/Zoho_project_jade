@@ -32,7 +32,6 @@
 
         .content-wrapper {
             flex-grow: 1;
-            margin-left: 70px;
             padding: 20px 30px;
             display: flex;
             gap: 30px;
@@ -267,9 +266,7 @@
     </style>
 </head>
 <body>
-<jsp:include page="LoggedInHeader.jsp" />
 <div class="body-wrapper">
-    <jsp:include page="SideBar.jsp" />
     <div class="content-wrapper">
         <div class="stats-panel">
             <div class="profile-header">

@@ -113,12 +113,8 @@
 </head>
 
 <body>
-    <jsp:include page="LoggedInHeader.jsp" />
 
     <div class="body-wrapper">
-        <div class="sidebar-wrapper">
-            <jsp:include page="SideBar.jsp" />
-        </div>
 
         <div class="content-wrapper">
             <div class="transaction-container">

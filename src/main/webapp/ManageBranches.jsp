@@ -21,7 +21,6 @@
         }
 
         .main-wrapper {
-            margin-left: 70px; /* collapsed sidebar default */
             padding: 30px;
             flex: 1;
             transition: margin-left 0.3s ease;
@@ -142,8 +141,6 @@
 <jsp:include page="LoggedInHeader.jsp" />
 
 <div class="body-wrapper">
-    <!-- Directly include the sidebar (no wrapper) -->
-    <jsp:include page="SideBar.jsp" />
 
     <!-- Main Content -->
     <div class="main-wrapper">
@@ -174,8 +171,6 @@
         </div>
     </div>
 </div>
-
-<jsp:include page="Footer.jsp" />
 
 <script>
     let offset = 0;

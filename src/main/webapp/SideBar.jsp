@@ -4,15 +4,18 @@
 <%@ page session="true" %>
 <%
     Integer role = (Integer) session.getAttribute("role");
-    if (role == null) role = -1;
+    if (role == null) {
+    	response.sendRedirect("Login.jsp");
+    }
     String currentPage = request.getRequestURI();
 %>
 
 <style>
 	.sidebar {
-	    position: fixed;
+	    position: absolute; /* Change from fixed to absolute */
+	    top: 70px; /* Adjust based on your header height */
 	    left: 0;
-	    height: 100vh;
+	    height: calc(100vh - 70px); /* Full height minus header */
 	    width: 70px;
 	    background-color: #373962;
 	    display: flex;
@@ -21,7 +24,6 @@
 	    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
 	    transition: width 0.3s ease;
 	    z-index: 1000;
-	    overflow-x: hidden;
 	    box-shadow: 6px 0 16px rgba(0, 0, 0, 0.3); /* subtle shadow */
     	transition: width 0.3s ease, box-shadow 0.3s ease;
 	}
@@ -98,38 +100,33 @@
 	}
 	
 	.toggle-btn {
+	    position: absolute;
+	    top: 50%;
+	    right: -19px;
+	    transform: translateY(-50%);
 	    background: #2c2e54;
 	    color: white;
 	    border: none;
-	    width: 100%;
-	    padding-top: 10px;
-	    padding-bottom: 85px;
+	    border-radius: 0 5px 5px 0;
+	    height: 80px;
 	    cursor: pointer;
-	    font-size: 18px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    transition: transform 0.3s ease, background 0.3s ease;
+	    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+	    z-index: 1000;
+	}
+	
+	.toggle-btn:hover {
+	    background: white;
+	    color: #373962;
+	}
+	
+	/* Rotate icon when sidebar is expanded */
+	.sidebar.expanded .toggle-btn i {
+	    transform: rotate(180deg);
 	    transition: transform 0.3s ease;
-	}
-	
-	.toggle-btn:hover{
-		background: white;
-		color: black;
-	}
-	
-	/* Tooltip (custom) */
-	.sidebar:not(.expanded) .sidebar-link:hover::after {
-	    content: attr(data-tooltip);
-	    position: absolute;
-	    left: 100%;
-	    top: 50%;
-	    transform: translateY(-50%);
-	    background-color: #373962;
-	    color: white;
-	    padding: 4px 10px;
-	    border-radius: 6px;
-	    white-space: nowrap;
-	    margin-left: 10px;
-	    font-size: 12px;
-	    z-index: 999;
-	    box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
 	}
 
 </style>
@@ -138,93 +135,93 @@
     <div class="nav-items">
 
         <% if (role == 0) { %>
-        	<a href="CustomerDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("Dashboard") ? "active" : "" %>" data-tooltip="Home">
+        	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('CustomerDashboard.jsp', this)" data-tooltip="Home" data-page="CustomerDashboard.jsp">
 	            <i class="fas fa-home"></i>
 	            <span class="label">Home</span>
 	        </a>
-            <a href="CustomerTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerTransfer") ? "active" : "" %>" data-tooltip="Transact">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('CustomerTransfer.jsp', this)" data-tooltip="Transact" data-page="CustomerTransfer.jsp">
                 <i class="fas fa-money-bill-transfer"></i>
                 <span class="label">Transact</span>
             </a>
-            <a href="QuickTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("QuickTransfer") ? "active" : "" %>" data-tooltip="Quick Transfer">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('QuickTransfer.jsp', this)" data-tooltip="Quick Transfer" data-page="QuickTransfer.jsp">
                	<i class="fas fa-bolt"></i>
                 <span class="label">Quick Transfer</span>
             </a>
-            <a href="CustomerAccTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerAccTransactions") ? "active" : "" %>" data-tooltip="Transactions">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('CustomerAccTransactions.jsp', this)" data-tooltip="Transactions" data-page="CustomerAccTransactions.jsp">
                 <i class="fas fa-clock-rotate-left"></i>
                 <span class="label">Transactions</span>
             </a>
-            <a href="BeneficiaryList.jsp" class="sidebar-link <%= request.getRequestURI().contains("Beneficiary") ? "active" : "" %>" data-tooltip="Beneficiaries">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('BeneficiaryList.jsp', this)" data-tooltip="Beneficiaries" data-page="BeneficiaryList.jsp">
                 <i class="fas fa-users"></i>
                 <span class="label">Beneficiaries</span>
             </a>
 
         <% } else if (role == 1) { %>
-        	<a href="ClerkDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("ClerkDashboard") ? "active" : "" %>" data-tooltip="Home">
+        	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ClerkDashboard.jsp', this)" data-tooltip="Home" data-page="ClerkDashboard.jsp">
 	            <i class="fas fa-home"></i>
 	            <span class="label">Home</span>
 	        </a>
-            <a href="Transact.jsp" class="sidebar-link <%= request.getRequestURI().contains("Transact") ? "active" : "" %>" data-tooltip="Transact">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('UnifiedTransfer.jsp', this)" data-tooltip="Transact" data-page="UnifiedTransfer.jsp">
                 <i class="fas fa-money-bill-transfer"></i>
                 <span class="label">Transact</span>
             </a>
-            <a href="Accounts.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AccountsList.jsp', this)" data-tooltip="Accounts" data-page="AccountsList.jsp">
                 <i class="fas fa-address-book"></i>
                 <span class="label">Accounts</span>
             </a>
-            <a href="CustomerSignUp.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerSignUp") ? "active" : "" %>" data-tooltip="Add Customer">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('CustomerSignUp.jsp', this)" data-tooltip="Add Customer" data-page="CustomerSignUp.jsp">
                 <i class="fas fa-user-plus"></i>
                 <span class="label">Add Customer</span>
             </a>
-            <a href="AccountTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("AccountTransactions") ? "active" : "" %>" data-tooltip="Past Transactions">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AccountTransactions.jsp', this)" data-tooltip="Past Transactions" data-page="AccountTransactions.jsp">
                 <i class="fas fa-clock-rotate-left"></i>
                 <span class="label">Transactions</span>
             </a>
 
         <% } else if (role == 2) { %>
-        	<a href="ManagerDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManagerDashboard") ? "active" : "" %>" data-tooltip="Home">
+        	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('Managerdashboard.jsp', this)" data-tooltip="Home" data-page="ManagerDashboard.jsp">
 	            <i class="fas fa-home"></i>
 	            <span class="label">Home</span>
 	        </a>
-            <a href="ManageBranches.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManageBranches") ? "active" : "" %>" data-tooltip="Branches">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ManageBranches.jsp', this)" data-tooltip="Branches" data-page="ManageBranches.jsp">
                 <i class="fas fa-building-columns"></i>
                 <span class="label">Branches</span>
             </a>
-            <a href="Accounts.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AccountsList.jsp', this)" data-tooltip="Accounts" data-page="AccountsList.jsp">
                 <i class="fas fa-address-book"></i>
                 <span class="label">Accounts</span>
             </a>
-            <a href="ViewEmployees.jsp" class="sidebar-link <%= request.getRequestURI().contains("ViewEmployees") ? "active" : "" %>" data-tooltip="Employees">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ViewEmployees.jsp', this)" data-tooltip="Employees" data-page="ViewEmployees.jsp">
                 <i class="fas fa-user-tie"></i>
                 <span class="label">Employees</span>
             </a>
-            <a href="AccountTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("AccountTransactions") ? "active" : "" %>" data-tooltip="Past Transactions">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AccountTransactions.jsp', this)" data-tooltip="Past Transactions" data-page="AccountTransactions.jsp">
                 <i class="fas fa-clock-rotate-left"></i>
                 <span class="label">Transactions</span>
             </a>
 
         <% } else if (role == 3) { %>
-        	<a href="AdminDashboard.jsp" class="sidebar-link <%= request.getRequestURI().contains("AdminDashboard") ? "active" : "" %>" data-tooltip="Home">
-	            <i class="fas fa-home"></i>
-	            <span class="label">Home</span>
-	        </a>
-            <a href="ManageBranches.jsp" class="sidebar-link <%= request.getRequestURI().contains("ManageBranches") ? "active" : "" %>" data-tooltip="Branches">
+        	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AdminDashboard.jsp', this)" data-tooltip="Home" data-page="AdminDashboard.jsp">
+			    <i class="fas fa-home"></i>
+			    <span class="label">Home</span>
+			</a>
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ManageBranches.jsp', this)" data-tooltip="Branches" data-page="ManageBranches.jsp">
                 <i class="fas fa-building-columns"></i>
                 <span class="label">Branches</span>
             </a>
-            <a href="AccountsList.jsp" class="sidebar-link <%= request.getRequestURI().contains("Accounts") ? "active" : "" %>" data-tooltip="Accounts">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AccountsList.jsp', this)" data-tooltip="Accounts" data-page="AccountsList.jsp">
                 <i class="fas fa-address-book"></i>
                 <span class="label">Accounts</span>
             </a>
-            <a href="ViewEmployees.jsp" class="sidebar-link <%= request.getRequestURI().contains("ViewEmployees") ? "active" : "" %>" data-tooltip="Employees">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ViewEmployees.jsp', this)" data-tooltip="Employees" data-page="ViewEmployees.jsp">
                 <i class="fas fa-user-tie"></i>
                 <span class="label">Employees</span>
             </a>
-            <a href="UnifiedTransfer.jsp" class="sidebar-link <%= request.getRequestURI().contains("CustomerTransfer") ? "active" : "" %>" data-tooltip="Transact">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('UnifiedTransfer.jsp', this)" data-tooltip="Transact" data-page="UnifiedTransfer.jsp">
                 <i class="fas fa-money-bill-transfer"></i>
                 <span class="label">Transact</span>
             </a>
-            <a href="AccountTransactions.jsp" class="sidebar-link <%= request.getRequestURI().contains("AccountTransactions") ? "active" : "" %>" data-tooltip="Past Transactions">
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AccountTransactions.jsp', this)" data-tooltip="Past Transactions" data-page="AccountTransactions.jsp">
                 <i class="fas fa-clock-rotate-left"></i>
                 <span class="label">Transactions</span>
             </a>
@@ -237,9 +234,10 @@
             </a>
         <% } %>
     </div>
+    <!-- Centered toggle button -->
     <button class="toggle-btn" id="toggleSidebar" onclick="toggleSidebar()">
-	    <i class="fas fa-bars"></i>
-	</button>
+        <i class="fas fa-chevron-right"></i>
+    </button>
 
 </div>
 

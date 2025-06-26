@@ -16,45 +16,88 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-        	transition: opacity 0.2s ease-in;
+    
+    	html, body {
             margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            max-width: 100vw;
+            box-sizing: border-box;
             font-family: "Segoe UI", sans-serif;
-            background-image: url("contents/background.png"); /* Replace with your actual path */
-		    background-size: cover;        /* Scales the image to cover the whole screen */
-		    background-repeat: no-repeat;  /* Prevents tiling */
-		    background-position: center;
-            padding-top: 70px; /* same as header height */
+        }
+
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        body {
+            background-image: url("contents/background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            padding-top: 70px;
         }
 
         .body-wrapper {
             display: flex;
+            transition: margin-left 0.3s ease;
             min-height: 100vh;
+            width: 100%;
+        }
+
+        body.expanded .body-wrapper {
+            margin-left: 223px;
         }
 
         .content-wrapper {
             flex-grow: 1;
-            margin-left: 70px;
-            padding: 20px 30px;
+            margin-left: 5px;
+            padding: 20px;
             display: flex;
-            gap: 30px;
+            gap: 20px;
+            flex-wrap: wrap;           /* ✅ wrap instead of overflow */
+            width: 100%;
+            max-width: 100%;
         }
 
         .stats-panel {
-            flex-grow: 1;
+            flex: 1 1 0;
+            min-width: 300px;
         }
 
         .operations-panel {
-            width: 250px;
+            flex: 0 0 250px;
             display: flex;
             flex-direction: column;
             gap: 20px;
             order: 2;
         }
-        
+
         .stat-section {
-        	display: flex;
-        	gap: 30px;
+            display: flex;
+            flex-wrap: wrap;          /* ✅ allow wrapping */
+            gap: 30px;
+        }
+
+        .chart-container {
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .info-cards-grid {
+            display: flex;
+            flex-wrap: wrap;         /* ✅ wrap to fit */
+            gap: 20px;
+        }
+
+        .chart-section, .stat-cards, .branch-list-section {
+            max-width: 100%;         /* ✅ restrict width */
+            overflow-x: auto;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
         }
         
         .stat-cards {
@@ -261,9 +304,7 @@
     </style>
 </head>
 <body>
-<jsp:include page="LoggedInHeader.jsp" />
-<div class="body-wrapper">
-    <jsp:include page="SideBar.jsp" />
+<div class="body-wrapper" id="bodyWrapper">
     <div class="content-wrapper">
         <div class="stats-panel">
             <div class="profile-header">
@@ -388,7 +429,7 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
     .catch(err => console.error("Profile fetch error:", err));
 
 function redirectToEditProfile() {
-    window.location.href = `EmployeeSignUp.jsp?userId=${userId}`;
+    parent.loadPage("EmployeeSignUp.jsp?userId=" + userId);
 }
 
 // 2. Load Employee Role Distribution
@@ -486,6 +527,19 @@ fetch(`${pageContext.request.contextPath}/jadebank/branch/accountstats`)
         });
     })
     .catch(err => console.error("Branch account fetch error:", err));
+    
+	function toggleSidebar() {
+	    const sidebar = document.getElementById('sidebar');
+	    const mainWrapper = document.querySelector('.body-wrapper');
+	
+	    sidebar.classList.toggle('expanded');
+	
+	    if (sidebar.classList.contains('expanded')) {
+	        mainWrapper.style.marginLeft = "220px";
+	    } else {
+	        mainWrapper.style.marginLeft = "70px";
+	    }
+	}
 
 </script>
 
