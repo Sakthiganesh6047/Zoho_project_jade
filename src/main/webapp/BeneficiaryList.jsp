@@ -20,7 +20,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 89vh;
+            min-height: 88vh;
         }
 
         .sidebar-wrapper {
@@ -35,8 +35,27 @@
 
         .main-wrapper {
 		    padding: 30px;
+		    padding-top: 10px;
 		    flex: 1;
 		    transition: margin-left 0.3s ease;
+		}
+		
+		.formsection-wrapper{
+			display: flex;
+		}
+		
+		.table-title {
+		    text-align: center;
+		    font-size: 28px;
+		    font-weight: 700;
+		    color: #2e2f60;
+		    position: relative;
+		    padding: 10px 20px;
+		    background: linear-gradient(to right, #e0e7ff, #f4f4fb);
+		    border-left: 6px solid #414485;
+		    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		    width: fit-content;
+		    margin-right: auto;
 		}
 
         .form-section {
@@ -206,6 +225,17 @@
             background-color: #2e2f60;
         }
         
+        .pagination button:disabled {
+		    cursor: not-allowed;
+		    background-color: #aaa;
+		    color: #eee;
+		    transform: none;
+		}
+		
+		.pagination button:disabled:hover {
+		    background-color: #aaa;
+		}
+        
         .icon-button {
 		    background-color: #414485;
 		    color: white;
@@ -257,17 +287,20 @@
 <div class="body-wrapper">
 
     <div class="main-wrapper">
-        <div class="form-section">
-            <label for="accountId">Select Account:</label>
-            <select id="accountId">
-                <option value="">-- Select Account --</option>
-            </select>
-        </div>
+		<h2 class="table-title">Your Beneficiaries</h2>
+		<div class="formsection-wrapper">
+	        <div class="form-section">
+	            <label for="accountId">Select Account:</label>
+	            <select id="accountId">
+	                <option value="">-- Select Account --</option>
+	            </select>
+	        </div>
         
-        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px;">
-		    <button class="icon-button add-button" onclick="window.location.href='AddBeneficiary.jsp'" title="Add Beneficiary">
-		        <i class="fas fa-plus"></i>
-		    </button>
+	        <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; margin-right: 20px;">
+			    <button class="icon-button add-button" onclick="window.location.href='AddBeneficiary.jsp'" title="Add Beneficiary">
+			        <i class="fas fa-plus"></i>
+			    </button>
+			</div>
 		</div>
         
         <table class="beneficiary-table" id="beneficiaryTable" style="display: none;">
@@ -285,20 +318,23 @@
 
         <div id="status"></div>
 
-        <div class="pagination">
-		    <button onclick="prevPage()" class="icon-button"><i class="fas fa-angle-left"></i></button>
+		<div class="pagination">
+		    <button id="prevBtn" onclick="prevPage()" class="icon-button"><i class="fas fa-angle-left"></i></button>
 		    <span id="pageIndicator">Page 1</span>
-		    <button onclick="nextPage()" class="icon-button"><i class="fas fa-angle-right"></i></button>
+		    <button id="nextBtn" onclick="nextPage()" class="icon-button"><i class="fas fa-angle-right"></i></button>
 		</div>
+
     </div>
 </div>
 
 <jsp:include page="Footer.jsp" />
 
 <script>
+
     const userId = <%= userId != null ? userId : "null" %>;
     let currentPage = 0;
-    const pageSize = 20;
+    const pageSize = 4;
+    let hasNextPage = false;
 
     document.addEventListener("DOMContentLoaded", () => {
         if (!userId) return;
@@ -351,35 +387,40 @@
         })
         .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch beneficiaries"))
         .then(beneficiaries => {
-            const tbody = document.getElementById("beneficiaryTableBody");
-            tbody.innerHTML = "";
-
-            if (!beneficiaries || beneficiaries.length === 0) {
-                table.style.display = "none";
-                statusDiv.textContent = "No beneficiaries found.";
-                return;
-            }
-
-            beneficiaries.forEach(function(b) {
-                const row = document.createElement("tr");
-                row.innerHTML =
-                    "<td>" + b.beneficiaryName + "</td>" +
-                    "<td>" + b.bankName + "</td>" +
-                    "<td>" + b.beneficiaryAccountNumber + "</td>" +
-                    "<td>" + b.ifscCode + "</td>" +
-                    "<td>" +
-                        "<div class='action-wrapper'>" +
-                            "<button class='icon-button del-button' onclick='deleteBeneficiary(" + b.beneficiaryId + ")'>" +
-                                "<i class='fas fa-trash-alt'></i>" +
-                            "</button>" +
-                        "</div>" +
-                    "</td>";
-                tbody.appendChild(row);
-            });
-
-            table.style.display = "table";
-            document.getElementById("pageIndicator").textContent = `Page ${currentPage + 1}`;
-        })
+		    const tbody = document.getElementById("beneficiaryTableBody");
+		    tbody.innerHTML = "";
+		
+		    if (!beneficiaries || beneficiaries.length === 0) {
+		        table.style.display = "none";
+		        statusDiv.textContent = "No beneficiaries found.";
+		        hasNextPage = false;
+		        updatePaginationButtons();
+		        return;
+		    }
+		
+		    hasNextPage = beneficiaries.length === pageSize;
+		
+		    beneficiaries.forEach(function(b) {
+		        const row = document.createElement("tr");
+		        row.innerHTML =
+		            "<td>" + b.beneficiaryName + "</td>" +
+		            "<td>" + b.bankName + "</td>" +
+		            "<td>" + b.beneficiaryAccountNumber + "</td>" +
+		            "<td>" + b.ifscCode + "</td>" +
+		            "<td>" +
+		                "<div class='action-wrapper'>" +
+		                    "<button class='icon-button del-button' onclick='deleteBeneficiary(" + b.beneficiaryId + ")'>" +
+		                        "<i class='fas fa-trash-alt'></i>" +
+		                    "</button>" +
+		                "</div>" +
+		            "</td>";
+		        tbody.appendChild(row);
+		    });
+		
+		    table.style.display = "table";
+		    document.getElementById("pageIndicator").textContent = "Page " + (currentPage + 1);
+		    updatePaginationButtons();
+		})
         .catch(err => {
             console.error(err);
             table.style.display = "none";
@@ -421,6 +462,17 @@
             currentPage--;
             loadBeneficiaries();
         }
+    }
+    
+    function updatePaginationButtons() {
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = !hasNextPage;
+
+        prevBtn.style.opacity = prevBtn.disabled ? "0.5" : "1";
+        nextBtn.style.opacity = nextBtn.disabled ? "0.5" : "1";
     }
     
     function toggleSidebar() {

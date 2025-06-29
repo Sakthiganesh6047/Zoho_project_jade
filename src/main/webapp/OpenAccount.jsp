@@ -35,7 +35,6 @@
 		}
 		
 		.content-wrapper {
-		    margin-left: 70px;
 		    flex: 1;
 		    display: flex;
 		    justify-content: center;
@@ -130,12 +129,8 @@
     </style>
 </head>
 <body>
-    <jsp:include page="LoggedInHeader.jsp" />
 
 	<div class="body-wrapper">
-	    <div class="sidebar-wrapper">
-	        <jsp:include page="SideBar.jsp" />
-	    </div>
 	
 	    <div class="content-wrapper">
 	        <div class="form-box">

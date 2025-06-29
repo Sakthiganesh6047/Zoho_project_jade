@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,6 +187,42 @@ public class BranchDAO {
 	
 	        return branchBalanceMap;
     	} catch(Exception e) {
+    		throw new CustomException(e.getMessage());
+    	}
+    }
+    
+    public Map<String, Map<String, Integer>> getBranchEmployeeAndAccountStats() throws CustomException {
+    	try (Connection connection = DBConnection.getConnection()) {
+    		String query = """
+	            SELECT 
+	                b.branch_name,
+	                COUNT(DISTINCT e.employee_id) AS employee_count,
+	                COUNT(DISTINCT a.account_id) AS account_count
+	            FROM Branch b
+	            LEFT JOIN Employee e ON e.branch = b.branch_id
+	            LEFT JOIN Account a ON a.branch_id = b.branch_id
+	            GROUP BY b.branch_name
+	        """;
+	
+	        Map<String, Map<String, Integer>> result = new HashMap<>();
+	
+	        try (PreparedStatement stmt = connection.prepareStatement(query);
+	             ResultSet rs = stmt.executeQuery()) {
+	            while (rs.next()) {
+	                String branchName = rs.getString("branch_name");
+	                int employeeCount = rs.getInt("employee_count");
+	                int accountCount = rs.getInt("account_count");
+	
+	                Map<String, Integer> counts = new HashMap<>();
+	                counts.put("employees", employeeCount);
+	                counts.put("accounts", accountCount);
+	
+	                result.put(branchName, counts);
+	            }
+	        }
+	
+	        return result;
+    	}catch(Exception e) {
     		throw new CustomException(e.getMessage());
     	}
     }

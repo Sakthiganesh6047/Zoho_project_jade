@@ -19,8 +19,23 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 89vh;
+            min-height: 88vh;
         }
+        
+        .page-title {
+		    text-align: center;
+		    font-size: 28px;
+		    font-weight: 700;
+		    color: #2e2f60;
+		    margin-bottom: 25px;
+		    position: relative;
+		    padding: 10px 20px;
+		    background: linear-gradient(to right, #e0e7ff, #f4f4fb);
+		    border-left: 6px solid #414485;
+		    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		    width: fit-content;
+		    margin-right: auto;
+		}
 
         .sidebar-wrapper {
             width: 70px;
@@ -35,6 +50,8 @@
         .main-wrapper {
 		    transition: margin-left 0.3s ease;
 		    padding: 30px;
+		    padding-bottom: 1px;
+		    padding-top: 10px;
 		    flex: 1;
 		}
 		
@@ -42,13 +59,6 @@
 		.sidebar.expanded ~ .main-wrapper {
 		    margin-left: 220px; /* match expanded width */
 		}
-
-        .main-wrapper {
-            margin-left: 100px;
-            padding: 30px;
-            flex: 1;
-            transition: margin-left 0.3s ease;
-        }
 
         h2 {
             text-align: center;
@@ -58,10 +68,7 @@
         .search-section {
             max-width: 700px;
             margin: 0 auto 30px auto;
-            padding: 20px;
-            background: white;
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .search-section label {
@@ -153,17 +160,31 @@
         }
 
         .pagination button {
-            padding: 10px;
-            border-radius: 50%;
+            padding: 8px 16px;
             border: none;
             background-color: #414485;
             color: white;
-            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
         }
 
         .pagination button:hover {
             background-color: #005fa3;
         }
+        
+        .pagination button:disabled {
+		    cursor: not-allowed;
+		    background-color: #aaa;
+		    color: #eee;
+		    transform: none;
+		    opacity: 0.6;
+		}
+		
+		.pagination button:disabled:hover {
+		    background-color: #aaa;
+		}
 
         .limit-container {
             display: flex;
@@ -218,7 +239,7 @@
 <div class="body-wrapper">
 
     <div class="main-wrapper">
-        <h2>View Transactions</h2>
+		<h2 class="page-title">Your Transactions</h2>
 
         <div class="search-section">
             <label for="accountId">Account ID:</label>
@@ -247,21 +268,20 @@
             <tbody id="transactionBody"></tbody>
         </table>
 
-        <div class="pagination">
-            <button onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
-            <span id="pageInfo">Page 1</span>
-            <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
-            <div class="limit-container">
-                <label for="limit">Limit:</label>
-                <input type="number" id="limit" value="10" min="1" onchange="fetchTransactions(true)" />
-            </div>
-        </div>
+		<div class="pagination">
+		    <button id="prevBtn" onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
+		    <span id="pageInfo">Page 1</span>
+		    <button id="nextBtn" onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+		</div>
     </div>
 </div>
 
 <jsp:include page="Footer.jsp" />
 
 <script>
+
+let hasNextPage = false;
+
 document.addEventListener("DOMContentLoaded", function() {
     var userId = <%= userId != null ? userId : "null" %>;
     if (userId) {
@@ -288,12 +308,13 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 var currentOffset = 0;
+const PAGE_LIMIT = 13; // limit
 
 function fetchTransactions(resetPage) {
     if (resetPage) currentOffset = 0;
 
     var selected = document.getElementById("accountId").value;
-    var limit = parseInt(document.getElementById("limit").value);
+    var limit = PAGE_LIMIT;
     var errorMsg = document.getElementById("errorMsg");
 
     if (!selected || limit < 1) {
@@ -367,7 +388,10 @@ function fetchTransactions(resetPage) {
         });
 
         document.getElementById("transactionTable").style.display = "table";
+        hasNextPage = data.length === limit;
+        updatePaginationButtons();
         document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / limit) + 1);
+
     })
     .catch(function(err) {
         errorMsg.textContent = "Error: " + err;
@@ -381,17 +405,24 @@ function formatDate(timestamp) {
 }
 
 function nextPage() {
-    var limit = parseInt(document.getElementById("limit").value);
-    currentOffset += limit;
+    if (!hasNextPage) return;
+    currentOffset += PAGE_LIMIT;
     fetchTransactions();
 }
 
 function prevPage() {
-    var limit = parseInt(document.getElementById("limit").value);
-    if (currentOffset >= limit) {
-        currentOffset -= limit;
+    if (currentOffset >= PAGE_LIMIT) {
+        currentOffset -= PAGE_LIMIT;
         fetchTransactions();
     }
+}
+
+function updatePaginationButtons() {
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    prevBtn.disabled = currentOffset === 0;
+    nextBtn.disabled = !hasNextPage;
 }
 
 function getTypeLabel(type) {

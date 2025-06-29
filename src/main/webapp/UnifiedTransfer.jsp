@@ -16,12 +16,11 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 89vh;
+            min-height: 88vh;
         }
 
         .content-wrapper {
             flex-grow: 1;
-            margin-left: 70px;
             display: flex;
             justify-content: center;
             padding: 40px 20px;
@@ -50,7 +49,7 @@
 		}
 		
 		.tab-bar div {
-		    padding: 12px 30px;
+		    padding: 15px 58px;
 		    cursor: pointer;
 		    font-weight: 600;
 		    border: 1px solid transparent;
@@ -64,7 +63,8 @@
 		}
 		
 		.tab-bar div:hover {
-		    background-color: black;
+		    background-color: #3b5998;
+		    color: white;
 		}
 		
 		.tab-bar .active {
@@ -75,7 +75,6 @@
 		    z-index: 2;
 		    top: 1px;
 		    box-shadow: 0 -1px 3px rgba(0,0,0,0.04);
-		    padding: 12px 140px;
 		}
 
         .tab-content {

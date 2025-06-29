@@ -6,12 +6,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <style>
         body {
-        	transition: opacity 0.2s ease-in;
+            transition: opacity 0.2s ease-in;
             font-family: "Roboto", sans-serif;
-            background-image: url("contents/background.png"); /* Replace with your actual path */
-		    background-size: cover;        /* Scales the image to cover the whole screen */
-		    background-repeat: no-repeat;  /* Prevents tiling */
-		    background-position: center;
+            background-image: url("contents/background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             margin: 0;
             padding-top: 70px;
         }
@@ -22,7 +22,7 @@
         }
 
         .main-wrapper {
-            margin-left: 70px;
+            margin-left: 20px;
             padding: 30px;
             flex: 1;
             transition: margin-left 0.3s ease;
@@ -32,16 +32,25 @@
             margin-left: 220px;
         }
 
-        h2 {
-            text-align: center;
+        .page-title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 25px;
-            position: relative;
+        }
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2e2f60;
+            background: linear-gradient(to right, #e0e7ff, #f4f4fb);
+            border-left: 6px solid #414485;
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .add-account-btn {
-            position: absolute;
-            top: 0;
-            right: 0;
             background: #414485;
             color: white;
             border: none;
@@ -80,26 +89,6 @@
             border: 1px solid #ccc;
         }
 
-        .controls button {
-            margin-left: 10px;
-            padding: 10px;
-            background-color: #414485;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .controls button:hover {
-            background-color: #2a2d63;
-        }
-
-		.filter-wrapper {
-			display: flex;
-			align-items: center;
-		}
-		
         .message {
             text-align: center;
             font-weight: bold;
@@ -146,7 +135,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
             margin-bottom: 40px;
         }
 
@@ -155,25 +144,20 @@
             color: white;
             border: none;
             border-radius: 50%;
-            padding: 10px 12px;
+            padding: 10px 14px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .pagination button:hover {
+        .pagination button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .pagination button:hover:not(:disabled) {
             background-color: #2a2d63;
-        }
-
-        .page-controls {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .page-controls select {
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
         }
 
         .hidden {
@@ -184,41 +168,39 @@
 <body>
 
 <div class="body-wrapper">
-
     <div class="main-wrapper">
-        <h2>
-            Branch Accounts List
+        <div class="page-title-wrapper">
+            <h2 class="page-title">Branch Accounts List</h2>
             <button class="add-account-btn" title="Add Account" onclick="window.location.href='OpenAccount.jsp'">
                 <i class="fas fa-plus"></i>
             </button>
-        </h2>
+        </div>
 
         <div class="controls">
-        	<div class="filter-wrapper">
-			    <label for="branchId">Select Branch:</label>
-			    <select id="branchId" onchange="loadAccounts(0)">
-			        <option value="">-- Select --</option>
-			    </select>
-			</div>
-			<div class = "filter-wrpper">
-			    <label for="accountType">Type:</label>
-			    <select id="accountType" onchange="loadAccounts(0)">
-			        <option value="">-- All --</option>
-			        <option value="savings">Savings</option>
-			        <option value="current">Current</option>
-			    </select>
-			</div>
-			<div class="filter-wrapper">
-			    <label for="accountStatus">Status:</label>
-			    <select id="accountStatus" onchange="loadAccounts(0)">
-			        <option value="">-- All --</option>
-			        <option value="new">New</option>
-			        <option value="active">Active</option>
-			        <option value="blocked">Blocked</option>
-			    </select>
-			</div>
-		    
-		</div>
+            <div>
+                <label for="branchId">Branch:</label>
+                <select id="branchId" onchange="loadAccounts()">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div>
+                <label for="accountType">Type:</label>
+                <select id="accountType" onchange="loadAccounts()">
+                    <option value="">-- All --</option>
+                    <option value="savings">Savings</option>
+                    <option value="current">Current</option>
+                </select>
+            </div>
+            <div>
+                <label for="accountStatus">Status:</label>
+                <select id="accountStatus" onchange="loadAccounts()">
+                    <option value="">-- All --</option>
+                    <option value="new">New</option>
+                    <option value="active">Active</option>
+                    <option value="blocked">Blocked</option>
+                </select>
+            </div>
+        </div>
 
         <div id="statusMessage" class="message"></div>
 
@@ -237,19 +219,9 @@
         </table>
 
         <div class="pagination">
-            <button onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
+            <button onclick="prevPage()" id="prevBtn"><i class="fas fa-angle-left"></i></button>
             <span id="pageInfo">Page 1</span>
-            <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
-
-            <div class="page-controls">
-                <label for="pageLimit">Rows:</label>
-                <select id="pageLimit" onchange="changePageSize()">
-                    <option value="5" selected>5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
+            <button onclick="nextPage()" id="nextBtn"><i class="fas fa-angle-right"></i></button>
         </div>
     </div>
 </div>
@@ -257,7 +229,7 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
-    let pageSize = 5;
+    const pageSize = 10;
     let currentPage = 0;
     let lastPageReached = false;
 
@@ -275,59 +247,41 @@
             });
     };
 
-    function changePageSize() {
-        pageSize = parseInt(document.getElementById("pageLimit").value);
-        currentPage = 0;
-        lastPageReached = false;
-        loadAccounts();
-    }
-
     function loadAccounts() {
         const branchId = document.getElementById("branchId").value;
         const accountType = document.getElementById("accountType").value;
         const accountStatus = document.getElementById("accountStatus").value;
         const offset = currentPage * pageSize;
-        const statusMessage = document.getElementById("statusMessage");
         const tbody = document.getElementById("accountTableBody");
         const table = document.getElementById("accountsTable");
+        const statusMessage = document.getElementById("statusMessage");
 
-        statusMessage.textContent = "";
         tbody.innerHTML = "";
         table.classList.add("hidden");
+        statusMessage.textContent = "";
 
         if (!branchId) {
             statusMessage.textContent = "Please select a branch.";
             return;
         }
 
-        // Use JSP expression to get context path
         let url = "<%= request.getContextPath() %>" + "/jadebank/accounts/list/" + branchId + "?limit=" + pageSize + "&offset=" + offset;
-
-        if (accountType) {
-            url += "&type=" + accountType;
-        }
-
-        if (accountStatus) {
-            url += "&status=" + accountStatus;
-        }
+        if (accountType) url += `&type=${accountType}`;
+        if (accountStatus) url += `&status=${accountStatus}`;
 
         fetch(url)
-            .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch"))
+            .then(res => res.ok ? res.json() : Promise.reject("Fetch error"))
             .then(accounts => {
                 if (!Array.isArray(accounts) || accounts.length === 0) {
-                    if (currentPage > 0) {
-                        currentPage--;
-                        lastPageReached = true;
-                        updatePageInfo();
-                    } else {
-                        statusMessage.textContent = "No accounts found.";
-                    }
+                    if (currentPage > 0) currentPage--;
+                    else statusMessage.textContent = "No accounts found.";
+                    updatePagination();
                     return;
                 }
 
-                lastPageReached = accounts.length < pageSize;
                 renderAccounts(accounts);
-                updatePageInfo();
+                lastPageReached = accounts.length < pageSize;
+                updatePagination();
             })
             .catch(err => {
                 console.error(err);
@@ -335,15 +289,12 @@
             });
     }
 
-    function renderAccounts(accountList) {
+    function renderAccounts(accounts) {
         const tbody = document.getElementById("accountTableBody");
         const table = document.getElementById("accountsTable");
-
-        tbody.innerHTML = "";
-
-        accountList.forEach(acc => {
-            const dateStr = acc.createdAt ? new Date(acc.createdAt).toLocaleDateString('en-IN') : "-";
+        accounts.forEach(acc => {
             const row = document.createElement("tr");
+            const dateStr = acc.createdAt ? new Date(acc.createdAt).toLocaleDateString('en-IN') : "-";
             row.innerHTML = 
                 "<td>" + acc.accountId + "</td>" +
                 "<td>" + acc.customerId + "</td>" +
@@ -353,12 +304,13 @@
                 "<td>" + dateStr + "</td>";
             tbody.appendChild(row);
         });
-
         table.classList.remove("hidden");
     }
 
-    function updatePageInfo() {
+    function updatePagination() {
         document.getElementById("pageInfo").textContent = `Page ${currentPage + 1}`;
+        document.getElementById("prevBtn").disabled = currentPage === 0;
+        document.getElementById("nextBtn").disabled = lastPageReached;
     }
 
     function nextPage() {
@@ -373,19 +325,6 @@
             currentPage--;
             lastPageReached = false;
             loadAccounts();
-        }
-    }
-
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const mainWrapper = document.querySelector('.main-wrapper');
-
-        sidebar.classList.toggle('expanded');
-
-        if (sidebar.classList.contains('expanded')) {
-            mainWrapper.style.marginLeft = "220px";
-        } else {
-            mainWrapper.style.marginLeft = "70px";
         }
     }
 </script>

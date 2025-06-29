@@ -17,10 +17,11 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 89vh;
+            min-height: 88vh;
         }
 
         .main-wrapper {
+        	margin-left: 20px;
             padding: 30px;
             flex: 1;
             transition: margin-left 0.3s ease;
@@ -36,14 +37,22 @@
             margin-left: 220px;
         }
 
-        .table-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-            flex-direction: row;
-    		margin-left: 45%;
-        }
+		.table-header {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    margin-bottom: 25px;
+		}
+		
+		.page-title {
+		    font-size: 26px;
+		    font-weight: 700;
+		    color: #2e2f60;
+		    background: linear-gradient(to right, #e0e7ff, #f4f4fb);
+		    border-left: 6px solid #414485;
+		    padding: 10px 20px;
+		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		}
 
         .branch-table {
             width: 100%;
@@ -135,23 +144,40 @@
             align-items: center;
             gap: 15px;
         }
+        
+        .pagination button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #414485;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .pagination button:disabled {
+		    cursor: not-allowed;
+		    background-color: #aaa;
+		    color: #eee;
+		    opacity: 0.6;
+		    transform: none;
+		}
+		
     </style>
 </head>
 <body>
-<jsp:include page="LoggedInHeader.jsp" />
 
 <div class="body-wrapper">
 
     <!-- Main Content -->
     <div class="main-wrapper">
-        <div class="table-header">
-            <h2>Branches</h2>
-            <div class="add-buttonwrap">
-	            <button class="icon-button add-button" onclick="window.location.href='AddNewBranch.jsp'" title="Add Branch">
-	                <i class="fas fa-plus"></i>
-	            </button>
-            </div>
-        </div>
+		<div class="table-header">
+		    <h2 class="page-title">Branches</h2>
+		    <button class="icon-button add-button" onclick="window.location.href='AddNewBranch.jsp'" title="Add Branch">
+		        <i class="fas fa-plus"></i>
+		    </button>
+		</div>
         <table class="branch-table" id="branch-table">
             <thead>
                 <tr>
@@ -171,11 +197,13 @@
         </div>
     </div>
 </div>
+<jsp:include page="Footer.jsp" />
 
 <script>
     let offset = 0;
     let currentPage = 1;
-    const limit = 10;
+    const limit = 3;
+    let hasNextPage = false;
 
     function fetchBranches() {
         fetch("${pageContext.request.contextPath}/jadebank/branch/all?limit=" + limit + "&offset=" + offset)
@@ -201,6 +229,8 @@
                     tbody.appendChild(row);
                 }
                 document.getElementById("pageIndicator").textContent = "Page " + currentPage;
+                hasNextPage = data.length === limit;
+                updatePaginationButtons();
             })
             .catch(error => {
                 console.error("Error:", error);
@@ -219,6 +249,11 @@
             currentPage--;
             fetchBranches();
         }
+    }
+    
+    function updatePaginationButtons() {
+        document.querySelector(".pagination button:nth-child(1)").disabled = offset === 0;
+        document.querySelector(".pagination button:nth-child(3)").disabled = !hasNextPage;
     }
 
     function editBranch(branchId) {

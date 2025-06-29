@@ -20,8 +20,8 @@
         }
 
         .main-wrapper {
+        	display: flex;
             padding: 20px;
-            margin-left: 70px; 
             flex: 1;
         }
         
@@ -30,16 +30,6 @@
 		    flex: 1;
 		    min-height: 70vh;
 		}
-		
-		.sidebar-wrapper {
-		    width: 70px;
-		    background-color: #373962; /* Dark sidebar */
-		    color: white;
-		    height: 100vh;
-		    position: fixed;
-		    left: 0;
-		}
-
 
         .container-wrapper {
             max-width: 900px;
@@ -118,12 +108,7 @@
     </style>
 </head>
 <body>
-	<jsp:include page="LoggedInHeader.jsp" />
 	<div class = "body-wrapper">
-	
-		<div class="sidebar wrapper">
-			<jsp:include page="SideBar.jsp" />
-		</div>
 		<div class="main-wrapper">
 		    <div id="signup-error" style="color: red; font-weight: bold; margin-bottom: 10px; display: flex; justify-content: center;"></div>
 		    <div class="container-wrapper">
@@ -201,7 +186,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
-    const employeeId = urlParams.get("employeeId");
+    const employeeId = urlParams.get("userId");
     console.log(employeeId);
 
     // Load branch list

@@ -46,7 +46,7 @@ public class BranchHandler {
 
 	    for (int i = 1; i <= 999; i++) {
 	        String branchSerial = String.format("%03d", i);
-	        String candidateIfsc = bankCode + districtCode + branchSerial;
+	        String candidateIfsc = bankCode + "0" + districtCode + branchSerial;
 	        if (!branchDAO.ifscExists(candidateIfsc)) {
 	            return candidateIfsc;
 	        }
@@ -116,6 +116,11 @@ public class BranchHandler {
 		ValidationsUtil.isNull(branchId, "BranchId");
 		
 		return Results.respondJson(branchDAO.getBranchById(branchId));
+	}
+	
+	@Route(path = "branch/stats", method = "GET")
+	public String getBranchWiseStats() throws CustomException {
+		return Results.respondJson(branchDAO.getBranchEmployeeAndAccountStats());
 	}
 	
 }

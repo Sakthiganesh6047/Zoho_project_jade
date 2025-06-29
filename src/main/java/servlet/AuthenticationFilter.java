@@ -1,10 +1,8 @@
 package servlet;
 
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -25,8 +23,7 @@ public class AuthenticationFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-        @SuppressWarnings("unused")
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String uri = httpRequest.getRequestURI();
         HttpSession session = httpRequest.getSession(false);
@@ -41,12 +38,8 @@ public class AuthenticationFilter implements Filter {
         if (isLoggedIn || isLoginRequest || isPublicResource || isLogoutRequest || isSignUpRequest) {
             chain.doFilter(request, response);
         } else {
-//            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            httpResponse.setContentType("application/json");
-//            httpResponse.getWriter().write("{\"error\":\"Unauthorized access. Please login.\"}");
-        	RequestDispatcher dispatcher = httpRequest.getRequestDispatcher("Login.jsp");
-        	dispatcher.forward(request, response);
-
+            // REDIRECT instead of forward
+            httpResponse.sendRedirect(httpRequest.getContextPath() + "/Login.jsp");
         }
     }
 

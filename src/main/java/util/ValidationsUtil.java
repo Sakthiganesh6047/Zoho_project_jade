@@ -150,7 +150,7 @@ public class ValidationsUtil {
 		    throw new CustomException("Beneficiary account number must be a positive number.");
 		}
 
-		if (ifscCode == null || !ifscCode.matches("^[A-Z]{4}[A-Z0-9]{6-7}$")) {
+		if (ifscCode == null || !ifscCode.matches("^[A-Z]{4}0[A-Z0-9]{6}$")) {
 		    throw new CustomException("Invalid IFSC code");
 		}
 

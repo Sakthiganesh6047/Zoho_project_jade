@@ -108,14 +108,7 @@
 
 <div class="body-wrapper">
 
-    <jsp:include page="LoggedInHeader.jsp" />
-
     <div class="branch-form-wrapper">
-
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <jsp:include page="SideBar.jsp" />
-        </div>
 
         <!-- Form Container -->
         <div class="branch-form-container">
@@ -139,7 +132,7 @@
                     <option value="Vellore">Vellore</option>
                     <option value="Thoothukudi">Thoothukudi</option>
                     <option value="Dindigul">Dindigul</option>
-                </select>
+                </select><br>
 
                 <label for="address">Address</label>
                 <textarea name="address" rows="4" maxlength="300" required></textarea>

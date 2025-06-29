@@ -31,7 +31,6 @@
             z-index: 1000;
         }
         .main-wrapper {
-            margin-left: 70px;
             padding: 40px 20px;
             flex: 1;
         }
@@ -52,13 +51,23 @@
             display: block;
             margin: 12px 0 6px;
         }
-        input, select {
-            width: 100%;
+        select {
+        	background-color: white;
+            width: 99%;
             padding: 10px;
             margin-bottom: 16px;
             border: 1px solid #ccc;
             border-radius: 6px;
         }
+        
+        input {
+            width: 95%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        
         button {
             padding: 12px 20px;
             border: none;
@@ -70,7 +79,7 @@
             width: 100%;
         }
         button:hover {
-            background-color: #388e3c;
+            background-color: #2e2f60;
         }
         #status {
             margin-top: 16px;
@@ -81,12 +90,7 @@
 </head>
 <body>
 
-<jsp:include page="LoggedInHeader.jsp" />
-
 <div class="body-wrapper">
-    <div class="sidebar-wrapper">
-        <jsp:include page="SideBar.jsp" />
-    </div>
 
     <div class="main-wrapper">
         <div class="form-container">

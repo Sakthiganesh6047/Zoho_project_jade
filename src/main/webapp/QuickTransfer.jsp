@@ -19,7 +19,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 88vh;
         }
 
         .sidebar-wrapper {
@@ -52,7 +52,16 @@
             margin: 12px 0 6px;
         }
 
-        input, select {
+        select {
+        	background-color: white;
+            width: 99%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        
+        input {
             width: 95%;
             padding: 10px;
             margin-bottom: 16px;
@@ -72,7 +81,7 @@
         }
 
         button:hover {
-            background-color: #388e3c;
+            background-color: #3b5998;
         }
 
         #status {
@@ -116,22 +125,22 @@
                 </select>
 
                 <label for="beneficiaryName">Receiver Name:</label>
-                <input type="text" id="beneficiaryName" required>
+                <input type="text" id="beneficiaryName" maxlength="50" required>
 
                 <label for="bankName">Bank Name:</label>
-                <input type="text" id="bankName" required>
+                <input type="text" id="bankName" maxlength="50" required>
 
                 <label for="beneficiaryAccountNumber">Receiver Account Number:</label>
-                <input type="number" id="beneficiaryAccountNumber" required>
+                <input type="number" id="beneficiaryAccountNumber" maxlength="20" required>
 
                 <label for="ifscCode">IFSC Code:</label>
-                <input type="text" id="ifscCode" required>
+                <input type="text" id="ifscCode" maxlength="11" required>
 
                 <label for="amount">Amount:</label>
                 <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
-                <label for="description">Description:</label>
-                <input type="text" id="description" placeholder="Reason for transfer..." required>
+                <label for="description">Description (optional):</label>
+                <input type="text" id="description" maxlength="50" placeholder="Reason for transfer...">
 
                 <button type="button" onclick="showPasswordModal()">Submit Transfer</button>
                 <div id="status"></div>
@@ -199,6 +208,22 @@
     };
 
     function showPasswordModal() {
+        const accountId = document.getElementById("accountId").value;
+        const beneficiaryName = document.getElementById("beneficiaryName").value.trim();
+        const bankName = document.getElementById("bankName").value.trim();
+        const beneficiaryAccountNumber = document.getElementById("beneficiaryAccountNumber").value.trim();
+        const ifscCode = document.getElementById("ifscCode").value.trim();
+        const amount = document.getElementById("amount").value;
+
+        const statusDiv = document.getElementById("status");
+        statusDiv.textContent = ""; // Clear previous status
+
+        if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || parseFloat(amount) <= 0) {
+            statusDiv.textContent = "Please fill all required fields correctly before proceeding.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
         document.getElementById("passwordModal").style.display = "block";
     }
 
@@ -220,7 +245,7 @@
         const statusDiv = document.getElementById("status");
         const modal = document.getElementById("passwordModal");
 
-        if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || !description || !password) {
+        if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || !password) {
             statusDiv.textContent = "All fields are required.";
             statusDiv.style.color = "red";
             return;

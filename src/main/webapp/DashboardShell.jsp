@@ -14,6 +14,11 @@
     }
     String requestedPage = request.getParameter("page");
     String initialPage = (requestedPage != null && !requestedPage.equals("#")) ? requestedPage : defaultPage;
+    if ("Login.jsp".equals(initialPage)) {
+        response.sendRedirect("Login.jsp");
+        return;
+    }
+
 %>
 <!DOCTYPE html>
 <html>

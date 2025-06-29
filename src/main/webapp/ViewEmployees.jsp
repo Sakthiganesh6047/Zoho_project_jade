@@ -8,17 +8,17 @@
 %>
 <html>
 <head>
-    <title>View Employees - JadeBank</title>
+    <title>Employee List - JadeBank</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <style>
         body {
-			opacity: 0;
-			transition: opacity 0.5 ease-in;
-            font-family: 'Segoe UI', sans-serif;
-            background-image: url("contents/background.png"); /* Replace with your actual path */
-		    background-size: cover;        /* Scales the image to cover the whole screen */
-		    background-repeat: no-repeat;  /* Prevents tiling */
-		    background-position: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+            font-family: 'Roboto', sans-serif;
+            background-image: url("contents/background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             margin: 0;
             padding-top: 70px;
         }
@@ -29,7 +29,7 @@
         }
 
         .main-wrapper {
-            margin-left: 70px;
+            margin-left: 20px;
             padding: 30px;
             flex: 1;
             transition: margin-left 0.3s ease;
@@ -39,22 +39,36 @@
             margin-left: 220px;
         }
 
-        h2 {
-            text-align: center;
-            color: #373962;
-            font-size: 24px;
-            margin-bottom: 20px;
+        .page-title-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
         }
-        
-        .list-header{
-        	display: flex;
-        	justify-content: space-between;
-		    align-items: center;
-		    margin-left: 45%;
-		    margin-right: 2%;
+
+        .page-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #2e2f60;
+            background: linear-gradient(to right, #e0e7ff, #f4f4fb);
+            border-left: 6px solid #414485;
+            padding: 10px 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
-        
-        .add-buttonwrap{
+
+        .add-btn {
+            background-color: #414485;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .add-btn:hover {
+            background-color: #2a2d63;
         }
 
         table {
@@ -62,7 +76,7 @@
             border-collapse: collapse;
             background-color: white;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             overflow: hidden;
             font-size: 15px;
         }
@@ -92,18 +106,21 @@
         }
 
         .edit-button {
-            display: none;
-            background-color: #414485;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        tr:hover .edit-button {
-            display: inline-block;
-        }
+		    visibility: hidden;
+		    background-color: #414485;
+		    color: white;
+		    border: none;
+		    padding: 6px 10px;
+		    border-radius: 6px;
+		    cursor: pointer;
+		    opacity: 0;
+		    transition: visibility 0.2s ease, opacity 0.2s ease;
+		}
+		
+		tr:hover .edit-button {
+			opacity: 1;
+		    visibility: visible;
+		}
 
         .pagination-controls {
             display: flex;
@@ -117,56 +134,53 @@
             background-color: #414485;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 50%;
+            padding: 10px 12px;
+            border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
 
-        .pagination-controls button:hover {
+        .pagination-controls button:hover:not(:disabled) {
             background-color: #2c2f5a;
         }
 
-        .limit-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        .pagination-controls button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
+        
+        button.disabled {
+		    background-color: #aaa !important;
+		    cursor: not-allowed;
+		    opacity: 0.6;
+		}
+        
+        .message {
+		    text-align: center;
+		    font-weight: bold;
+		    color: #d63333;
+		    margin: 15px 0;
+		    font-size: 15px;
+		}
 
-        .limit-container label {
+        #pageInfo {
             font-weight: bold;
-        }
-
-        .limit-container select {
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        .add-btn {
-            background-color: #414485;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 20px;
-            padding: 6px 8px;
-            cursor: pointer;
+            color: #333;
         }
     </style>
 </head>
 <body>
 
 <div class="body-wrapper">
-
     <div class="main-wrapper">
-    	<div class="list-header">
-	        <h2>Employees</h2>
-			<div class="add-buttonwrap">
-		        <button class="add-btn" onclick="window.location.href='EmployeeSignUp.jsp'">
-		            <i class="fas fa-plus"></i>
-		        </button>
-		    </div>
-		</div>
+        <div class="page-title-wrapper">
+            <h2 class="page-title">Employee List</h2>
+            <button class="add-btn" onclick="window.location.href='EmployeeSignUp.jsp'" title="Add Employee">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
 
         <table id="employee-table">
             <thead>
@@ -175,40 +189,33 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Role</th>
-                    <th>Branch Id</th>
+                    <th>Branch ID</th>
                     <th>Branch Name</th>
-                    <th> </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
-
-        <div class="pagination-controls">
-            <button onclick="previousPage()"><i class="fas fa-angle-left"></i></button>
-            <span id="pageInfo">Page 1</span>
-            <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
-
-            <div class="limit-container">
-                <label for="limit">Rows:</label>
-                <select id="limit">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
-                </select>
-            </div>
-        </div>
+		<div id="messageBox" class="message" style="display: none;"></div>
+		<div class="pagination-controls">
+		    <button id="prevBtn" onclick="previousPage()"><i class="fas fa-angle-left"></i></button>
+		    <span id="pageInfo">Page 1</span>
+		    <button id="nextBtn" onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+		</div>
     </div>
 </div>
 
 <jsp:include page="Footer.jsp" />
 
 <script>
+    let currentPage = 0;
+    const limit = 4;
+    let lastPageReached = false;
 
-window.addEventListener('DOMContentLoaded', () => {
-    document.body.style.opacity = 1;
-});
-
-    let offset = 0;
+    window.addEventListener('DOMContentLoaded', () => {
+        document.body.style.opacity = 1;
+        fetchEmployees();
+    });
 
     function getRoleName(roleId) {
         const roles = {
@@ -219,7 +226,8 @@ window.addEventListener('DOMContentLoaded', () => {
         return roles[roleId] || "Unknown";
     }
 
-    function fetchEmployees(limit = 10, offset = 0) {
+    function fetchEmployees() {
+        const offset = currentPage * limit;
         fetch("<%= request.getContextPath() %>/jadebank/user/employeelist?limit=" + limit + "&offset=" + offset)
             .then(response => response.json())
             .then(data => {
@@ -227,6 +235,8 @@ window.addEventListener('DOMContentLoaded', () => {
                 tbody.innerHTML = "";
 
                 if (Array.isArray(data) && data.length > 0) {
+                    lastPageReached = data.length < limit;
+
                     data.forEach(emp => {
                         const row = document.createElement("tr");
                         row.innerHTML =
@@ -239,11 +249,20 @@ window.addEventListener('DOMContentLoaded', () => {
                             "<td><button class='edit-button' onclick='editEmployee(" + emp.employeeId + ")'><i class='fas fa-edit'></i></button></td>";
                         tbody.appendChild(row);
                     });
+
                 } else {
-                    const row = document.createElement("tr");
-                    row.innerHTML = "<td colspan='7' style='text-align:center;'>No employees found.</td>";
-                    tbody.appendChild(row);
+                    if (currentPage > 0) {
+                        currentPage--;
+                        lastPageReached = true;
+                        fetchEmployees();
+                    } else {
+                        const row = document.createElement("tr");
+                        row.innerHTML = "<td colspan='7' style='text-align:center;'>No employees found.</td>";
+                        tbody.appendChild(row);
+                    }
                 }
+
+                updatePageInfo();
             })
             .catch(err => {
                 console.error("Failed to fetch employee list:", err);
@@ -251,33 +270,62 @@ window.addEventListener('DOMContentLoaded', () => {
             });
     }
 
+    function updatePageInfo() {
+        document.getElementById("pageInfo").textContent = `Page ${currentPage + 1}`;
+    }
+
     function editEmployee(employeeId) {
         window.location.href = "EmployeeSignUp.jsp?employeeId=" + encodeURIComponent(employeeId);
     }
+    
+    function updatePageInfo() {
+        document.getElementById("pageInfo").textContent = `Page ${currentPage + 1}`;
+        
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Disable prev button on first page
+        prevBtn.disabled = currentPage === 0;
+
+        // Disable next button if lastPageReached is true
+        nextBtn.disabled = lastPageReached;
+
+        // Optionally add a "disabled" style
+        prevBtn.classList.toggle("disabled", prevBtn.disabled);
+        nextBtn.classList.toggle("disabled", nextBtn.disabled);
+    }
 
     function previousPage() {
-        const limit = parseInt(document.getElementById("limit").value);
-        offset = Math.max(0, offset - limit);
-        fetchEmployees(limit, offset);
+        const messageBox = document.getElementById("messageBox");
+        messageBox.style.display = "none";
+
+        if (currentPage > 0) {
+            currentPage--;
+            lastPageReached = false;
+            fetchEmployees();
+        } else {
+            messageBox.textContent = "You are already on the first page.";
+            messageBox.style.display = "block";
+            setTimeout(() => messageBox.style.display = "none", 3000);
+            updatePageInfo(); // still update
+        }
     }
 
     function nextPage() {
-        const limit = parseInt(document.getElementById("limit").value);
-        offset += limit;
-        fetchEmployees(limit, offset);
+        const messageBox = document.getElementById("messageBox");
+        messageBox.style.display = "none";
+
+        if (!lastPageReached) {
+            currentPage++;
+            fetchEmployees();
+        } else {
+            messageBox.textContent = "You are already on the last page.";
+            messageBox.style.display = "block";
+            setTimeout(() => messageBox.style.display = "none", 3000);
+            updatePageInfo(); // still update
+        }
     }
 
-    document.getElementById("limit").addEventListener("change", () => {
-        offset = 0;
-        const limit = parseInt(document.getElementById("limit").value);
-        fetchEmployees(limit, offset);
-    });
-
-    window.onload = function () {
-        const limit = parseInt(document.getElementById("limit").value);
-        fetchEmployees(limit, offset);
-    };
-    
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const mainWrapper = document.querySelector('.main-wrapper');
@@ -291,6 +339,7 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 </script>
+
 
 </body>
 </html>

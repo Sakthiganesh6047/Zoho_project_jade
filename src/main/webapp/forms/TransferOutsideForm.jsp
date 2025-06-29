@@ -1,11 +1,9 @@
 <style>
     .form-box {
-        background: linear-gradient(to bottom right, #f0f4ff, #ffffff);
         padding: 30px;
+        padding-top: 5px;
         border-radius: 16px;
-        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         max-width: 750px;
-        margin: 30px auto;
     }
 
     .form-box h2 {
@@ -17,12 +15,10 @@
     }
 
     fieldset {
-        border: none;
+        /*border: none;*/
         padding: 20px;
         margin-bottom: 25px;
         border-radius: 10px;
-        background: #f9fbff;
-        box-shadow: inset 0 0 4px rgba(0,0,0,0.05);
     }
 
     legend {

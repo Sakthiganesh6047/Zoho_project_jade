@@ -20,7 +20,7 @@
         }
 
         .main-wrapper {
-            margin-left: 70px;
+            margin-left: 20px;
             padding: 30px;
             flex: 1;
             transition: margin-left 0.3s ease;
@@ -33,15 +33,25 @@
         h2 {
             text-align: center;
             margin-bottom: 25px;
+            font-size: 26px;
+            color: #373962;
+            position: relative;
         }
-
+        
+        .page-title {
+		    font-size: 26px;
+		    font-weight: 700;
+		    color: #2e2f60;
+		    background: linear-gradient(to right, #e0e7ff, #f4f4fb);
+		    border-left: 6px solid #414485;
+		    padding: 10px 20px;
+		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		    width: fit-content;
+		}
+        
         .search-section {
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto 30px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .search-row {
@@ -61,7 +71,7 @@
         }
 
         .search-section input {
-            width: 80%;
+            width: 100%;
             padding: 10px;
             margin-top: 5px;
             border-radius: 6px;
@@ -69,27 +79,10 @@
         }
 
         .error {
-            color: red;
             text-align: center;
-            margin-top: 10px;
-        }
-
-        .search-box {
-            max-width: 300px;
-            margin: 0 auto 20px auto;
-        }
-        
-        .search-wrapper{
-        	display: flex;
-        	justify-content: center;
-        	gap: 10px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #c62828;
         }
 
         table {
@@ -131,13 +124,12 @@
         .debit { color: #c62828; font-weight: bold; }
 
         .pagination {
-		    display: flex;
-		    justify-content: center;
-		    align-items: center;
-		    gap: 30px;
-		    margin-bottom: 40px;
-		}
-
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
 
         .pagination-controls {
             display: flex;
@@ -149,46 +141,39 @@
             background-color: #414485;
             color: white;
             border: none;
-            border-radius: 50%;
+            border-radius: 5px;
             padding: 10px 12px;
             font-size: 16px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
 
         .pagination button:hover {
             background-color: #2a2d63;
         }
 
-        .limit-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .limit-container input {
-            width: 60px;
-            padding: 8px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+        .pagination button:disabled {
+            background-color: #aaa;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
     </style>
 </head>
 <body>
 
 <div class="body-wrapper">
-
     <div class="main-wrapper">
-        <h2>View Transactions</h2>
+		    <h2 class="page-title">Transactions History</h2>
 
         <div class="search-section">
             <div class="search-row">
                 <div class="search-wrapper">
                     <label for="accountId">Account ID:</label>
-                    <input type="number" id="accountId" placeholder="Enter Account ID"
-                           onblur="fetchTransactions(true)" />
+                    <input type="number" id="accountId" placeholder="Enter Account ID" onblur="fetchTransactions(true)" />
                 </div>
             </div>
         </div>
+
         <div class="error" id="errorMsg"></div>
 
         <table id="transactionTable" style="display: none;">
@@ -207,46 +192,37 @@
             <tbody id="transactionBody"></tbody>
         </table>
 
-        <div class="pagination" style="justify-content: center;">
-		    <div class="pagination-controls">
-		        <button onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
-		        <span id="pageInfo">Page 1</span>
-		        <button onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
-		        <div class="limit-container">
-		            <label for="limit">Limit:</label>
-		            <input type="number" id="limit" value="10" min="1" onchange="fetchTransactions(true)" />
-		        </div>
-		    </div>
-</div>
-
+        <div class="pagination">
+            <div class="pagination-controls">
+                <button id="prevBtn" onclick="prevPage()"><i class="fas fa-angle-left"></i></button>
+                <span id="pageInfo">Page 1</span>
+                <button id="nextBtn" onclick="nextPage()"><i class="fas fa-angle-right"></i></button>
+            </div>
+        </div>
     </div>
 </div>
 
 <jsp:include page="Footer.jsp" />
 
 <script>
+    const pageSize = 10;
     let currentOffset = 0;
+    let lastPageReached = false;
 
     function fetchTransactions(resetPage) {
         const accountId = parseInt(document.getElementById("accountId").value.trim());
-        let limit = parseInt(document.getElementById("limit").value.trim());
         const errorMsg = document.getElementById("errorMsg");
-        
-        if (limit > 100) {
-            limit = 100;
-            document.getElementById("limit").value = 100; // reset input visually too
-        }
 
-        if (!accountId || limit < 1) {
-            errorMsg.textContent = "Please enter a valid Account ID and Limit.";
+        if (!accountId) {
+            errorMsg.textContent = "Please enter a valid Account ID.";
             return;
         }
 
         if (resetPage) currentOffset = 0;
+        lastPageReached = false;
         errorMsg.textContent = "";
 
-        const ctxPath = "<%= request.getContextPath() %>";
-        const url = ctxPath + "/jadebank/transactions/account?limit=" + limit + "&offset=" + currentOffset;
+        const url = "<%= request.getContextPath() %>/jadebank/transactions/account?limit=" + pageSize + "&offset=" + currentOffset;
 
         fetch(url, {
             method: "POST",
@@ -259,10 +235,18 @@
             tbody.innerHTML = "";
 
             if (!Array.isArray(data) || data.length === 0) {
-                errorMsg.textContent = "No transactions found.";
-                document.getElementById("transactionTable").style.display = "none";
+                if (currentOffset > 0) {
+                    currentOffset -= pageSize;
+                    lastPageReached = true;
+                    updatePaginationControls();
+                } else {
+                    errorMsg.textContent = "No transactions found.";
+                    document.getElementById("transactionTable").style.display = "none";
+                }
                 return;
             }
+
+            lastPageReached = data.length < pageSize;
 
             data.forEach(txn => {
                 const row = document.createElement("tr");
@@ -281,7 +265,7 @@
             });
 
             document.getElementById("transactionTable").style.display = "table";
-            document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / limit) + 1);
+            updatePaginationControls();
         })
         .catch(err => {
             errorMsg.textContent = "Error: " + err;
@@ -290,17 +274,29 @@
     }
 
     function nextPage() {
-        const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
-        currentOffset += limit;
-        fetchTransactions();
+        if (!lastPageReached) {
+            currentOffset += pageSize;
+            fetchTransactions();
+        } else {
+            document.getElementById("errorMsg").textContent = "You are already on the last page.";
+            updatePaginationControls();
+        }
     }
 
     function prevPage() {
-        const limit = parseInt(document.getElementById("limit").value.trim()) || 10;
-        if (currentOffset >= limit) {
-            currentOffset -= limit;
+        if (currentOffset >= pageSize) {
+            currentOffset -= pageSize;
             fetchTransactions();
+        } else {
+            document.getElementById("errorMsg").textContent = "You are already on the first page.";
+            updatePaginationControls();
         }
+    }
+
+    function updatePaginationControls() {
+        document.getElementById("pageInfo").textContent = "Page " + (Math.floor(currentOffset / pageSize) + 1);
+        document.getElementById("prevBtn").disabled = currentOffset === 0;
+        document.getElementById("nextBtn").disabled = lastPageReached;
     }
 
     function getTypeLabel(type) {
@@ -315,16 +311,6 @@
     function formatDate(timestamp) {
         const date = new Date(Number(timestamp));
         return date.toLocaleString("en-IN");
-    }
-
-    function filterTable() {
-        const input = document.getElementById("localSearch").value.toLowerCase();
-        const rows = document.getElementById("transactionBody").getElementsByTagName("tr");
-
-        for (let row of rows) {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(input) ? "" : "none";
-        }
     }
 </script>
 

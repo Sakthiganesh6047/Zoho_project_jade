@@ -264,5 +264,11 @@
 	    </div>
 	</div>
 	<jsp:include page="Footer.jsp" />
+<script>
+if (window.top !== window.self) {
+    // We are inside an iframe — break out!
+    window.top.location = window.location.href;
+}
+</script>
 </body>
 </html>

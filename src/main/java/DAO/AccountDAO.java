@@ -197,6 +197,18 @@ public class AccountDAO {
         return (int) executor.executeQuery(query, null);
     }
     
+    public Account getPrimary(Long customerId) throws CustomException {
+    	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
+    	QueryResult query = queryBuilder.select("*")
+    			.where("customerId", "=", customerId)
+    			.where("isPrimary", "=", 1)
+    			.build();
+    	QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+    	@SuppressWarnings("unchecked")
+		List<Account> accounts = (List<Account>) executor.executeQuery(query, Account.class);
+    	return Results.getSingleResult(accounts);
+    }
+    
     public int updateAccount(Account account, Connection connection) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.update(account, "balance", "modifiedBy", "modifiedOn")

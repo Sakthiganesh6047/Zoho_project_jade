@@ -64,6 +64,13 @@ public class AccountHandler {
     	}
     }
     
+    @Route(path = "account/primary", method = "GET")
+    public String getPrimaryAccount(@FromSession("userId") Long sessionId) throws CustomException {
+    	ValidationsUtil.isNull(sessionId, "UserId");
+    	
+    	return Results.respondJson(accountDAO.getPrimary(sessionId));
+    }
+    
     @Route(path = "accounts/list/{branchId}", method = "GET")
     public String getAccountsList(@FromPath("branchId") Long branchId, @FromQuery("limit") int limit, 
     							@FromQuery("offset") int offset, @FromSession("userId") Long userId, 

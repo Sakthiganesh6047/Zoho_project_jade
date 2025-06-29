@@ -41,8 +41,9 @@
         .body-wrapper {
             display: flex;
             transition: margin-left 0.3s ease;
-            min-height: 100vh;
+            min-height: 85vh;
             width: 100%;
+            margin-left: 20px;
         }
 
         body.expanded .body-wrapper {
@@ -53,6 +54,7 @@
             flex-grow: 1;
             margin-left: 5px;
             padding: 20px;
+            padding-bottom: 2px;
             display: flex;
             gap: 20px;
             flex-wrap: wrap;           /* ✅ wrap instead of overflow */
@@ -63,6 +65,7 @@
         .stats-panel {
             flex: 1 1 0;
             min-width: 300px;
+             max-width: 1500px;
         }
 
         .operations-panel {
@@ -71,11 +74,12 @@
             flex-direction: column;
             gap: 20px;
             order: 2;
+            margin-right: 20px;
         }
 
         .stat-section {
             display: flex;
-            flex-wrap: wrap;          /* ✅ allow wrapping */
+            flex-wrap: nowrap;          /* ✅ allow wrapping */
             gap: 30px;
         }
 
@@ -103,11 +107,10 @@
         .stat-cards {
         	background: white;
 		    padding: 20px;
-		    padding-right: 115px;
-		    padding-left:115px;
 		    border-radius: 12px;
 		    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		    margin-bottom: 20px;
+		    width: 100%
         }
         
         .stat-cards h3 {
@@ -116,50 +119,61 @@
 		
 		.info-cards-grid {
 		    display: flex;
-		    gap: 20px;
+		    gap: 37px;
 		    flex-wrap: wrap;
 		}
 		
 		.info-card {
 		    display: flex;
+		    flex-direction: column;
 		    align-items: center;
-		    gap: 20px;
+		    justify-content: center;
+		    gap: 10px;
 		    background-color: #ffffff;
 		    padding: 20px;
 		    border-radius: 12px;
 		    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 		    min-width: 180px;
-		    min-height: 120px;
+		    min-height: 140px;
 		    flex: 1;
+		    text-decoration: none;
+		    color: inherit;
+		    transition: transform 0.2s ease;
+		    cursor: pointer;
+		}
+		
+		.info-card:hover {
+		    transform: scale(1.03);
+		    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+		}
+		
+		.info-card h4 {
+		    font-size: 18px;
+		    font-weight: 600;
+		    color: #373962;
+		    margin: 0;
 		}
 		
 		.info-card i {
-		    font-size: 32px;
+		    font-size: 28px;
 		    color: #414485;
 		}
 		
-		.info-text {
-		    display: flex;
-		    flex-direction: column;
-		    justify-content: center;
-		}
-		
-		.info-text h4 {
-		    margin: 0;
-		    font-size: 17px;
-		    color: #333;
-		}
-		
-		.info-text p {
-		    margin: 4px 0 0;
-		    font-size: 18px;
+		.info-card p {
+		    font-size: 20px;
 		    font-weight: bold;
 		    color: #414485;
+		    margin: 0;
+		}
+		
+		.infocard-logo {
+			display: flex;
+			gap: 5px;
 		}
 
         .dashboard-card {
             background: white;
-            padding: 30px 20px;
+            padding: 33px 20px;
             border-radius: 12px;
             text-align: center;
             text-decoration: none;
@@ -167,6 +181,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: 0.3s;
             min-height: 120px;
+            border-block: 1px solid #373962;
         }
 
         .dashboard-card:hover {
@@ -241,7 +256,14 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            max-height: 280px; /* LIMIT HEIGHT HERE */
         }
+        
+        .chart-section canvas {
+		    max-height: 200px; /* Chart will stay within bounds */
+		    width: 100% !important;
+		    height: auto !important;
+		}
 
         .chart-container {
             display: flex;
@@ -249,6 +271,19 @@
             justify-content: space-between;
             gap: 30px;
         }
+        
+        .scroll-container {
+		    overflow-x: auto;
+		    overflow-y: hidden;
+		    width: 100%;
+		}
+		
+		.scroll-container canvas {
+		    min-width: 1000px; /* Enough to show 10 branches clearly */
+		    height: 400px !important; /* Double height */
+		    max-height: 400px;
+		}
+        
 
         .info-cards {
             display: flex;
@@ -300,6 +335,27 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
+        .donut-chart-section {
+		    max-width: 400px;
+		    overflow: hidden; /* Important: hides any overflow */
+		    display: flex;
+		    flex-direction: column;
+		    justify-content: center;
+		}
+		
+		.donut-wrapper {
+		    width: 300px;
+		    height: 300px;
+		    position: relative;
+		    margin-left: 30px;
+		    margin-right: 130px;
+		}
+		
+		#employeePieChart {
+		    width: 100% !important;
+		    height: 100% !important;
+		    display: block;
+		}
 
     </style>
 </head>
@@ -320,62 +376,46 @@
             </div>
 
 			<div class="stat-section">
-	            <div class="chart-section">
-	                <h3>Employee Role Distribution</h3>
-	                <div class="chart-container">
-	                    <div style="width: 200px; height: 200px;">
-	                        <canvas id="employeePieChart" width="180" height="180"></canvas>
-	                    </div>
-	                </div>
-	            </div>
-	            
+				<div class="chart-section donut-chart-section">
+				    <h3>Employee Role Distribution</h3>
+				    <div class="donut-wrapper">
+				        <canvas id="employeePieChart"></canvas>
+				    </div>
+				</div>
 	            <div class="stat-cards">
 				    <h3>Stats</h3>
 				    <div class="info-cards-grid">
-				        <div class="info-card">
-				            <i class="fas fa-code-branch"></i>
-				            <div>
-				                <h4>Branches</h4>
-				                <p>12</p>
-				            </div>
-				        </div>
-				        <div class="info-card">
-				            <i class="fas fa-users"></i>
-				            <div>
-				                <h4>Employees</h4>
-				                <p>100</p>
-				            </div>
-				        </div>
-				        <div class="info-card">
-				            <i class="fas fa-user-circle"></i>
-				            <div>
-				                <h4>Customers</h4>
-				                <p>800</p>
-				            </div>
-				        </div>
-				        <div class="info-card">
-				            <i class="fa-solid fa-file-invoice-dollar"></i>
-				            <div>
-				                <h4>Accounts</h4>
-				                <p>8000</p>
-				            </div>
-				        </div>
-				    </div>
+					    <div class="info-card" onclick="parent.loadPage('ManageBranches.jsp')">
+					        <h4>Branches</h4>
+					        <div class="infocard-logo">
+						        <i class="fas fa-code-branch"></i>
+						        <p id="statBranches">0</p>
+					        </div>
+					    </div>
+					    <div class="info-card" onclick="parent.loadPage('ViewEmployees.jsp')">
+					        <h4>Employees</h4>
+					        <i class="fas fa-users"></i>
+					        <p id="statEmployees">0</p>
+					    </div>
+					    <div class="info-card" onclick="parent.loadPage('CustomerSignUp.jsp')">
+					        <h4>Customers</h4>
+					        <i class="fas fa-user-circle"></i>
+					        <p id="statCustomers">0</p>
+					    </div>
+					    <div class="info-card" onclick="parent.loadPage('AccountsList.jsp')">
+					        <h4>Accounts</h4>
+					        <i class="fa-solid fa-file-invoice-dollar"></i>
+					        <p id="statAccounts">0</p>
+					    </div>
+					</div>
 				</div>
 			</div>
-			
-            <div class="chart-section">
-                <h3>Daily Transactions</h3>
-                <canvas id="transactionBarChart" width="400" height="120"></canvas>
-            </div>
-
-            <div class="branch-list-section">
-                <h3>Accounts Per Branch</h3>
-                <div id="branchAccountList">
-                    <div class="branch-item">Branch A - 150 Accounts</div>
-                    <div class="branch-item">Branch B - 92 Accounts</div>
-                </div>
-            </div>
+		<div class="chart-section" style="max-height: 500px;">
+		    <h3>Accounts Per Branch</h3>
+		    <div class="scroll-container">
+		        <canvas id="transactionBarChart"></canvas>
+		    </div>
+		</div>
         </div>
 
         <div class="operations-panel">
@@ -399,11 +439,6 @@
                 <h4>New Bank Account</h4>
                 <p>Create Bank Account</p>
             </a>
-            <a href="AccountsList.jsp" class="dashboard-card">
-                <i class="fa-regular fa-address-book"></i>
-                <h4>View Bank Accounts</h4>
-                <p>Accounts List</p>
-            </a>
             <a href="ViewEmployees.jsp" class="dashboard-card">
                 <i class="fas fa-users"></i>
                 <h4>View Employees</h4>
@@ -412,6 +447,8 @@
         </div>
     </div>
 </div>
+<jsp:include page="Footer.jsp" />
+
 <script>
 const userId = <%= userId %>;
 
@@ -443,7 +480,7 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/employeecount`)
         };
 
         new Chart(document.getElementById('employeePieChart').getContext('2d'), {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: ['Clerks', 'Managers', 'GMs'],
                 datasets: [{
@@ -453,7 +490,13 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/employeecount`)
             },
             options: {
                 responsive: true,
-                plugins: { legend: { position: 'right' } }
+                cutout: '50%', // Donut hole
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
             }
         });
     })
@@ -470,76 +513,66 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/dashboardstats`)
             customers: data.userCount ?? 0,
             accounts: data.accountCount ?? 0
         };
-        const statTexts = document.querySelectorAll(".info-cards-grid .info-card p");
-        statTexts[0].textContent = stats.branches;
-        statTexts[1].textContent = stats.employees;
-        statTexts[2].textContent = stats.customers;
-        statTexts[3].textContent = stats.accounts;
+        document.getElementById("statBranches").textContent = stats.branches;
+        document.getElementById("statEmployees").textContent = stats.employees;
+        document.getElementById("statCustomers").textContent = stats.customers;
+        document.getElementById("statAccounts").textContent = stats.accounts;
     })
     .catch(err => console.error("Stats fetch error:", err));
 
-// 4. Load Daily Transactions (Line Chart)
-fetch(`${pageContext.request.contextPath}/jadebank/account/transactionchart`)
-    .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions chart"))
+//3. Load Accounts per Branch
+fetch(`${pageContext.request.contextPath}/jadebank/branch/accountstats`)
+    .then(res => res.json())
     .then(data => {
-        const labels = Object.keys(data);
-        const counts = Object.values(data);
+        const labels = Object.keys(data); // Branch names or codes
+        const counts = Object.values(data); // Account counts
 
-        const ctx = document.getElementById('transactionBarChart').getContext('2d');
-        const lineChart = new Chart(ctx, {
+        new Chart(document.getElementById('transactionBarChart').getContext('2d'), {
             type: 'line',
             data: {
-                labels: labels,
+                labels,
                 datasets: [{
-                    label: 'Transactions',
+                    label: 'No. of Accounts',
                     data: counts,
-                    backgroundColor: 'rgba(65, 68, 133, 0.2)',
                     borderColor: '#414485',
+                    backgroundColor: 'rgba(65, 68, 133, 0.1)',
+                    tension: 0.4,
                     fill: true,
-                    tension: 0.4
+                    pointBackgroundColor: '#414485',
+                    pointRadius: 5,
+                    borderWidth: 2
                 }]
             },
             options: {
                 responsive: true,
-                plugins: { legend: { display: false } },
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true }
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Branch'
+                        },
+                        ticks: {
+                            maxRotation: 30,
+                            autoSkip: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Account Count'
+                        }
+                    }
                 }
             }
         });
-    })
-    .catch(err => console.error("Transaction chart error:", err));
-
-//3. Load Accounts per Branch
-fetch(`${pageContext.request.contextPath}/jadebank/branch/accountstats`)
-    .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch branch accounts"))
-    .then(data => {
-        const container = document.getElementById("branchAccountList");
-        container.innerHTML = ""; // Clear any existing content
-
-        Object.entries(data).forEach(([branch, count]) => {
-            const row = document.createElement("div");
-            row.className = "branch-item";
-            row.innerHTML = 
-                '<span class="branch-name">' + branch + '</span>' +
-                '<span class="branch-count">' + count + ' Accounts</span>';
-            container.appendChild(row);
-        });
-    })
-    .catch(err => console.error("Branch account fetch error:", err));
-    
-	function toggleSidebar() {
-	    const sidebar = document.getElementById('sidebar');
-	    const mainWrapper = document.querySelector('.body-wrapper');
-	
-	    sidebar.classList.toggle('expanded');
-	
-	    if (sidebar.classList.contains('expanded')) {
-	        mainWrapper.style.marginLeft = "220px";
-	    } else {
-	        mainWrapper.style.marginLeft = "70px";
-	    }
-	}
+    });
 
 </script>
 

@@ -19,7 +19,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 89vh;
+            min-height: 88vh;
         }
 
         .sidebar-wrapper {
@@ -53,7 +53,16 @@
         }
 
         input, select, textarea {
-            width: 95%;
+            width: 99%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: white;
+        }
+        
+        input {
+            width: 95.5%;
             padding: 10px;
             margin-bottom: 16px;
             border: 1px solid #ccc;
@@ -72,7 +81,7 @@
         }
 
         button:hover {
-            background-color: #388e3c;
+            background-color: #3b5998;
         }
 
         #status {
@@ -123,7 +132,7 @@
                 <label for="amount">Amount:</label>
                 <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
-                <label for="description">Description:</label>
+                <label for="description">Description (optional):</label>
 				<input type="text" id="description" placeholder="Reason for transfer...">
 
                 <button type="button" onclick="showPasswordModal()">Submit Transfer</button>
@@ -225,8 +234,23 @@
     }
 
     function showPasswordModal() {
+        const accountId = document.getElementById("accountId").value;
+        const beneficiaryId = document.getElementById("beneficiaryId").value;
+        const amount = document.getElementById("amount").value;
+
+        const statusDiv = document.getElementById("status");
+        statusDiv.textContent = ""; // Reset any previous message
+
+        if (!accountId || !beneficiaryId || !amount || parseFloat(amount) <= 0) {
+            statusDiv.textContent = "Please fill all required fields correctly before proceeding.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
+        // Show modal only if everything is valid
         document.getElementById("passwordModal").style.display = "block";
     }
+
 
     function closeModal() {
         document.getElementById("passwordModal").style.display = "none";

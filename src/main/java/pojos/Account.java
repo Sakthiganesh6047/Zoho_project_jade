@@ -13,6 +13,7 @@ public class Account {
     private Long createdAt;
     private Long modifiedBy;
     private Long modifiedOn;
+    private Boolean isPrimary;
 
 	// Getters and Setters
     public Long getAccountId() {
@@ -94,5 +95,14 @@ public class Account {
     public void setModifiedOn(Long modifiedOn) {
         this.modifiedOn = modifiedOn;
     }
+
+	public Boolean getIsPrimary() {
+		return isPrimary;
+	}
+
+	public void setIsPrimary(Boolean isPrimary) {
+		this.isPrimary = isPrimary;
+	}
+    
 }
 
