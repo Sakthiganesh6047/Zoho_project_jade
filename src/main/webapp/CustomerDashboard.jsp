@@ -27,12 +27,15 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 85vh;
+            margin-left: 20px;
         }
 
         .content-wrapper {
             flex-grow: 1;
             padding: 20px 30px;
+            padding-bottom: 0px;
+            padding-top: 15px;
             display: flex;
             gap: 30px;
             transition: margin-left 0.3s ease;
@@ -47,16 +50,18 @@
         }
 
         .operations-panel {
-            width: 350px;
+            width: 300px;
             display: flex;
             flex-direction: column;
             gap: 20px;
             order: 2;
+            flex-shrink: 0; /* Prevent shrinking */
+    		flex-grow: 0;   /* Prevent growing */
         }
 
         .dashboard-card {
             background: white;
-            padding: 30px 20px;
+            padding: 25px 20px;
             border-radius: 12px;
             text-align: center;
             text-decoration: none;
@@ -155,13 +160,22 @@
         }
 
         .account-card {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 10px;
-            min-width: 220px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+		    background: #f9fafb;
+		    padding: 20px;
+		    border-radius: 10px;
+		    min-width: 220px;
+		    border: 1px solid #e0e0e0; /* Minimal light border */
+		    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+		    text-align: center;
+		    cursor: pointer;
+		    position: relative;
+		    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+		}
+		
+		.account-card:hover {
+		    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+		    border-color: green; /* Slightly darker border on hover */
+		}
 
         .account-card h4 {
             margin: 5px 0;
@@ -354,10 +368,16 @@
                 <h4>Add Beneficiary</h4>
                 <p>Save contacts</p>
             </a>
+            <a href="BeneficiaryList.jsp" class="dashboard-card">
+                <i class="fas fa-user-plus"></i>
+                <h4>Beneficiary List</h4>
+                <p>View contacts</p>
+            </a>
         </div>
     </div>
 </div>
 <div class="popup" id="popupMessage"></div>
+<jsp:include page="Footer.jsp" />
 
 <script>
     const userId = <%= userId %>;

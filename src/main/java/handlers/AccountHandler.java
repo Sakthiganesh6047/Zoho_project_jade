@@ -37,6 +37,7 @@ public class AccountHandler {
     	ValidationsUtil.isNull(creatorRole, "User Role");
     	ValidationsUtil.checkUserRole(creatorRole);
     	
+    	account.setIsPrimary(true);
     	account.setCreatedBy(creatorId);
     	account.setCreatedAt(Instant.now().toEpochMilli());
     	if (creatorRole == 0) {

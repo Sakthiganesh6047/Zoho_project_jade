@@ -46,7 +46,6 @@
             background: linear-gradient(to right, #e0e7ff, #f4f4fb);
             border-left: 6px solid #414485;
             padding: 10px 20px;
-            border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
@@ -143,7 +142,7 @@
             background-color: #414485;
             color: white;
             border: none;
-            border-radius: 50%;
+            border-radius: 5px;
             padding: 10px 14px;
             font-size: 16px;
             cursor: pointer;

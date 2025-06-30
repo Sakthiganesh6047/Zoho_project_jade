@@ -205,7 +205,7 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
-    const pageSize = 10;
+    const pageSize = 13;
     let currentOffset = 0;
     let lastPageReached = false;
 

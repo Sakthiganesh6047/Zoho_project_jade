@@ -38,6 +38,7 @@
 		    padding-top: 10px;
 		    flex: 1;
 		    transition: margin-left 0.3s ease;
+		    margin-left: 20px;
 		}
 		
 		.formsection-wrapper{
@@ -287,7 +288,7 @@
 <div class="body-wrapper">
 
     <div class="main-wrapper">
-		<h2 class="table-title">Your Beneficiaries</h2>
+		<h2 class="table-title">Beneficiaries</h2>
 		<div class="formsection-wrapper">
 	        <div class="form-section">
 	            <label for="accountId">Select Account:</label>
@@ -333,7 +334,7 @@
 
     const userId = <%= userId != null ? userId : "null" %>;
     let currentPage = 0;
-    const pageSize = 4;
+    const pageSize = 10;
     let hasNextPage = false;
 
     document.addEventListener("DOMContentLoaded", () => {

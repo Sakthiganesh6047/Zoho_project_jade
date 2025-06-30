@@ -202,7 +202,7 @@
 <script>
     let offset = 0;
     let currentPage = 1;
-    const limit = 3;
+    const limit = 10;
     let hasNextPage = false;
 
     function fetchBranches() {

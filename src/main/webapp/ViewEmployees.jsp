@@ -209,7 +209,7 @@
 
 <script>
     let currentPage = 0;
-    const limit = 4;
+    const limit = 10;
     let lastPageReached = false;
 
     window.addEventListener('DOMContentLoaded', () => {

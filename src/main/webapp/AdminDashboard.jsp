@@ -421,7 +421,7 @@
         <div class="operations-panel">
             <a href="AddNewBranch.jsp" class="dashboard-card">
                 <i class="fa-solid fa-building-columns"></i>
-                <h4>Add New Branch</h4>
+                <h4>Add Branch</h4>
                 <p>New Jade Branch</p>
             </a>
             <a href="EmployeeSignUp.jsp" class="dashboard-card">
@@ -436,7 +436,7 @@
             </a>
             <a href="OpenAccount.jsp" class="dashboard-card">
                 <i class="fa-solid fa-file-invoice-dollar"></i>
-                <h4>New Bank Account</h4>
+                <h4>Add Account</h4>
                 <p>Create Bank Account</p>
             </a>
             <a href="ViewEmployees.jsp" class="dashboard-card">

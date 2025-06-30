@@ -94,11 +94,15 @@
 	    display: block;
 	}
 	
-	.sidebar-link:hover, .sidebar-link.active {
+	.sidebar-link {
+	    transition: background-color 0.3s ease 0.2s, color 0.3s ease 0.2s;
+	}
+	
+	.sidebar-link:hover {
 	    background-color: #ffffff;
 	    color: #373962;
 	}
-	
+
 	.toggle-btn {
 	    position: absolute;
 	    top: 50%;

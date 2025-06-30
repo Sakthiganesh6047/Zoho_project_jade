@@ -20,6 +20,7 @@
         .body-wrapper {
             display: flex;
             min-height: 88vh;
+            margin-left: 20px;
         }
         
         .page-title {
@@ -239,7 +240,7 @@
 <div class="body-wrapper">
 
     <div class="main-wrapper">
-		<h2 class="page-title">Your Transactions</h2>
+		<h2 class="page-title">Transaction History</h2>
 
         <div class="search-section">
             <label for="accountId">Account ID:</label>
