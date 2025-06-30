@@ -53,6 +53,11 @@
         border-left: 4px solid #2196F3;
         border-radius: 4px;
     }
+    
+    .status-box{
+    	align-items: center;
+    	margin-bottom: 15px;
+    }
 
     .info-box.hidden {
         display: none;
@@ -173,59 +178,73 @@
 </div>
 
 <script>
-
-	function validateAmount(input) {
-	    input.value = input.value
-	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
-	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
-	
-	    if (Number(input.value) > 100000) {
-	        input.value = "100000";
-	    }
-	}
-	
-	document.getElementById("debitAmount").addEventListener("keydown", function(e) {
-	    // Disallow: e, +, -, and multiple dots
-	    if (
-	        ["e", "E", "+", "-"].includes(e.key) ||
-	        (e.key === "." && this.value.includes("."))
-	    ) {
-	        e.preventDefault();
-	    }
-	});
-	
     let senderDetails = null;
+
+    function validateAmount(input) {
+        input.value = input.value
+            .replace(/[^\d.]/g, '')
+            .replace(/^(\d*\.\d{0,2}).*$/, '$1');
+        if (Number(input.value) > 100000) input.value = "100000";
+    }
+
+    document.getElementById("outsideAmount").addEventListener("keydown", function (e) {
+        if (["e", "E", "+", "-"].includes(e.key) || (e.key === "." && this.value.includes("."))) {
+            e.preventDefault();
+        }
+    });
 
     function fetchOutsideSenderDetails() {
         const accountId = parseInt(document.getElementById("outsideSenderAccountId").value);
+        const infoDiv = document.getElementById("outsideInfoDiv");
+        infoDiv.classList.add("hidden");
+
         if (!accountId) return;
 
-        fetch(`${pageContext.request.contextPath}/jadebank/account/details`, {
+        fetch(contextPath + "/jadebank/account/details", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ accountId: accountId })
         })
         .then(res => res.ok ? res.json() : Promise.reject("Fetch failed"))
         .then(data => {
-            const infoDiv = document.getElementById("outsideInfoDiv");
             if (!data || !data.fullName || !data.customerId) {
                 infoDiv.textContent = "No sender data found.";
-                infoDiv.classList.remove("hidden");
-                return;
+            } else {
+                senderDetails = data;
+                infoDiv.textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
             }
-            senderDetails = data;
-            infoDiv.textContent = "Sender: " + data.fullName + ", Customer ID: " + data.customerId;
             infoDiv.classList.remove("hidden");
         })
         .catch(err => {
-            const infoDiv = document.getElementById("outsideInfoDiv");
             infoDiv.textContent = "Account not found";
             infoDiv.classList.remove("hidden");
-            console.error(err);
         });
     }
 
     function openOutsidePasswordModal() {
+        const accountId = parseInt(document.getElementById("outsideSenderAccountId").value);
+        const amount = parseFloat(document.getElementById("outsideAmount").value);
+        const beneficiaryAccount = document.getElementById("outsideBeneficiaryAccountNumber").value.trim();
+        const statusDiv = document.getElementById("outsideTransferStatus");
+
+        statusDiv.textContent = "";
+        statusDiv.style.color = "red";
+        statusDiv.classList.remove("hidden");
+
+        if (!accountId) {
+            statusDiv.textContent = "Valid sender account ID is required.";
+            return;
+        }
+        if (!beneficiaryAccount || isNaN(beneficiaryAccount)) {
+            statusDiv.textContent = "Please enter a valid receiver account number.";
+            return;
+        }
+        if (!amount || isNaN(amount) || amount <= 0) {
+            statusDiv.textContent = "Please enter a valid amount.";
+            return;
+        }
+
+        statusDiv.classList.add("hidden");
         document.getElementById("outsidePasswordModal").style.display = "flex";
     }
 
@@ -237,10 +256,8 @@
     function submitOutsideTransfer() {
         const accountId = parseInt(document.getElementById("outsideSenderAccountId").value);
         const amount = parseFloat(document.getElementById("outsideAmount").value);
-        const description = document.getElementById("outsideDescription").value;
+        const description = document.getElementById("outsideDescription").value.trim();
         const password = document.getElementById("outsideConfirmPassword").value;
-        const statusDiv = document.getElementById("outsideTransferStatus");
-        const infoDiv = document.getElementById("outsideInfoDiv");
 
         const beneficiary = {
             beneficiaryAccountNumber: document.getElementById("outsideBeneficiaryAccountNumber").value.trim(),
@@ -249,8 +266,11 @@
             ifscCode: document.getElementById("outsideIfscCode").value.trim()
         };
 
+        const statusDiv = document.getElementById("outsideTransferStatus");
+        const infoDiv = document.getElementById("outsideInfoDiv");
+
         if (!accountId || !amount || amount <= 0 || !password || !senderDetails) {
-            statusDiv.textContent = "All fields, password, and sender fetch are required.";
+            statusDiv.textContent = "All fields, password, and sender check are required.";
             statusDiv.style.color = "red";
             statusDiv.classList.remove("hidden");
             return;
@@ -270,7 +290,7 @@
             }
         };
 
-        fetch(`${pageContext.request.contextPath}/jadebank/transaction/transfer`, {
+        fetch(contextPath + "/jadebank/transaction/transfer", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
@@ -278,7 +298,6 @@
         .then(async res => {
             closeOutsidePasswordModal();
             const result = await res.json();
-
             statusDiv.classList.remove("hidden");
 
             if (res.ok && result.status === "success") {
@@ -294,7 +313,7 @@
                     statusDiv.classList.add("hidden");
                 }, 5000);
             } else {
-                statusDiv.textContent = result.message || "Transfer failed.";
+                statusDiv.textContent = result.error || "Transfer failed.";
                 statusDiv.style.color = "red";
             }
         })

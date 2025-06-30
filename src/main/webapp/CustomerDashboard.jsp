@@ -61,7 +61,7 @@
 
         .dashboard-card {
             background: white;
-            padding: 25px 20px;
+            padding: 24px 20px;
             border-radius: 12px;
             text-align: center;
             text-decoration: none;
@@ -73,6 +73,9 @@
 		    flex-direction: column;
 		    justify-content: center;
 		    align-items: center;
+		    border-block: 1px solid #373962;
+            border-left: 1px solid #373962;
+    		border-right: 1px solid #373962;
         }
 
         .dashboard-card:hover {
@@ -163,7 +166,6 @@
 		    background: #f9fafb;
 		    padding: 20px;
 		    border-radius: 10px;
-		    min-width: 220px;
 		    border: 1px solid #e0e0e0; /* Minimal light border */
 		    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 		    text-align: center;
@@ -281,7 +283,6 @@
             background: #f9fafb;
             padding: 20px;
             border-radius: 10px;
-            min-width: 220px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             text-align: center;
             cursor: pointer;

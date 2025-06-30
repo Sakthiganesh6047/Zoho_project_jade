@@ -99,6 +99,9 @@
 	    display: flex;
 	    opacity: 1;
 	    pointer-events: auto;
+	    border-block: 3px solid #5c6bc0;
+	    border-left: 3px solid #5c6bc0;
+	    border-right: 3px solid #5c6bc0;
 	}
 
     .profile-pic {
@@ -224,12 +227,34 @@
 	    const box = document.getElementById("profileBox");
 	    box.classList.toggle("active");
 	}
-
+	
 	document.addEventListener("click", function (e) {
 	    const box = document.getElementById("profileBox");
 	    const icon = document.querySelector(".profile-icon");
+	
+	    // Close only if clicked outside both icon and profile box
 	    if (!box.contains(e.target) && !icon.contains(e.target)) {
 	        box.classList.remove("active");
+	    }
+	});
+	
+	// === New logic to detect iframe interaction ===
+	const iframe = document.getElementById("content-frame"); // Change ID if needed
+	
+	if (iframe) {
+	    iframe.addEventListener("mouseenter", () => {
+	        const box = document.getElementById("profileBox");
+	        box.classList.remove("active");
+	    });
+	}
+	
+	window.addEventListener("blur", () => {
+	    const iframe = document.getElementById("content-frame");
+	    const profileBox = document.getElementById("profileBox");
+
+	    // If focus moved into the iframe, and the profile box is open, close it
+	    if (document.activeElement === iframe && profileBox.classList.contains("active")) {
+	        profileBox.classList.remove("active");
 	    }
 	});
 

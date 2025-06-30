@@ -36,7 +36,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
         }
 
         .page-title {
@@ -265,8 +264,8 @@
         }
 
         let url = "<%= request.getContextPath() %>" + "/jadebank/accounts/list/" + branchId + "?limit=" + pageSize + "&offset=" + offset;
-        if (accountType) url += `&type=${accountType}`;
-        if (accountStatus) url += `&status=${accountStatus}`;
+        if (accountType) url += "&type=" + accountType;
+        if (accountStatus) url += "&status=" + accountStatus;
 
         fetch(url)
             .then(res => res.ok ? res.json() : Promise.reject("Fetch error"))

@@ -82,8 +82,12 @@ public class BranchHandler {
 	}
 	
 	@Route(path = "branch/all", method = "GET")
-	public String branchList(@FromQuery("limit") int limit, @FromQuery("offset") int offset) throws CustomException {
+	public String branchList(@FromQuery("limit") int limit, @FromQuery("offset") int offset, @FromSession("userId") Long userId, @FromSession("role") Integer userRole) throws CustomException {
 		ValidationsUtil.checkLimitAndOffset(limit, offset);
+		if(userRole == 2) {
+			Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+			return Results.respondJson(branchDAO.getAllBranches(employee.getBranch()));
+		}
 		return Results.respondJson(branchDAO.getBranchList(limit, offset));
 	}
 	

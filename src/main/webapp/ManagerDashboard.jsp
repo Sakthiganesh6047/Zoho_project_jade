@@ -16,54 +16,101 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
+    
+    	html, body {
             margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            max-width: 100vw;
+            box-sizing: border-box;
             font-family: "Segoe UI", sans-serif;
-            background-image: url("contents/background.png"); /* Replace with your actual path */
-		    background-size: cover;        /* Scales the image to cover the whole screen */
-		    background-repeat: no-repeat;  /* Prevents tiling */
-		    background-position: center;
-            padding-top: 70px; /* same as header height */
+        }
+
+        *, *::before, *::after {
+            box-sizing: inherit;
+        }
+
+        body {
+            background-image: url("contents/background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            padding-top: 70px;
         }
 
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+            min-height: 85vh;
+            width: 100%;
+            margin-left: 20px;
+        }
+
+        body.expanded .body-wrapper {
+            margin-left: 223px;
         }
 
         .content-wrapper {
             flex-grow: 1;
-            margin-left: 20px;
-            padding: 20px 30px;
+            margin-left: 5px;
+            padding: 20px;
+            padding-bottom: 2px;
             display: flex;
-            gap: 30px;
+            gap: 20px;
+            flex-wrap: wrap;           /* ✅ wrap instead of overflow */
+            width: 100%;
+            max-width: 100%;
         }
 
         .stats-panel {
-            flex-grow: 1;
+            flex: 1 1 0;
+            min-width: 300px;
+             max-width: 1500px;
         }
 
         .operations-panel {
-            width: 250px;
+            flex: 0 0 250px;
             display: flex;
             flex-direction: column;
             gap: 20px;
             order: 2;
+            margin-right: 20px;
         }
-        
+
         .stat-section {
-        	display: flex;
-        	gap: 30px;
+            display: flex;
+            flex-wrap: nowrap;          /* ✅ allow wrapping */
+            gap: 20px;
+        }
+
+        .chart-container {
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .info-cards-grid {
+            display: flex;
+            flex-wrap: wrap;         /* ✅ wrap to fit */
+            gap: 20px;
+        }
+
+        .chart-section, .stat-cards, .branch-list-section {
+            max-width: 100%;         /* ✅ restrict width */
+            overflow-x: auto;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
         }
         
         .stat-cards {
         	background: white;
 		    padding: 20px;
-		    padding-right: 115px;
-		    padding-left:115px;
 		    border-radius: 12px;
 		    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		    margin-bottom: 20px;
+		    width: 100%
         }
         
         .stat-cards h3 {
@@ -72,50 +119,61 @@
 		
 		.info-cards-grid {
 		    display: flex;
-		    gap: 20px;
+		    gap: 37px;
 		    flex-wrap: wrap;
 		}
 		
 		.info-card {
 		    display: flex;
+		    flex-direction: column;
 		    align-items: center;
-		    gap: 20px;
+		    justify-content: center;
+		    gap: 10px;
 		    background-color: #ffffff;
 		    padding: 20px;
 		    border-radius: 12px;
 		    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 		    min-width: 180px;
-		    min-height: 120px;
+		    min-height: 140px;
 		    flex: 1;
+		    text-decoration: none;
+		    color: inherit;
+		    transition: transform 0.2s ease;
+		    cursor: pointer;
+		}
+		
+		.info-card:hover {
+		    transform: scale(1.03);
+		    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+		}
+		
+		.info-card h4 {
+		    font-size: 18px;
+		    font-weight: 600;
+		    color: #373962;
+		    margin: 0;
 		}
 		
 		.info-card i {
-		    font-size: 32px;
+		    font-size: 28px;
 		    color: #414485;
 		}
 		
-		.info-text {
-		    display: flex;
-		    flex-direction: column;
-		    justify-content: center;
-		}
-		
-		.info-text h4 {
-		    margin: 0;
-		    font-size: 17px;
-		    color: #333;
-		}
-		
-		.info-text p {
-		    margin: 4px 0 0;
-		    font-size: 18px;
+		.info-card p {
+		    font-size: 20px;
 		    font-weight: bold;
 		    color: #414485;
+		    margin: 0;
+		}
+		
+		.infocard-logo {
+			display: flex;
+			gap: 5px;
 		}
 
         .dashboard-card {
             background: white;
-            padding: 30px 20px;
+            padding: 33px 20px;
             border-radius: 12px;
             text-align: center;
             text-decoration: none;
@@ -123,6 +181,9 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: 0.3s;
             min-height: 120px;
+            border-block: 1px solid #373962;
+            border-left: 1px solid #373962;
+    		border-right: 1px solid #373962;
         }
 
         .dashboard-card:hover {
@@ -197,7 +258,14 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            max-height: 280px; /* LIMIT HEIGHT HERE */
         }
+        
+        .chart-section canvas {
+		    max-height: 200px; /* Chart will stay within bounds */
+		    width: 100% !important;
+		    height: auto !important;
+		}
 
         .chart-container {
             display: flex;
@@ -205,6 +273,19 @@
             justify-content: space-between;
             gap: 30px;
         }
+        
+        .scroll-container {
+		    overflow-x: auto;
+		    overflow-y: hidden;
+		    width: 100%;
+		}
+		
+		.scroll-container canvas {
+		    min-width: 1000px; /* Enough to show 10 branches clearly */
+		    height: 400px !important; /* Double height */
+		    max-height: 400px;
+		}
+        
 
         .info-cards {
             display: flex;
@@ -217,7 +298,7 @@
             background-color: white;
             padding: 16px 20px;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
             color: #373962;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
@@ -256,16 +337,37 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             margin-bottom: 20px;
         }
+        .donut-chart-section {
+		    max-width: 400px;
+		    overflow: hidden; /* Important: hides any overflow */
+		    display: flex;
+		    flex-direction: column;
+		    justify-content: center;
+		}
+		
+		.donut-wrapper {
+		    width: 300px;
+		    height: 300px;
+		    position: relative;
+		    margin-left: 30px;
+		    margin-right: 130px;
+		}
+		
+		#employeePieChart {
+		    width: 100% !important;
+		    height: 100% !important;
+		    display: block;
+		}
 
     </style>
 </head>
 <body>
-<div class="body-wrapper">
+<div class="body-wrapper" id="bodyWrapper">
     <div class="content-wrapper">
         <div class="stats-panel">
             <div class="profile-header">
                 <div class="info">
-                    <img id="profilePic" src="contents/man_6997551.png" alt="Profile Pic">
+                    <img id="profilePic" src="contents/man_6997551.png" alt="Profile Pic"/>
                     <div class="name-role">
                         <h2 id="userName">Loading...</h2>
                         <p id="userEmail">Email: -</p>
@@ -274,87 +376,49 @@
                 </div>
                 <i class="fas fa-pen-to-square edit-icon" onclick="redirectToEditProfile()"></i>
             </div>
-
-			<div class="stat-section">
-	            <div class="chart-section">
-	                <h3>Employee Role Distribution</h3>
-	                <div class="chart-container">
-	                    <div style="width: 200px; height: 200px;">
-	                        <canvas id="employeePieChart" width="180" height="180"></canvas>
-	                    </div>
-	                </div>
-	            </div>
-	            
+            <div class="stat-section">
+	            <div class="chart-section donut-chart-section">
+				    <h3>Employee Role Distribution</h3>
+				    <div class="donut-wrapper">
+				        <canvas id="employeePieChart"></canvas>
+				    </div>
+				</div>
 	            <div class="stat-cards">
-			        <h3>Stats</h3>
-			        <div class="info-cards-grid">
-			            <div class="info-card">
-			                <i class="fas fa-code-branch"></i>
-			                <div>
-			                    <h4>Branches</h4>
-			                    <p>12</p>
-			                </div>
-			            </div>
-			            <div class="info-card">
-			                <i class="fas fa-users"></i>
-			                <div>
-			                    <h4>Employees</h4>
-			                    <p>100</p>
-			                </div>
-			            </div>
-			            <div class="info-card">
-			                <i class="fas fa-user-circle"></i>
-			                <div>
-			                    <h4>Customers</h4>
-			                    <p>800</p>
-			                </div>
-			            </div>
-			            <div class="info-card">
-			                <i class="fas fa-user-circle"></i>
-			                <div>
-			                    <h4>Accounts</h4>
-			                    <p>8000</p>
-			                </div>
-			            </div>
-			        </div>
+				    <h3>Stats</h3>
+				    <div class="info-cards-grid">
+					    <div class="info-card" onclick="parent.loadPage('ViewEmployees.jsp')">
+					        <h4>Employees</h4>
+					        <i class="fas fa-users"></i>
+					        <p id="statEmployees">0</p>
+					    </div>
+					    <div class="info-card" onclick="parent.loadPage('AccountsList.jsp')">
+					        <h4>Accounts</h4>
+					        <i class="fa-solid fa-file-invoice-dollar"></i>
+					        <p id="statAccounts">0</p>
+					    </div>
+					</div>
+				</div>
+	        </div>
+           <div class="chart-section" style="max-height: 500px;">
+			    <h3>Current Week Transaction</h3>
+			    <div class="scroll-container">
+			        <canvas id="transactionBarChart"></canvas>
 			    </div>
 			</div>
-			
-            <div class="chart-section">
-                <h3>Daily Transactions</h3>
-                <canvas id="transactionBarChart" width="400" height="120"></canvas>
-            </div>
         </div>
-
         <div class="operations-panel">
-            <a href="EmployeeSignUp.jsp" class="dashboard-card">
-                <i class="fas fa-user-plus"></i>
-                <h4>Add Employee</h4>
-                <p>Register new staff</p>
-            </a>
-            <a href="CustomerSignUp.jsp" class="dashboard-card">
-                <i class="fa-solid fa-user-plus"></i>
-                <h4>Add Customer</h4>
-                <p>Create User Account</p>
-            </a>
-            <a href="OpenAccount.jsp" class="dashboard-card">
-                <i class="fa-solid fa-file-invoice-dollar"></i>
-                <h4>New Bank Account</h4>
-                <p>Create Bank Account</p>
-            </a>
-            <a href="ViewEmployees.jsp" class="dashboard-card">
-                <i class="fas fa-users"></i>
-                <h4>Employees</h4>
-                <p>Clerks, Managers</p>
-            </a>
+            <a href="EmployeeSignUp.jsp" class="dashboard-card"><i class="fas fa-user-plus"></i><h4>Add Employee</h4><p>Register new staff</p></a>
+            <a href="CustomerSignUp.jsp" class="dashboard-card"><i class="fa-solid fa-user-plus"></i><h4>Add Customer</h4><p>Create User Account</p></a>
+            <a href="OpenAccount.jsp" class="dashboard-card"><i class="fa-solid fa-file-invoice-dollar"></i><h4>New Bank Account</h4><p>Create Bank Account</p></a>
+            <a href="ViewEmployees.jsp" class="dashboard-card"><i class="fas fa-users"></i><h4>Employees</h4><p>Clerks, Managers</p></a>
         </div>
     </div>
 </div>
+<jsp:include page="Footer.jsp" />
 <script>
 const userId = <%= userId %>;
 
-// 1. Load Admin Profile
-fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
+fetch("" + "<%=request.getContextPath()%>" + "/jadebank/user/profile")
     .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch user"))
     .then(data => {
         document.getElementById("userName").textContent = data.fullName || "Unknown";
@@ -367,11 +431,10 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
     .catch(err => console.error("Profile fetch error:", err));
 
 function redirectToEditProfile() {
-    window.location.href = `AdminSignUp.jsp?userId=${userId}`;
+    window.location.href = "EmployeeSignUp.jsp?userId=" + userId;
 }
 
-// 2. Load Employee Role Distribution
-fetch(`${pageContext.request.contextPath}/jadebank/user/employeecount`)
+fetch("" + "<%=request.getContextPath()%>" + "/jadebank/user/employeecount")
     .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch role data"))
     .then(data => {
         const roleCounts = {
@@ -381,7 +444,7 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/employeecount`)
         };
 
         new Chart(document.getElementById('employeePieChart').getContext('2d'), {
-            type: 'pie',
+            type: 'doughnut',
             data: {
                 labels: ['Clerks', 'Managers', 'GMs'],
                 datasets: [{
@@ -391,40 +454,36 @@ fetch(`${pageContext.request.contextPath}/jadebank/user/employeecount`)
             },
             options: {
                 responsive: true,
-                plugins: { legend: { position: 'right' } }
+                cutout: '50%',
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                }
             }
         });
     })
     .catch(err => console.error("Pie chart fetch error:", err));
 
-
-// 3. Load Summary Stats
 fetch(`${pageContext.request.contextPath}/jadebank/user/dashboardstats`)
-    .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch summary stats"))
-    .then(data => {
-        const stats = {
-            branches: data.branchCount ?? 0,
-            employees: data.employeeCount ?? 0,
-            customers: data.userCount ?? 0,
-            accounts: data.accountCount ?? 0
-        };
-        const statTexts = document.querySelectorAll(".info-cards-grid .info-card p");
-        statTexts[0].textContent = stats.branches;
-        statTexts[1].textContent = stats.employees;
-        statTexts[2].textContent = stats.customers;
-        statTexts[3].textContent = stats.accounts;
-    })
-    .catch(err => console.error("Stats fetch error:", err));
+.then(res => res.ok ? res.json() : Promise.reject("Failed to fetch summary stats"))
+.then(data => {
+    const stats = {
+        employees: data.employeeCount ?? 0,
+        accounts: data.accountCount ?? 0
+    };
+    document.getElementById("statEmployees").textContent = stats.employees;
+    document.getElementById("statAccounts").textContent = stats.accounts;
+})
+.catch(err => console.error("Stats fetch error:", err));
 
-// 4. Load Daily Transactions (Line Chart)
-fetch(`${pageContext.request.contextPath}/jadebank/account/transactionchart`)
+fetch("" + "<%=request.getContextPath()%>" + "/jadebank/account/transactionchart")
     .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions chart"))
     .then(data => {
         const labels = Object.keys(data);
         const counts = Object.values(data);
 
-        const ctx = document.getElementById('transactionBarChart').getContext('2d');
-        const lineChart = new Chart(ctx, {
+        new Chart(document.getElementById('transactionBarChart').getContext('2d'), {
             type: 'line',
             data: {
                 labels: labels,
@@ -439,34 +498,20 @@ fetch(`${pageContext.request.contextPath}/jadebank/account/transactionchart`)
             },
             options: {
                 responsive: true,
-                plugins: { legend: { display: false } },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
                 scales: {
-                    y: { beginAtZero: true }
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
         });
     })
     .catch(err => console.error("Transaction chart error:", err));
-
-//3. Load Accounts per Branch
-fetch(`${pageContext.request.contextPath}/jadebank/branch/accountstats`)
-    .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch branch accounts"))
-    .then(data => {
-        const container = document.getElementById("branchAccountList");
-        container.innerHTML = ""; // Clear any existing content
-
-        Object.entries(data).forEach(([branch, count]) => {
-            const row = document.createElement("div");
-            row.className = "branch-item";
-            row.innerHTML = 
-                '<span class="branch-name">' + branch + '</span>' +
-                '<span class="branch-count">' + count + ' Accounts</span>';
-            container.appendChild(row);
-        });
-    })
-    .catch(err => console.error("Branch account fetch error:", err));
-
 </script>
-
 </body>
 </html>

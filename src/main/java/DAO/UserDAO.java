@@ -215,6 +215,41 @@ public class UserDAO {
     }
     
     @SuppressWarnings("unchecked")
+    public List<EmployeeProfile> getFilteredEmployeeDetails(Long branchId, Integer roleType, int limit, int offset) throws CustomException {
+
+        ValidationsUtil.checkLimitAndOffset(limit, offset);
+
+        QueryBuilder queryBuilder = new QueryBuilder(EmployeeProfile.class);
+        queryBuilder.select(
+                "u.user_id AS employee_id",
+                "u.full_name AS employee_name",
+                "u.email AS employee_email",
+                "e.role AS employee_role",
+                "e.branch AS employee_branch",
+                "b.branch_name AS employee_branch_name"
+            )
+            .join("INNER", "Employee e", "u.user_id = e.employee_id")
+            .join("INNER", "Branch b", "e.branch = b.branch_id");
+
+        // Apply optional filters
+        if (branchId != null) {
+            queryBuilder.where("e.branch", "=", branchId);
+        }
+        if (roleType != null) {
+            queryBuilder.where("e.role", "=", roleType);
+        }
+
+        queryBuilder.limit(limit)
+                    .offset(offset)
+                    .orderBy("employee_id", "ASC");
+
+        QueryResult getQuery = queryBuilder.build();
+        System.out.println("Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        return (List<EmployeeProfile>) executor.executeQuery(getQuery, EmployeeProfile.class);
+    }
+    
+    @SuppressWarnings("unchecked")
 	public List<EmployeeProfile> getAllEmployeeDetails(Long branchId, int limit, int offset) throws CustomException {
     	
     	ValidationsUtil.checkLimitAndOffset(limit, offset);
@@ -224,11 +259,11 @@ public class UserDAO {
         											"u.full_name AS employee_name",
                 									"u.email AS employee_email",
                 									"e.role AS employee_role",
-                									"e.branch_id AS employee_branch",
+                									"e.branch AS employee_branch",
         											"b.branch_name AS employee_branch_name")
         											.join("INNER", "Employee e", "u.user_id = e.employee_id")
-        											.join("INNER", "Branch b", "e.branch_id = b.branch_id")
-        											.where("e.branch_id", "=", branchId)
+        											.join("INNER", "Branch b", "e.branch = b.branch_id")
+        											.where("e.branch", "=", branchId)
         											.limit(limit)
         											.offset(offset)
         											.orderBy("employee_id", "ASC")

@@ -266,7 +266,6 @@
             })
             .catch(err => {
                 console.error("Failed to fetch employee list:", err);
-                alert("Error loading employee list.");
             });
     }
 

@@ -374,6 +374,31 @@ public class UserHandler {
     	}
     }
     
+//    @Route(path = "user/employeelist", method = "GET")
+//    public String getEmployeeProfiles(
+//            @FromSession("userId") Long userId,
+//            @FromSession("role") Integer role,
+//            @FromQuery("limit") int limit,
+//            @FromQuery("offset") int offset,
+//            @FromQuery("branchId") Long branchId,
+//            @FromQuery("roleType") Integer roleType // e.g., 0=Clerk, 1=Manager, etc.
+//    ) throws CustomException {
+//
+//        ValidationsUtil.isNull(userId, "UserId");
+//        ValidationsUtil.isNull(role, "User Role");
+//        ValidationsUtil.checkLimitAndOffset(limit, offset);
+//        ValidationsUtil.checkUserRole(role);
+//
+//        if (role == 2) {
+//            Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+//            branchId = employee.getBranch(); // enforce manager's own branch
+//        }
+//
+//        return Results.respondJson(
+//            userDAO.getFilteredEmployeeDetails(branchId, roleType, limit, offset)
+//        );
+//    }
+    
     @Route(path = "user/employeecount", method = "GET")
     public String getRoleCount(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
     	

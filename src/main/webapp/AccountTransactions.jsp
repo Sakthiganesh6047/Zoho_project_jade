@@ -229,7 +229,19 @@
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ accountId: accountId })
         })
-        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch transactions"))
+        .then(async res => {
+            const contentType = res.headers.get("content-type");
+            const isJson = contentType && contentType.includes("application/json");
+
+            const data = isJson ? await res.json() : null;
+
+            if (!res.ok) {
+                const errorMsgFromServer = data?.error || "Failed to fetch transactions";
+                throw new Error(errorMsgFromServer);
+            }
+
+            return data;
+        })
         .then(data => {
             const tbody = document.getElementById("transactionBody");
             tbody.innerHTML = "";
@@ -268,9 +280,10 @@
             updatePaginationControls();
         })
         .catch(err => {
-            errorMsg.textContent = "Error: " + err;
+            errorMsg.textContent = "Error: " + err.message;
             console.error(err);
         });
+
     }
 
     function nextPage() {

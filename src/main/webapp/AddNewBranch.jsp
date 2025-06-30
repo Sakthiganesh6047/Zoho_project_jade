@@ -163,6 +163,7 @@
 
         if (branchId) {
             document.getElementById("form-title").innerText = "Edit Branch";
+            document.querySelector('button[type="submit"]').innerText = "Update Branch"; // <-- Add this line
 
             fetch('${pageContext.request.contextPath}/jadebank/branch/id/' + branchId)
                 .then(res => res.json())

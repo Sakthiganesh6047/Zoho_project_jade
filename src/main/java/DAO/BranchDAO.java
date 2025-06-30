@@ -80,7 +80,7 @@ public class BranchDAO {
     
     public List<Branch> getAllBranches(Long branchId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Branch.class);
-        QueryResult query = queryBuilder.select("branchId", "branchName", "branchDistrict")
+        QueryResult query = queryBuilder.select("branchId", "branchName", "branchDistrict", "ifscCode")
         								.where("branchId", "=", branchId)
         								.orderBy("branchDistrict", "ASC")
         								.build();

@@ -94,6 +94,11 @@
 	    display: block;
 	}
 	
+	.sidebar-link.active {
+	    background-color: #ffffff;
+	    color: #373962;
+	}
+	
 	.sidebar-link {
 	    transition: background-color 0.3s ease 0.2s, color 0.3s ease 0.2s;
 	}
@@ -102,7 +107,7 @@
 	    background-color: #ffffff;
 	    color: #373962;
 	}
-
+	
 	.toggle-btn {
 	    position: absolute;
 	    top: 50%;
@@ -183,7 +188,7 @@
             </a>
 
         <% } else if (role == 2) { %>
-        	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('Managerdashboard.jsp', this)" data-tooltip="Home" data-page="ManagerDashboard.jsp">
+        	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ManagerDashboard.jsp', this)" data-tooltip="Home" data-page="ManagerDashboard.jsp">
 	            <i class="fas fa-home"></i>
 	            <span class="label">Home</span>
 	        </a>

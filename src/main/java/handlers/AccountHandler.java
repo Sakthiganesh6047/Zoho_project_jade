@@ -72,23 +72,23 @@ public class AccountHandler {
     	return Results.respondJson(accountDAO.getPrimary(sessionId));
     }
     
-    @Route(path = "accounts/list/{branchId}", method = "GET")
-    public String getAccountsList(@FromPath("branchId") Long branchId, @FromQuery("limit") int limit, 
-    							@FromQuery("offset") int offset, @FromSession("userId") Long userId, 
-    						@FromSession("role") Integer role) throws CustomException {
-    	
-    	ValidationsUtil.isNull(userId, "UserId");
-    	ValidationsUtil.isNull(role, "User Role");
-    	ValidationsUtil.checkLimitAndOffset(limit, offset);
-    	ValidationsUtil.checkUserRole(role);
-    	
-    	if (role <= 2) {
-    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
-    		return Results.respondJson(accountDAO.getAccountsList(employee.getBranch()));
-    	} else {
-    		return Results.respondJson(accountDAO.getAccountsList(branchId));
-    	}
-    }
+//    @Route(path = "accounts/list/{branchId}", method = "GET")
+//    public String getAccountsList(@FromPath("branchId") Long branchId, @FromQuery("limit") int limit, 
+//    							@FromQuery("offset") int offset, @FromSession("userId") Long userId, 
+//    						@FromSession("role") Integer role) throws CustomException {
+//    	
+//    	ValidationsUtil.isNull(userId, "UserId");
+//    	ValidationsUtil.isNull(role, "User Role");
+//    	ValidationsUtil.checkLimitAndOffset(limit, offset);
+//    	ValidationsUtil.checkUserRole(role);
+//    	
+//    	if (role <= 2) {
+//    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+//    		return Results.respondJson(accountDAO.getAccountsList(employee.getBranch()));
+//    	} else {
+//    		return Results.respondJson(accountDAO.getAccountsList(branchId));
+//    	}
+//    }
     
     @Route(path = "accounts/list/{branchId}", method = "GET")
     public String getAccountsList(

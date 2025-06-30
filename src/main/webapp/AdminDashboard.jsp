@@ -80,7 +80,7 @@
         .stat-section {
             display: flex;
             flex-wrap: nowrap;          /* ✅ allow wrapping */
-            gap: 30px;
+            gap: 20px;
         }
 
         .chart-container {
@@ -160,7 +160,7 @@
 		}
 		
 		.info-card p {
-		    font-size: 20px;
+		    font-size: 24px;
 		    font-weight: bold;
 		    color: #414485;
 		    margin: 0;
@@ -168,7 +168,8 @@
 		
 		.infocard-logo {
 			display: flex;
-			gap: 5px;
+			gap: 15px;
+			justify-content: center;
 		}
 
         .dashboard-card {
@@ -182,6 +183,8 @@
             transition: 0.3s;
             min-height: 120px;
             border-block: 1px solid #373962;
+            border-left: 1px solid #373962;
+    		border-right: 1px solid #373962;
         }
 
         .dashboard-card:hover {
@@ -394,18 +397,24 @@
 					    </div>
 					    <div class="info-card" onclick="parent.loadPage('ViewEmployees.jsp')">
 					        <h4>Employees</h4>
-					        <i class="fas fa-users"></i>
-					        <p id="statEmployees">0</p>
+					        <div class="infocard-logo">
+						        <i class="fas fa-users"></i>
+						        <p id="statEmployees">0</p>
+						    </div>
 					    </div>
 					    <div class="info-card" onclick="parent.loadPage('CustomerSignUp.jsp')">
 					        <h4>Customers</h4>
-					        <i class="fas fa-user-circle"></i>
-					        <p id="statCustomers">0</p>
+					        <div class="infocard-logo">
+						        <i class="fas fa-user-circle"></i>
+						        <p id="statCustomers">0</p>
+							</div>
 					    </div>
 					    <div class="info-card" onclick="parent.loadPage('AccountsList.jsp')">
 					        <h4>Accounts</h4>
-					        <i class="fa-solid fa-file-invoice-dollar"></i>
-					        <p id="statAccounts">0</p>
+					        <div class="infocard-logo">
+						        <i class="fa-solid fa-file-invoice-dollar"></i>
+						        <p id="statAccounts">0</p>
+							</div>
 					    </div>
 					</div>
 				</div>
@@ -536,7 +545,7 @@ fetch(`${pageContext.request.contextPath}/jadebank/branch/accountstats`)
                     data: counts,
                     borderColor: '#414485',
                     backgroundColor: 'rgba(65, 68, 133, 0.1)',
-                    tension: 0.4,
+                    tension: 0.1,
                     fill: true,
                     pointBackgroundColor: '#414485',
                     pointRadius: 5,
