@@ -216,7 +216,7 @@
             <label for="confirmPassword">Confirm Password:</label>
             <input type="password" id="confirmNewPassword" required />
             <button onclick="submitPasswordChange()">Submit</button>
-            <button onclick="closePasswordChangeModal()" style="background-color: #ccc; margin-top: 10px;">Cancel</button>
+            <button onclick="closePasswordChangeModal()" style="margin-top: 10px;">Cancel</button>
             <div id="passwordStatus" style="margin-top: 10px; text-align: center; font-weight: bold;"></div>
         </div>
     </div>

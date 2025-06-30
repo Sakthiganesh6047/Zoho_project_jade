@@ -201,19 +201,24 @@
         }
 
         .account-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .account-meta {
-            flex: 1;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    min-height: 48px;
+		    padding: 8px 12px;
+		    border-bottom: 1px solid #eee;
+		    font-size: 14px;
+		    width: 100%;
+		    max-width: 1400px; /* fix this as needed */
+		    box-sizing: border-box;
+		}
+		.account-meta {
+		    display: flex;
+		    gap: 30px;
+		    align-items: center;
+		    flex-wrap: wrap;
+		    flex: 1;
+		}
 
         .toggle {
             position: relative;
@@ -447,17 +452,47 @@
                 if (acc.accountId === selectedAccountId) {
                     const toggleRow = document.createElement("div");
                     toggleRow.className = "account-item";
+
+                    var commonPrimaryStyle = 
+                        "display: inline-block;" +
+                        "width: 130px;" +
+                        "padding: 6px 12px;" +
+                        "text-align: center;" +
+                        "font-weight: bold;" +
+                        "font-size: 14px;" +
+                        "border-radius: 6px;" +
+                        "box-sizing: border-box;";
+
+                    // Button version
+                    if (acc.accountId !== primaryAccountId) {
+                        setPrimaryButton = "<button onclick=\"setAsPrimary(" + acc.accountId + ")\" " +
+                            "style=\"" + commonPrimaryStyle + 
+                            "background-color: #414485; color: white; border: none; cursor: pointer;\">" +
+                            "Set as Primary" +
+                            "</button>";
+                    } else {
+                        setPrimaryButton = "<span style=\"" + commonPrimaryStyle + 
+                            "background-color: #d0f0d0; color: green; border: 1px solid green;\">" +
+                            "Primary" +
+                            "</span>";
+                    }
+
                     toggleRow.innerHTML =
-                        "<div class='account-meta'>" +
-                            "<strong>" + accType + " #" + acc.accountId + "</strong><br>" +
+                        "<div class=\"account-meta\" style=\"display: flex; align-items: center; gap: 30px; font-size: 14px;\">" +
+                            "<span><strong>" + accType + " #" + acc.accountId + "</strong></span>" +
                             "<span>Created: " + new Date(acc.createdAt).toLocaleDateString() + "</span>" +
+                            (acc.accountId !== primaryAccountId
+                                ? "<button onclick=\"setAsPrimary(" + acc.accountId + ")\"" +
+                                  " style=\"background-color:#414485; color:white; border:none; border-radius:6px; padding:6px 12px; cursor:pointer;\">" +
+                                  "Set as Primary</button>"
+                                : "<span style=\"color: green; font-weight: bold;\">Primary</span>") +
                         "</div>" +
-                        "<label class='toggle'>" +
-                            "<input type='checkbox'" +
-                            (acc.accountStatus === 1 ? " checked" : "") +
-                            " onchange='handleToggle(this, " + acc.accountId + ", this.checked)'>" +
-                            "<span class='slider'></span>" +
+                        "<label class=\"toggle\">" +
+                            "<input type=\"checkbox\" " + (acc.accountStatus === 1 ? "checked" : "") +
+                            " onchange=\"handleToggle(this, " + acc.accountId + ", this.checked)\">" +
+                            "<span class=\"slider\"></span>" +
                         "</label>";
+
                     toggleList.appendChild(toggleRow);
                 }
             });
@@ -513,6 +548,30 @@
             showPopup("Operation failed.");
         });
     }
+    
+    function setAsPrimary(accountId) {
+        fetch(`${pageContext.request.contextPath}/jadebank/account/setprimary`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ accountId })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to update primary account.");
+            return res.text();
+        })
+        .then(message => {
+            showPopup("Primary account updated.");
+            primaryAccountId = accountId;
+            loadAccounts(); // Refresh cards and status
+        })
+        .catch(err => {
+            console.error(err);
+            showPopup("Failed to update primary.");
+        });
+    }
+
 
     function formatDate(timestamp) {
         const date = new Date(Number(timestamp));

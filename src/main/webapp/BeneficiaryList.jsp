@@ -340,6 +340,8 @@
     document.addEventListener("DOMContentLoaded", () => {
         if (!userId) return;
 
+        const accountSelect = document.getElementById("accountId");
+
         // Populate account dropdown
         fetch(`${pageContext.request.contextPath}/jadebank/account/id`, {
             method: "POST",
@@ -348,20 +350,30 @@
         })
         .then(res => res.ok ? res.json() : Promise.reject("Failed to load accounts"))
         .then(accounts => {
-            const accountSelect = document.getElementById("accountId");
             accounts.forEach(acc => {
                 const option = document.createElement("option");
                 option.value = acc.accountId;
                 option.textContent = "ID: " + acc.accountId + " | Type: " + (acc.accountType === 1 ? "Savings" : "Current");
                 accountSelect.appendChild(option);
             });
+
+            // After populating, fetch primary account using GET
+            return fetch(`${pageContext.request.contextPath}/jadebank/account/primary`);
+        })
+        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch primary account"))
+        .then(primary => {
+            if (primary && primary.accountId) {
+                accountSelect.value = primary.accountId;
+                currentPage = 0;
+                loadBeneficiaries();
+            }
         })
         .catch(err => {
             console.error(err);
             document.getElementById("status").textContent = "Unable to load accounts.";
         });
 
-        document.getElementById("accountId").addEventListener("change", () => {
+        accountSelect.addEventListener("change", () => {
             currentPage = 0;
             loadBeneficiaries();
         });

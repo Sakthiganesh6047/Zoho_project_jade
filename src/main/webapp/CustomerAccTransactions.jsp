@@ -283,29 +283,44 @@
 
 let hasNextPage = false;
 
-document.addEventListener("DOMContentLoaded", function() {
-    var userId = <%= userId != null ? userId : "null" %>;
-    if (userId) {
-        fetch("<%= request.getContextPath() %>/jadebank/account/id", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: userId })
-        })
+document.addEventListener("DOMContentLoaded", function () {
+    const userId = <%= userId != null ? userId : "null" %>;
+    const contextPath = "<%= request.getContextPath() %>";
+    const dropdown = document.getElementById("accountId");
+
+    if (!userId) return;
+
+    // Fetch all accounts for dropdown
+    fetch(contextPath + "/jadebank/account/id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: userId })
+    })
         .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch accounts"))
         .then(accounts => {
-            var dropdown = document.getElementById("accountId");
-            accounts.forEach(function(acc) {
-                var option = document.createElement("option");
+            accounts.forEach(acc => {
+                const option = document.createElement("option");
                 option.value = acc.accountId;
                 option.textContent = "ID: " + acc.accountId + " | " + (acc.accountType === 1 ? "Savings" : "Current");
                 dropdown.appendChild(option);
             });
+
+            // After adding accounts, fetch primary account and trigger transaction fetch
+            return fetch(contextPath + "/jadebank/account/primary", {
+                method: "GET"
+            });
         })
-        .catch(function(err) {
-            document.getElementById("errorMsg").textContent = "Failed to load account list.";
+        .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch primary account"))
+        .then(primary => {
+            if (primary && primary.accountId) {
+                dropdown.value = primary.accountId;
+                fetchTransactions(true);
+            }
+        })
+        .catch(err => {
+            document.getElementById("errorMsg").textContent = "Error loading account data.";
             console.error(err);
         });
-    }
 });
 
 var currentOffset = 0;

@@ -52,6 +52,7 @@
 		    border-left: 6px solid #414485;
 		    padding: 10px 20px;
 		    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+		    margin-top: 0px;
 		}
 
         .branch-table {

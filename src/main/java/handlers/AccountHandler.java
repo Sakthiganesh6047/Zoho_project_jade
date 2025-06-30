@@ -1,5 +1,7 @@
 package handlers;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Map;
 import DAO.AccountDAO;
@@ -17,6 +19,7 @@ import pojos.Employee;
 import pojos.User;
 import util.AuthorizeUtil;
 import util.CustomException;
+import util.DBConnection;
 import util.Results;
 import util.ValidationsUtil;
 
@@ -37,6 +40,7 @@ public class AccountHandler {
     	ValidationsUtil.isNull(creatorRole, "User Role");
     	ValidationsUtil.checkUserRole(creatorRole);
     	
+    	accountDAO.setAllPrimaryFlagsFalse(account.getCustomerId());
     	account.setIsPrimary(true);
     	account.setCreatedBy(creatorId);
     	account.setCreatedAt(Instant.now().toEpochMilli());
@@ -72,23 +76,43 @@ public class AccountHandler {
     	return Results.respondJson(accountDAO.getPrimary(sessionId));
     }
     
-//    @Route(path = "accounts/list/{branchId}", method = "GET")
-//    public String getAccountsList(@FromPath("branchId") Long branchId, @FromQuery("limit") int limit, 
-//    							@FromQuery("offset") int offset, @FromSession("userId") Long userId, 
-//    						@FromSession("role") Integer role) throws CustomException {
-//    	
-//    	ValidationsUtil.isNull(userId, "UserId");
-//    	ValidationsUtil.isNull(role, "User Role");
-//    	ValidationsUtil.checkLimitAndOffset(limit, offset);
-//    	ValidationsUtil.checkUserRole(role);
-//    	
-//    	if (role <= 2) {
-//    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
-//    		return Results.respondJson(accountDAO.getAccountsList(employee.getBranch()));
-//    	} else {
-//    		return Results.respondJson(accountDAO.getAccountsList(branchId));
-//    	}
-//    }
+    @Route(path = "account/setprimary", method = "POST")
+    public String setPrimaryAccount(@FromBody Account account, @FromSession("userId") Long userId) throws CustomException {
+        ValidationsUtil.isNull(userId, "User Id");
+        
+        Long accountId = account.getAccountId();
+        ValidationsUtil.isNull(accountId, "Account Number");
+
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);     // Begin transaction
+
+            accountDAO.setAllPrimaryFlagsFalse(userId, conn);
+            accountDAO.setPrimary(accountId, conn);
+
+            conn.commit(); // Commit if both succeed
+            return Results.respondJson(Map.of("status", "success"));
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Rollback on any failure
+                } catch (SQLException ex) {
+                    throw new CustomException("Rollback failed", ex);
+                }
+            }
+            throw new CustomException("Failed to update primary account", e);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e) {
+                    throw new CustomException("Failed to close connection", e);
+                }
+            }
+        }
+    }
     
     @Route(path = "accounts/list/{branchId}", method = "GET")
     public String getAccountsList(

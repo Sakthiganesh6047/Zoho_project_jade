@@ -410,7 +410,8 @@
             <a href="EmployeeSignUp.jsp" class="dashboard-card"><i class="fas fa-user-plus"></i><h4>Add Employee</h4><p>Register new staff</p></a>
             <a href="CustomerSignUp.jsp" class="dashboard-card"><i class="fa-solid fa-user-plus"></i><h4>Add Customer</h4><p>Create User Account</p></a>
             <a href="OpenAccount.jsp" class="dashboard-card"><i class="fa-solid fa-file-invoice-dollar"></i><h4>New Bank Account</h4><p>Create Bank Account</p></a>
-            <a href="ViewEmployees.jsp" class="dashboard-card"><i class="fas fa-users"></i><h4>Employees</h4><p>Clerks, Managers</p></a>
+            <a href="SearchCustomer.jsp" class="dashboard-card"><i class="fas fa-users"></i><h4>Customers</h4><p>View Customer Details</p></a>
+            <a href="ViewEmployees.jsp" class="dashboard-card"><i class="fas fa-user-tie"></i><h4>Employees</h4><p>Clerks, Managers</p></a>
         </div>
     </div>
 </div>

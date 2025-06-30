@@ -108,7 +108,7 @@ public class UserDAO {
     
     public User getUserByPhone(String phone) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(User.class);
-    	QueryResult getQuery = queryBuilder.select("userId", "fullName", "email", "userType", "status")
+    	QueryResult getQuery = queryBuilder.select("userId", "fullName", "email", "phone", "dob", "age", "gender", "userType", "status")
                 							.where("phone", "LIKE", phone)
                 							.build();
     	System.out.println("Select Query: " + getQuery);

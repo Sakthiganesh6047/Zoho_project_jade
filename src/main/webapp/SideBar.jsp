@@ -208,6 +208,10 @@
                 <i class="fas fa-clock-rotate-left"></i>
                 <span class="label">Transactions</span>
             </a>
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('SearchCustomer.jsp', this)" data-tooltip="Search User" data-page="SearchCustomer.jsp">
+                <i class="fa-solid fa-users"></i>
+                <span class="label">Customers</span>
+            </a>
 
         <% } else if (role == 3) { %>
         	<a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('AdminDashboard.jsp', this)" data-tooltip="Home" data-page="AdminDashboard.jsp">
@@ -225,6 +229,10 @@
             <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('ViewEmployees.jsp', this)" data-tooltip="Employees" data-page="ViewEmployees.jsp">
                 <i class="fas fa-user-tie"></i>
                 <span class="label">Employees</span>
+            </a>
+            <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('SearchCustomer.jsp', this)" data-tooltip="Search User" data-page="SearchCustomer.jsp">
+                <i class="fa-solid fa-users"></i>
+                <span class="label">Customers</span>
             </a>
             <a href="javascript:void(0)" class="sidebar-link" onclick="loadPage('UnifiedTransfer.jsp', this)" data-tooltip="Transact" data-page="UnifiedTransfer.jsp">
                 <i class="fas fa-money-bill-transfer"></i>

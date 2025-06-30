@@ -218,6 +218,54 @@ public class AccountDAO {
         return (int) executor.executeQuery(query, connection, null);
     }
     
+    public void setPrimary(Long accountId) throws CustomException {
+    	try(Connection conn = DBConnection.getConnection()) {
+    		String sql = "UPDATE Account SET is_primary = TRUE WHERE account_id = ?";
+	        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	            ps.setLong(1, accountId);
+	            ps.executeUpdate();
+	        } 
+    	} catch (Exception e) {
+            throw new CustomException("Failed to set primary account.", e);
+        }
+    }
+    
+    public void setPrimary(Long accountId, Connection connection) throws CustomException {
+    	try {
+    		String sql = "UPDATE Account SET is_primary = TRUE WHERE account_id = ?";
+	        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	            ps.setLong(1, accountId);
+	            ps.executeUpdate();
+	        } 
+    	} catch (Exception e) {
+            throw new CustomException("Failed to set primary account.", e);
+        }
+    }
+    
+    public void setAllPrimaryFlagsFalse(Long customerId) throws CustomException {
+    	try(Connection conn = DBConnection.getConnection()){
+    		String sql = "UPDATE Account SET is_primary = FALSE WHERE customer_id = ?";
+	        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	            ps.setLong(1, customerId);
+	            ps.executeUpdate();
+	        }
+    	} catch (Exception e) {
+            throw new CustomException("Failed to reset primary flags.", e);
+        }
+    }
+    
+    public void setAllPrimaryFlagsFalse(Long customerId, Connection connection) throws CustomException {
+    	try {
+    		String sql = "UPDATE Account SET is_primary = FALSE WHERE customer_id = ?";
+	        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+	            ps.setLong(1, customerId);
+	            ps.executeUpdate();
+	        }
+    	} catch (Exception e) {
+            throw new CustomException("Failed to reset primary flags.", e);
+        }
+    }
+    
     public Map<String, Integer> getCurrentWeekTransactionSplitByDayName() throws CustomException  {
 	    try(Connection connection = DBConnection.getConnection()){    
 	    	String sql = """

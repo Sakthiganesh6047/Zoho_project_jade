@@ -46,6 +46,13 @@
             border-left: 6px solid #414485;
             padding: 10px 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0px;
+            margin-top: 0px;
+        }
+        
+        .control-add{
+        	display: flex;
+        	align-items: center;
         }
 
         .add-account-btn {
@@ -58,6 +65,7 @@
             font-size: 18px;
             cursor: pointer;
             transition: background 0.3s ease;
+            margin-bottom: 20px;
         }
 
         .add-account-btn:hover {
@@ -169,36 +177,39 @@
     <div class="main-wrapper">
         <div class="page-title-wrapper">
             <h2 class="page-title">Branch Accounts List</h2>
-            <button class="add-account-btn" title="Add Account" onclick="window.location.href='OpenAccount.jsp'">
-                <i class="fas fa-plus"></i>
-            </button>
         </div>
-
-        <div class="controls">
-            <div>
-                <label for="branchId">Branch:</label>
-                <select id="branchId" onchange="loadAccounts()">
-                    <option value="">-- Select --</option>
-                </select>
-            </div>
-            <div>
-                <label for="accountType">Type:</label>
-                <select id="accountType" onchange="loadAccounts()">
-                    <option value="">-- All --</option>
-                    <option value="savings">Savings</option>
-                    <option value="current">Current</option>
-                </select>
-            </div>
-            <div>
-                <label for="accountStatus">Status:</label>
-                <select id="accountStatus" onchange="loadAccounts()">
-                    <option value="">-- All --</option>
-                    <option value="new">New</option>
-                    <option value="active">Active</option>
-                    <option value="blocked">Blocked</option>
-                </select>
-            </div>
-        </div>
+		<div class="control-add">
+	        <div class="controls">
+	            <div>
+	                <label for="branchId">Branch:</label>
+	                <select id="branchId" onchange="loadAccounts()">
+	                    <option value="">-- Select --</option>
+	                </select>
+	            </div>
+	            <div>
+	                <label for="accountType">Type:</label>
+	                <select id="accountType" onchange="loadAccounts()">
+	                    <option value="">-- All --</option>
+	                    <option value="savings">Savings</option>
+	                    <option value="current">Current</option>
+	                </select>
+	            </div>
+	            <div>
+	                <label for="accountStatus">Status:</label>
+	                <select id="accountStatus" onchange="loadAccounts()">
+	                    <option value="">-- All --</option>
+	                    <option value="new">New</option>
+	                    <option value="active">Active</option>
+	                    <option value="blocked">Blocked</option>
+	                </select>
+	            </div>
+	        </div>
+	        <div>
+		        <button class="add-account-btn" title="Add Account" onclick="window.location.href='OpenAccount.jsp'">
+		           <i class="fas fa-plus"></i>
+		       </button>
+	       </div>
+	    </div>
 
         <div id="statusMessage" class="message"></div>
 

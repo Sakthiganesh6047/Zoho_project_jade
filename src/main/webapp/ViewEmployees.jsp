@@ -43,7 +43,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
         }
 
         .page-title {
@@ -54,6 +53,14 @@
             border-left: 6px solid #414485;
             padding: 10px 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 0px;
+            margin-top: 0px;
+        }
+        
+        .control-add{
+        	display: flex;
+        	align-items: center;
+        	gap: 560px;
         }
 
         .add-btn {
@@ -65,6 +72,7 @@
             padding: 10px;
             cursor: pointer;
             transition: background 0.3s ease;
+            margin-bottom: 20px;
         }
 
         .add-btn:hover {
@@ -164,6 +172,46 @@
 		    margin: 15px 0;
 		    font-size: 15px;
 		}
+		
+		.filter-section {
+		    display: flex;
+		    gap: 25px;
+		    align-items: flex-end;
+		    margin-bottom: 25px;
+		    background: #ffffff;
+		    padding: 15px 20px;
+		    border-radius: 10px;
+		    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+		    justify-content: center;
+		    max-width: fit-content;
+		    margin-left: 33%
+		}
+		
+		.filter-group {
+		    display: flex;
+		    flex-direction: row;
+		    align-items: center;
+		    gap: 7px;
+		}
+		
+		.filter-group label {
+		    font-weight: bold;
+		    color: #2e2f60;
+		}
+		
+		.filter-group select {
+		    padding: 8px 12px;
+		    border: 1px solid #ccc;
+		    border-radius: 6px;
+		    font-size: 14px;
+		    background-color: #fff;
+		    outline: none;
+		    transition: border-color 0.3s ease;
+		}
+		
+		.filter-group select:focus {
+		    border-color: #414485;
+		}
 
         #pageInfo {
             font-weight: bold;
@@ -176,11 +224,32 @@
 <div class="body-wrapper">
     <div class="main-wrapper">
         <div class="page-title-wrapper">
-            <h2 class="page-title">Employee List</h2>
-            <button class="add-btn" onclick="window.location.href='EmployeeSignUp.jsp'" title="Add Employee">
-                <i class="fas fa-plus"></i>
-            </button>
-        </div>
+		    <h2 class="page-title">Employee List</h2>
+		</div>
+		<div class="control-add">
+			<div class="filter-section">
+			    <div class="filter-group">
+			        <label for="branchFilter">Branch:</label>
+			        <select id="branchFilter">
+			            <option value="">All</option>
+			        </select>
+			    </div>
+			    <div class="filter-group">
+			        <label for="roleFilter">Role:</label>
+			        <select id="roleFilter">
+			            <option value="">All</option>
+			            <option value="1">Clerk</option>
+			            <option value="2">Manager</option>
+			            <option value="3">General Manager</option>
+			        </select>
+			    </div>
+			</div>
+			<div>
+				<button class="add-btn" onclick="window.location.href='EmployeeSignUp.jsp'" title="Add Employee">
+			        <i class="fas fa-plus"></i>
+			    </button>
+			</div>
+		</div>
 
         <table id="employee-table">
             <thead>
@@ -214,6 +283,20 @@
 
     window.addEventListener('DOMContentLoaded', () => {
         document.body.style.opacity = 1;
+        loadBranches();
+
+        document.getElementById("branchFilter").addEventListener("change", () => {
+            currentPage = 0;
+            lastPageReached = false;
+            fetchEmployees();
+        });
+
+        document.getElementById("roleFilter").addEventListener("change", () => {
+            currentPage = 0;
+            lastPageReached = false;
+            fetchEmployees();
+        });
+
         fetchEmployees();
     });
 
@@ -225,10 +308,36 @@
         };
         return roles[roleId] || "Unknown";
     }
+    
+    function loadBranches() {
+        fetch("<%= request.getContextPath() %>/jadebank/branch/list")
+            .then(response => response.json())
+            .then(data => {
+                const branchSelect = document.getElementById("branchFilter");
+                branchSelect.innerHTML = '<option value="">All</option>'; // Reset
+
+                data.forEach(branch => {
+                    const option = document.createElement("option");
+                    option.value = branch.branchId;
+                    option.textContent = branch.branchName + " - " + branch.branchDistrict;
+                    branchSelect.appendChild(option);
+                });
+            })
+            .catch(err => {
+                console.error("Failed to load branches:", err);
+            });
+    }
 
     function fetchEmployees() {
         const offset = currentPage * limit;
-        fetch("<%= request.getContextPath() %>/jadebank/user/employeelist?limit=" + limit + "&offset=" + offset)
+        const branchId = document.getElementById("branchFilter").value;
+        const roleType = document.getElementById("roleFilter").value;
+
+        let url = "<%= request.getContextPath() %>/jadebank/user/employeelist?limit=" + limit + "&offset=" + offset;
+        if (branchId) url += "&branchId=" + encodeURIComponent(branchId);
+        if (roleType) url += "&roleType=" + encodeURIComponent(roleType);
+
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 const tbody = document.querySelector("#employee-table tbody");
@@ -269,27 +378,25 @@
             });
     }
 
-    function updatePageInfo() {
-        document.getElementById("pageInfo").textContent = `Page ${currentPage + 1}`;
+    function applyFilters() {
+        currentPage = 0;
+        lastPageReached = false;
+        fetchEmployees();
     }
 
     function editEmployee(employeeId) {
         window.location.href = "EmployeeSignUp.jsp?employeeId=" + encodeURIComponent(employeeId);
     }
-    
+
     function updatePageInfo() {
         document.getElementById("pageInfo").textContent = `Page ${currentPage + 1}`;
-        
+
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
 
-        // Disable prev button on first page
         prevBtn.disabled = currentPage === 0;
-
-        // Disable next button if lastPageReached is true
         nextBtn.disabled = lastPageReached;
 
-        // Optionally add a "disabled" style
         prevBtn.classList.toggle("disabled", prevBtn.disabled);
         nextBtn.classList.toggle("disabled", nextBtn.disabled);
     }
@@ -306,7 +413,7 @@
             messageBox.textContent = "You are already on the first page.";
             messageBox.style.display = "block";
             setTimeout(() => messageBox.style.display = "none", 3000);
-            updatePageInfo(); // still update
+            updatePageInfo();
         }
     }
 
@@ -321,21 +428,15 @@
             messageBox.textContent = "You are already on the last page.";
             messageBox.style.display = "block";
             setTimeout(() => messageBox.style.display = "none", 3000);
-            updatePageInfo(); // still update
+            updatePageInfo();
         }
     }
 
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const mainWrapper = document.querySelector('.main-wrapper');
-
         sidebar.classList.toggle('expanded');
-
-        if (sidebar.classList.contains('expanded')) {
-            mainWrapper.style.marginLeft = "220px";
-        } else {
-            mainWrapper.style.marginLeft = "70px";
-        }
+        mainWrapper.style.marginLeft = sidebar.classList.contains('expanded') ? "220px" : "70px";
     }
 </script>
 

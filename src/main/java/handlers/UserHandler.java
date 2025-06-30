@@ -295,7 +295,6 @@ public class UserHandler {
     public String getUserByPhone(@FromBody User user) throws CustomException {
     	
     	String phone = user.getPhone();
-    	ValidationsUtil.isNull(phone, "Phone Number");
     	ValidationsUtil.isEmpty(phone, "Phone Number");
     	
     	User fetchedUser = userDAO.getUserByPhone(phone);
@@ -312,6 +311,31 @@ public class UserHandler {
     	ValidationsUtil.isNull(userId, "UserId");
     	
         User fetchedUser = userDAO.getUserById(userId);
+        if (fetchedUser == null) {
+        	return null;
+        }
+
+        UserProfile profile = new UserProfile(fetchedUser);
+        switch (fetchedUser.getUserType()) {
+            case 2:
+                Employee employee = employeeHandler.getEmployeeDetails(fetchedUser.getUserId());
+                profile.setEmployeeDetails(employee);
+                break;
+            case 1:
+                Customer customer = customerHandler.getCustomerDetails(fetchedUser.getUserId());
+                profile.setCustomerDetails(customer);
+                break;
+        }
+        return Results.respondJson(profile);
+    }
+    
+    @Route(path = "user/details", method = "POST")
+    public String getUserDetails(@FromBody User user) throws CustomException {
+    	
+    	String phone = user.getPhone();
+    	ValidationsUtil.isEmpty(phone, "Phone Number");
+    	
+        User fetchedUser = userDAO.getUserByPhone(phone);
         if (fetchedUser == null) {
         	return null;
         }
@@ -359,45 +383,29 @@ public class UserHandler {
     }
     
     @Route(path = "user/employeelist", method = "GET")
-    public String getEmployeeProfiles(@FromSession("userId") Long userId, @FromSession("role") Integer role,
-    								@FromQuery("limit") int limit, @FromQuery("offset") int offset) throws CustomException {
-    	
-    	ValidationsUtil.isNull(userId, "UserId");
-    	ValidationsUtil.isNull(role, "User Role");
-    	ValidationsUtil.checkLimitAndOffset(limit, offset);
-    	
-    	if(role == 2) {
-    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
-    		return Results.respondJson(userDAO.getAllEmployeeDetails(employee.getBranch(), limit, offset));
-    	} else {
-    		return Results.respondJson(userDAO.getAllEmployeeDetails(limit, offset));
-    	}
+    public String getEmployeeProfiles(
+            @FromSession("userId") Long userId,
+            @FromSession("role") Integer role,
+            @FromQuery("limit") int limit,
+            @FromQuery("offset") int offset,
+            @FromQuery("branchId") Long branchId,
+            @FromQuery("roleType") Integer roleType // e.g., 0=Clerk, 1=Manager, etc.
+    ) throws CustomException {
+
+        ValidationsUtil.isNull(userId, "UserId");
+        ValidationsUtil.isNull(role, "User Role");
+        ValidationsUtil.checkLimitAndOffset(limit, offset);
+        ValidationsUtil.checkUserRole(role);
+
+        if (role == 2) {
+            Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+            branchId = employee.getBranch(); // enforce manager's own branch
+        }
+
+        return Results.respondJson(
+            userDAO.getFilteredEmployeeDetails(branchId, roleType, limit, offset)
+        );
     }
-    
-//    @Route(path = "user/employeelist", method = "GET")
-//    public String getEmployeeProfiles(
-//            @FromSession("userId") Long userId,
-//            @FromSession("role") Integer role,
-//            @FromQuery("limit") int limit,
-//            @FromQuery("offset") int offset,
-//            @FromQuery("branchId") Long branchId,
-//            @FromQuery("roleType") Integer roleType // e.g., 0=Clerk, 1=Manager, etc.
-//    ) throws CustomException {
-//
-//        ValidationsUtil.isNull(userId, "UserId");
-//        ValidationsUtil.isNull(role, "User Role");
-//        ValidationsUtil.checkLimitAndOffset(limit, offset);
-//        ValidationsUtil.checkUserRole(role);
-//
-//        if (role == 2) {
-//            Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
-//            branchId = employee.getBranch(); // enforce manager's own branch
-//        }
-//
-//        return Results.respondJson(
-//            userDAO.getFilteredEmployeeDetails(branchId, roleType, limit, offset)
-//        );
-//    }
     
     @Route(path = "user/employeecount", method = "GET")
     public String getRoleCount(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
