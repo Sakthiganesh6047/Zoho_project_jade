@@ -19,7 +19,7 @@
         }
         .body-wrapper {
             display: flex;
-            min-height: 87vh;
+            min-height: 89vh;
         }
         .sidebar-wrapper {
             width: 60px;

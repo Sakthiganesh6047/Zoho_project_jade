@@ -13,7 +13,7 @@
 		    margin: 0; 
 		    display: flex; 
 		    flex-direction: column; 
-		    min-height: 94vh;
+		    min-height: 93vh;
 		    padding-top: 70px; /* same as header height */
 		}
 		

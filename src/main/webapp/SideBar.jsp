@@ -23,7 +23,7 @@
 	    justify-content: space-between;
 	    box-shadow: 4px 0 12px rgba(0,0,0,0.3);
 	    transition: width 0.3s ease;
-	    z-index: 1000;
+	    /*z-index: 100;*/
 	    box-shadow: 6px 0 16px rgba(0, 0, 0, 0.3); /* subtle shadow */
     	transition: width 0.3s ease, box-shadow 0.3s ease;
 	}

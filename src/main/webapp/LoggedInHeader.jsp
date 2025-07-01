@@ -177,6 +177,66 @@
         border-radius: 6px;
         font-weight: bold;
     }
+    
+    .logout-box {
+	    text-align: center;
+	    margin: 0;
+	    position: absolute;
+	    top: 50%;
+	    left: 50%;
+	    transform: translate(-50%, -50%);
+	    width: 350px;
+	    padding: 25px;
+	    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	    background-color: #fff;
+	    border-radius: 10px;
+	}
+	
+	.logout-box h3 {
+	    margin-bottom: 10px;
+	    color: #373962;
+	}
+	
+	.logout-box p {
+	    font-size: 15px;
+	    margin-bottom: 20px;
+	    color: #444;
+	}
+	
+	.button-group {
+	    display: flex;
+	    justify-content: space-between;
+	    gap: 10px;
+	}
+	
+	.button-group button {
+	    flex: 1;
+	    padding: 10px;
+	    font-weight: bold;
+	    border: none;
+	    border-radius: 6px;
+	    cursor: pointer;
+	    transition: background 0.3s ease;
+	}
+	
+	.confirm-btn {
+	    background-color: #414485;
+	    color: white;
+	}
+	
+	.confirm-btn:hover {
+	    background-color: #303268;
+	}
+	
+	.cancel-btn {
+	    background-color: #ccc;
+	    color: #333;
+	}
+	
+	.cancel-btn:hover {
+	    background-color: #bbb;
+	}
+    
 </style>
 
 <!-- Header -->
@@ -200,7 +260,7 @@
         <a href="javascript:void(0)" onclick="showPasswordChangeModal()">
             <i class="fa-solid fa-key"></i> Change Password
         </a>
-        <a href="Logout.jsp" class="logout-link">
+        <a href="javascript:void(0);" class="logout-link" onclick="showLogoutModal()">
             <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
     </div>
@@ -220,6 +280,19 @@
             <div id="passwordStatus" style="margin-top: 10px; text-align: center; font-weight: bold;"></div>
         </div>
     </div>
+    
+<!-- Logout Confirmation Modal -->
+<div id="logoutConfirmModal" class="modal">
+    <div class="modal-content logout-box">
+        <h3>Confirm Logout</h3>
+        <p>Are you sure you want to logout?</p>
+        <div class="button-group">
+            <button class="confirm-btn" onclick="confirmLogout()">Yes, Logout</button>
+            <button class="cancel-btn" onclick="closeLogoutModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+    
 </div>
 
 <script>
@@ -257,6 +330,14 @@
 	        profileBox.classList.remove("active");
 	    }
 	});
+	
+	window.onclick = function(event) {
+	    const logoutModal = document.getElementById("logoutConfirmModal");
+	    const passwordModal = document.getElementById("changePasswordModal");
+
+	    if (event.target === logoutModal) logoutModal.style.display = "none";
+	    if (event.target === passwordModal) passwordModal.style.display = "none";
+	}
 
     fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
         .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch profile"))
@@ -280,6 +361,18 @@
     function closePasswordChangeModal() {
         document.getElementById("changePasswordModal").style.display = "none";
         ["oldPassword", "newPassword", "confirmNewPassword"].forEach(id => document.getElementById(id).value = "");
+    }
+    
+    function showLogoutModal() {
+        document.getElementById("logoutConfirmModal").style.display = "block";
+    }
+
+    function closeLogoutModal() {
+        document.getElementById("logoutConfirmModal").style.display = "none";
+    }
+
+    function confirmLogout() {
+        window.location.href = "Logout.jsp";
     }
 
     function submitPasswordChange() {

@@ -25,7 +25,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 100vh;
+            min-height: 89vh;
         }
 
         .main-wrapper {

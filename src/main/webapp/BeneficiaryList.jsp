@@ -20,7 +20,7 @@
 
         .body-wrapper {
             display: flex;
-            min-height: 88vh;
+            min-height: 89vh;
         }
 
         .sidebar-wrapper {

@@ -3,7 +3,6 @@
 	        background-color: transparent;
 	        color: black;
 	        text-align: center;
-	        padding: 5px;
 	        font-size: 14px;
 	    }
 </style>

@@ -391,18 +391,18 @@
 					    <div class="info-card" onclick="parent.loadPage('ManageBranches.jsp')">
 					        <h4>Branches</h4>
 					        <div class="infocard-logo">
-						        <i class="fas fa-code-branch"></i>
+						        <i class="fa-solid fa-building-columns"></i>
 						        <p id="statBranches">0</p>
 					        </div>
 					    </div>
 					    <div class="info-card" onclick="parent.loadPage('ViewEmployees.jsp')">
 					        <h4>Employees</h4>
 					        <div class="infocard-logo">
-						        <i class="fas fa-users"></i>
+						        <i class="fas fa-user-tie"></i>
 						        <p id="statEmployees">0</p>
 						    </div>
 					    </div>
-					    <div class="info-card" onclick="parent.loadPage('CustomerSignUp.jsp')">
+					    <div class="info-card" onclick="parent.loadPage('SearchCustomer.jsp')">
 					        <h4>Customers</h4>
 					        <div class="infocard-logo">
 						        <i class="fas fa-user-circle"></i>
@@ -434,7 +434,7 @@
                 <p>New Jade Branch</p>
             </a>
             <a href="EmployeeSignUp.jsp" class="dashboard-card">
-                <i class="fas fa-user-plus"></i>
+                <i class="fas fa-user-tie"></i>
                 <h4>Add Employee</h4>
                 <p>Register new staff</p>
             </a>

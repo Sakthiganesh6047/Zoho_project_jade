@@ -375,7 +375,7 @@
                 <p>Save contacts</p>
             </a>
             <a href="BeneficiaryList.jsp" class="dashboard-card">
-                <i class="fas fa-user-plus"></i>
+                <i class="fas fa-users"></i>
                 <h4>Beneficiary List</h4>
                 <p>View contacts</p>
             </a>

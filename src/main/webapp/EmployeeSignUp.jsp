@@ -10,7 +10,7 @@
             margin: 0; 
 		    display: flex; 
 		    flex-direction: column; 
-		    min-height: 94vh;
+		    min-height: 93vh;
 		    font-family: 'Roboto Flex', sans-serif;
 		    padding-top: 70px; /* same as header height */
 		    background-image: url("contents/background.png"); /* Replace with your actual path */
