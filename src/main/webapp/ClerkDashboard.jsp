@@ -173,7 +173,6 @@
     </div>
     <% } else if (role == 1 || role == 2 || role == 3) { %>
     <div class="section-wrapper">
-        <div class="section-title">Staff Operations</div>
         <div class="cards-grid">
             <% if (role != 1) { %>
             <a href="ManageBranches.jsp" class="dashboard-card">
@@ -181,7 +180,6 @@
                 <h4>Manage Branches</h4>
                 <p>Branch operations</p>
             </a>
-            <% } %>
             <% if (role == 3) { %>
             <a href="AddNewBranch.jsp" class="dashboard-card">
                 <i class="fa-solid fa-building-columns"></i>
@@ -199,6 +197,7 @@
                 <h4>Add Employee</h4>
                 <p>Register new staff</p>
             </a>
+             <% } %>
         </div>
     </div>
     <div class="section-wrapper">

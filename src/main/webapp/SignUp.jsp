@@ -282,13 +282,17 @@ LocalDate minEligibleDate = today.minusYears(18);
 				        <div class="password-container">
 						    <div class="field-container" style="position: relative;">
 						        <label>Password:<span class="required">*</span></label>
-						        <input type="password" id="password" name="user.passwordHash" maxlength="50" required oncopy="return false" onpaste="return false" oncut="return false">
+						        <input type="password" id="password" name="user.passwordHash" maxlength="20"
+								pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+							 	title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character." oncopy="return false" onpaste="return false" oncut="return false">
 						        <i class="fa-solid fa-eye toggle-password" toggle="#password"></i>
 						    </div>
 						
 						    <div class="field-container" style="position: relative;">
 						        <label>Confirm Password:<span class="required">*</span></label>
-						        <input type="password" id="confirmPassword" name="confirmPassword" maxlength="50" oncopy="return false" required oncopy="return false" oncut="return false" onpaste="return false">
+						        <input type="password" id="confirmPassword" name="confirmPassword" maxlength="20"
+						        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+							 	title="Must match the new password." oncopy="return false" required oncopy="return false" oncut="return false" onpaste="return false">
 						        <i class="fa-solid fa-eye toggle-password" toggle="#confirmPassword"></i>
 						    </div>
 						</div><br>

@@ -44,6 +44,7 @@ public class ValidationsUtil {
 	    Integer age = user.getAge();
 	    String gender = user.getGender();
 	    Integer userType = user.getUserType();
+	    String password = user.getPasswordHash();
 		
 	    if (fullName == null || !fullName.matches("[A-Za-z]+(?:[\\-' ][A-Za-z]+)*")) {
 	        throw new CustomException("Full name must contain only letters and spaces (2–50 characters).");
@@ -53,9 +54,9 @@ public class ValidationsUtil {
 	        throw new CustomException("Invalid email format.");
 	    }
 
-//	    if (passwordHash == null || passwordHash.length() < 8) {
-//	        throw new CustomException("Password must be at least 8 characters long.");
-//	    }
+	    if (password == null || password.matches("^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\W).{8,20}$")) {
+	        throw new CustomException("Password must be 8-20 characters, include uppercase, lowercase, number, and a special character.");
+	    }
 
 	    if (phone == null || !phone.matches("^[6-9]\\d{9}$")) {
 	        throw new CustomException("Phone number must be a valid 10-digit Indian number starting with 6–9.");

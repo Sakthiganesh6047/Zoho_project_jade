@@ -62,8 +62,8 @@ public class UserHandler {
     	
     	User user = profile.getUser();
     	user.setAge(TimeConversion.calculateAge(user.getDob()));
-    	user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
     	ValidationsUtil.validateUser(user);
+    	user.setPasswordHash(Password.hashPassword(user.getPasswordHash()));
     	
     	if (user.getUserType() == 1) {
 			ValidationsUtil.validateCustomer(profile.getCustomerDetails());
@@ -234,7 +234,6 @@ public class UserHandler {
                 	throw new CustomException("Employee details missing.");
                 }
                 employee.setEmployeeId(user.getUserId());
-
                 // Optional: validate update authority for roles
                 Employee updater = employeeHandler.getEmployeeDetails(updaterId);
                 if (!hasPermissionToUpdate(updater, employee)) {
