@@ -62,7 +62,7 @@ public class TransactionDAO {
                 .where("account_id", "=", accountId)
                 .limit(limit)
                 .offset(offset)
-                .orderBy("transactionDate", "ASC")
+                .orderBy("transactionDate", "DESC")
                 .build();
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         return castResult(executor.executeQuery(query, Transaction.class));

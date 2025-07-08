@@ -1,3 +1,4 @@
+<%@ page session="false" %>
 <style>
 .footer {
 	        background-color: transparent;

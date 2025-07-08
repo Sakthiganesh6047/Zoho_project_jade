@@ -125,16 +125,18 @@
                 </select>
 
                 <label for="beneficiaryName">Receiver Name:</label>
-                <input type="text" id="beneficiaryName" maxlength="50" required>
+                <input type="text" id="beneficiaryName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" required autofocus
+				title="Name should contain only letters, spaces, hyphens or apostrophes.">
 
                 <label for="bankName">Bank Name:</label>
-                <input type="text" id="bankName" maxlength="50" required>
+                <input type="text" id="bankName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required
+				title="Bank Name should contain only letters, spaces, hyphens or apostrophes.">
 
                 <label for="beneficiaryAccountNumber">Receiver Account Number:</label>
-                <input type="number" id="beneficiaryAccountNumber" maxlength="20" required>
+                <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
                 <label for="ifscCode">IFSC Code:</label>
-                <input type="text" id="ifscCode" maxlength="11" required>
+                <input type="text" id="ifscCode" maxlength="11" pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter a valid IFSC code (e.g., JADE000000)." required>
 
                 <label for="amount">Amount:</label>
                 <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
@@ -168,10 +170,6 @@
 	    input.value = input.value
 	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
 	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
-	
-	    if (Number(input.value) > 100000) {
-	        input.value = "100000";
-	    }
 	}
 	
 	document.getElementById("amount").addEventListener("keydown", function(e) {
@@ -208,19 +206,13 @@
     };
 
     function showPasswordModal() {
-        const accountId = document.getElementById("accountId").value;
-        const beneficiaryName = document.getElementById("beneficiaryName").value.trim();
-        const bankName = document.getElementById("bankName").value.trim();
-        const beneficiaryAccountNumber = document.getElementById("beneficiaryAccountNumber").value.trim();
-        const ifscCode = document.getElementById("ifscCode").value.trim();
-        const amount = document.getElementById("amount").value;
-
+        const form = document.getElementById("quickTransferForm");
         const statusDiv = document.getElementById("status");
         statusDiv.textContent = ""; // Clear previous status
 
-        if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || parseFloat(amount) <= 0) {
-            statusDiv.textContent = "Please fill all required fields correctly before proceeding.";
-            statusDiv.style.color = "red";
+        if (!form.checkValidity()) {
+            // Trigger browser to show built-in validation messages
+            form.reportValidity();
             return;
         }
 
@@ -237,6 +229,7 @@
         const beneficiaryName = document.getElementById("beneficiaryName").value.trim();
         const bankName = document.getElementById("bankName").value.trim();
         const beneficiaryAccountNumber = parseInt(document.getElementById("beneficiaryAccountNumber").value);
+        console.log(beneficiaryAccountNumber);
         const ifscCode = document.getElementById("ifscCode").value.trim();
         const amount = parseFloat(document.getElementById("amount").value);
         const description = document.getElementById("description").value.trim();

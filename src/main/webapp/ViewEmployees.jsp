@@ -385,7 +385,7 @@
     }
 
     function editEmployee(employeeId) {
-        window.location.href = "EmployeeSignUp.jsp?employeeId=" + encodeURIComponent(employeeId);
+        window.location.href = "EmployeeSignUp.jsp?employeeId=" + (employeeId);
     }
 
     function updatePageInfo() {

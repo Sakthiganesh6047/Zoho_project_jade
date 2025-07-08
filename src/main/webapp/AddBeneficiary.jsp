@@ -113,13 +113,14 @@
                 </select>
 
                 <label for="accountNumber">Account Number:</label>
-                <input type="number" id="accountNumber" required>
+                <input type="tel" id="accountNumber" maxlength="20" required>
 
                 <label for="beneficiaryName">Beneficiary Name:</label>
-                <input type="text" id="beneficiaryName" required>
+                <input type="text" id="beneficiaryName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
+				title="Name should contain only letters, spaces, hyphens or apostrophes.">
 
                 <label for="ifscCode">IFSC Code:</label>
-                <input type="text" id="ifscCode" required>
+                <input type="text" id="ifscCode" pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter a valid IFSC code (e.g., JADE000000)." required>
 
                 <button type="submit">Add Beneficiary</button>
                 <div id="status"></div>

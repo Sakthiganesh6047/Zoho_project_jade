@@ -1,5 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" session="true"%>
 <%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
+<%
     Integer role = (Integer) session.getAttribute("role");
     if (role == null || role < 0 || role > 3) {
         response.sendRedirect("Login.jsp");

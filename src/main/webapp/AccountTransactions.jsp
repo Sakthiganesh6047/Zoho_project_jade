@@ -1,3 +1,4 @@
+<%@ page session="false" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -22,6 +23,7 @@
         .main-wrapper {
             margin-left: 20px;
             padding: 30px;
+            padding-bottom: 0px;
             flex: 1;
             transition: margin-left 0.3s ease;
         }
@@ -169,9 +171,9 @@
         <div class="search-section">
             <div class="search-row">
                 <div class="search-wrapper">
-                    <label for="accountId">Account ID:</label>
-                    <input type="number" id="accountId" placeholder="Enter Account ID" onblur="fetchTransactions(true)" />
-                </div>
+				    <label for="accountId">Account ID:</label>
+				    <input type="number" id="accountId" placeholder="Enter Account ID" />
+				</div>
             </div>
         </div>
 
@@ -326,6 +328,12 @@
         const date = new Date(Number(timestamp));
         return date.toLocaleString("en-IN");
     }
+    document.getElementById("accountId").addEventListener("input", function () {
+        const value = this.value;
+        if (value.length >= 10) {
+            fetchTransactions(true);
+        }
+    });
 </script>
 
 </body>

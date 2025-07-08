@@ -115,11 +115,13 @@ public class HandlersRegistry {
     }
     
     private Integer getUserRole(HttpServletRequest request, HttpServletResponse response) throws CustomException {
+    	Integer userRole;
     	HttpSession session = request.getSession(false);
     	if (session == null) {
-    		Results.respondError(response, 403, "Session not found, Please login");
+    		//Results.respondError(response, 403, "Session not found, Please login");
+    		return 4;
     	}
-    	Integer userRole = (Integer) session.getAttribute("role");
+    	userRole = (Integer) session.getAttribute("role");
     	if (userRole == null) {
     		return 4;
     	} else {

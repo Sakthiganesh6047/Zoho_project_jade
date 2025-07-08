@@ -155,7 +155,7 @@
         <div id="debit-account-info" class="info-box hidden"></div>
 
         <label for="debitAmount">Amount:</label>
-        <input type="number" step="0.01" name="amount" id="debitAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
+        <input type="number" step="0.01" name="amount" id="debitAmount" required min="0.01" max="100000" />
 
         <div class="submit-wrapper">
             <button type="button" onclick="openDebitPasswordModal()">Debit</button>
@@ -177,15 +177,6 @@
 </div>
 
 <script>
-    function validateAmount(input) {
-        input.value = input.value
-            .replace(/[^\d.]/g, '')
-            .replace(/^(\d*\.\d{0,2}).*$/, '$1');
-
-        if (Number(input.value) > 100000) {
-            input.value = "100000";
-        }
-    }
 
     document.getElementById("debitAmount").addEventListener("keydown", function (e) {
         if (["e", "E", "+", "-"].includes(e.key) || (e.key === "." && this.value.includes("."))) {
@@ -243,8 +234,16 @@
             return;
         }
 
+        const MAX_AMOUNT = 1000000; // 10,00,000
+        
         if (!amount || isNaN(amount) || amount <= 0) {
             statusDiv.textContent = "Please enter a valid amount.";
+            statusDiv.style.color = "red";
+            return;
+        }
+        
+        if (amount > MAX_AMOUNT) {
+            statusDiv.textContent = "Amount must not exceed 10,00,000.";
             statusDiv.style.color = "red";
             return;
         }

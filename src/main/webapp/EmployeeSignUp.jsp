@@ -1,10 +1,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.time.LocalDate"%>
+<%
+LocalDate today = LocalDate.now();
+LocalDate minEligibleDate = today.minusYears(18);
+%>
 <!DOCTYPE html>
 <html>
 <head>
     <title>Employee Signup</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body {
             margin: 0; 
@@ -71,7 +77,13 @@
             font-weight: 600;
         }
 
-        .field-container input,
+        .field-container input {
+            width: 95%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
         .field-container select {
             width: 100%;
             padding: 8px;
@@ -105,6 +117,15 @@
         .btn:hover {
             background-color: #155a9c;
         }
+        
+        .toggle-password {
+		    position: absolute;
+		    top: 32px;
+		    right: 14px;
+		    cursor: pointer;
+		    color: #666;
+		    font-size: 16px;
+		}
     </style>
 </head>
 <body>
@@ -123,25 +144,33 @@
 		
 		                    <div class="field-container">
 		                        <label>Full Name:<span class="required">*</span></label>
-		                        <input type="text" name="user.fullName" maxlength="50" required>
+		                        <input type="text" name="user.fullName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
+								title="Name should contain only letters, spaces, hyphens or apostrophes.">
 		                    </div>
 		                    <div class="field-container">
 		                        <label>Email:<span class="required">*</span></label>
-		                        <input type="email" name="user.email" maxlength="70" required>
+		                        <input type="email" name="user.email" maxlength="70" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
+							title="Enter a valid email address (e.g., user@example.com)." required>
 		                    </div>
 		                    <div class="gender-container">
 		                        <label>Gender:<span class="required">*</span></label>
-		                        <input type="radio" id="male" name="user.gender" value="male"><label for="male">Male</label>
-		                        <input type="radio" id="female" name="user.gender" value="female"><label for="female">Female</label>
-		                        <input type="radio" id="other" name="user.gender" value="others"><label for="other">Others</label>
+		                        <input type="radio" id="male" name="user.gender" value="male" required title="Select your gender.">
+		                        <label for="male">Male</label>
+		                        
+		                        <input type="radio" id="female" name="user.gender" value="female" required title="Select your gender.">
+		                        <label for="female">Female</label>
+		                        
+		                        <input type="radio" id="other" name="user.gender" value="others" required title="Select your gender.">
+		                        <label for="other">Others</label>
 		                    </div>
 		                    <div class="field-container">
 		                        <label for="dob">Date of Birth:<span class="required">*</span></label>
-		                        <input type="date" id="dob" name="user.dob" required>
+		                        <input type="date" id="dob" name="user.dob" max="<%=minEligibleDate%>"
+						 	title="You must be at least 18 years old." required>
 		                    </div>
 		                    <div class="field-container">
 		                        <label for="phone">Phone Number:<span class="required">*</span></label>
-		                        <input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" maxlength="10" required>
+		                        <input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
 		                    </div>
 		                    <div class="proof-container">
 		                        <div class="field-container">
@@ -161,15 +190,18 @@
 		                        </div>
 		                    </div>
 		                    <div class="password-container">
-		                        <div class="field-container" style="padding-right: 10px">
-		                            <label>Password:<span class="required">*</span></label>
-		                            <input type="password" name="user.passwordHash" maxlength="50" required>
-		                        </div>
-		                        <div class="field-container">
-		                            <label>Confirm Password:<span class="required">*</span></label>
-		                            <input type="password" name="confirmPassword" maxlength="50" required>
-		                        </div>
-		                    </div><br>
+							    <div class="field-container" style="position: relative;">
+							        <label>Password:<span class="required">*</span></label>
+							        <input type="password" id="password" name="user.passwordHash" maxlength="50" required oncopy="return false" onpaste="return false" oncut="return false">
+							        <i class="fa-solid fa-eye toggle-password" toggle="#password"></i>
+							    </div>
+							
+							    <div class="field-container" style="position: relative;">
+							        <label>Confirm Password:<span class="required">*</span></label>
+							        <input type="password" id="confirmPassword" name="confirmPassword" maxlength="50" oncopy="return false" required oncopy="return false" oncut="return false" onpaste="return false">
+							        <i class="fa-solid fa-eye toggle-password" toggle="#confirmPassword"></i>
+							    </div>
+							</div><br>
 		                    <div>
 		                        <button type="submit" class="btn" id="form-submit-btn">Register</button>
 		                    </div>
@@ -186,7 +218,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
-    const employeeId = urlParams.get("userId");
+    const employeeId = urlParams.get("employeeId");
     console.log(employeeId);
 
     // Load branch list
@@ -319,6 +351,15 @@ document.addEventListener("DOMContentLoaded", function () {
         .catch(err => {
             document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
         });
+    });
+});
+document.querySelectorAll('.toggle-password').forEach(function (icon) {
+    icon.addEventListener('click', function () {
+        const input = document.querySelector(icon.getAttribute('toggle'));
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
     });
 });
 </script>

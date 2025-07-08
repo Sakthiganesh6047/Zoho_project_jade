@@ -1,6 +1,10 @@
 <!-- Include Font Awesome for icons -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
 <%@ page session="true" %>
 <%
     Integer role = (Integer) session.getAttribute("role");
@@ -9,7 +13,6 @@
     }
     String currentPage = request.getRequestURI();
 %>
-
 <style>
 	.sidebar {
 	    position: absolute; /* Change from fixed to absolute */

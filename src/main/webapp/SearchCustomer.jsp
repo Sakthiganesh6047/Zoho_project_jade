@@ -1,4 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.time.LocalDate"%>
+<%
+LocalDate today = LocalDate.now();
+LocalDate minEligibleDate = today.minusYears(18);
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -306,10 +311,10 @@
             <h2 class="page-title">Search Customer</h2>
         </div>
 		<div class="input-wrapper">
-	        <label for="phone">Customer Phone Number:</label>
-	        <input type="text" id="phone" name="phone" placeholder="Enter phone number..." onblur="fetchUserProfile()">
-	        <div class="error" id="errorMsg"></div>
-	    </div>
+		    <label for="phone">Customer Phone Number:</label>
+		    <input type="text" id="phone" name="phone" placeholder="Enter phone number..." maxlength="10">
+		    <div class="error" id="errorMsg"></div>
+		</div>
 	    
 	    <div id="statusMessage" style="display:none; padding: 12px 18px; margin-top: 20px; border-radius: 8px; font-weight: 500;"></div>
 
@@ -352,32 +357,38 @@
       <input type="hidden" name="user.userId" id="editUserId">
 
       <label>Full Name</label>
-      <input type="text" name="user.fullName" id="editFullName" required>
+      <input type="text" name="user.fullName" id="editFullName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
+		title="Name should contain only letters, spaces, hyphens or apostrophes.">
 
       <label>Email</label>
-      <input type="email" name="user.email" id="editEmail" required>
+      <input type="email" name="user.email" id="editEmail" maxlength="70" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
+		title="Enter a valid email address (e.g., user@example.com)." required>
 
       <label>Gender</label>
-      <select id="editGender" name="user.gender">
+      <select id="editGender" name="user.gender" required title="Select your gender.">
         <option value="male">Male</option>
         <option value="female">Female</option>
         <option value="others">Others</option>
       </select>
 
       <label>Date of Birth</label>
-      <input type="date" name="user.dob" id="editDob" required>
+      <input type="date" name="user.dob" id="editDob" max="<%=minEligibleDate%>"
+		title="You must be at least 18 years old." required>
 
       <label>Phone</label>
-      <input type="tel" name="user.phone" id="editPhone" required pattern="[0-9]{10}">
+      <input type="tel" name="user.phone" id="editPhone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
 
       <label>Aadhar Number</label>
-      <input type="text" name="customerDetails.aadharNumber" id="editAadhar" required pattern="[0-9]{12}">
+      <input type="text" name="customerDetails.aadharNumber" id="editAadhar" pattern="[0-9]{12}" inputmode="numeric" maxlength="12" 
+		title="Aadhar number must be exactly 12 digits." required>
 
       <label>PAN ID</label>
-      <input type="text" name="customerDetails.panId" id="editPan" required>
+      <input type="text" name="customerDetails.panId" id="editPan" maxlength="10" pattern="[A-Z]{5}\d{4}[A-Z]"
+		oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
+		title="PAN format: 5 uppercase letters, 4 digits, and 1 uppercase letter (e.g., ABCDE1234F)." required>
 
       <label>Address</label>
-      <textarea name="customerDetails.address" id="editAddress" required></textarea>
+      <textarea name="customerDetails.address" id="editAddress" rows="3" maxlength="50" required></textarea>
 
       <button type="submit">Save Changes</button>
     </form>
@@ -513,6 +524,16 @@
             statusDiv.style.display = "none";
         }, 4000); // Message disappears after 4 seconds
     }
+    
+    document.getElementById("phone").addEventListener("input", function () {
+        const phone = this.value;
+        const onlyDigits = /^\d+$/;
+
+        // Trigger fetch only if it's exactly 10 digits and only numbers
+        if (phone.length === 10 && onlyDigits.test(phone)) {
+            fetchUserProfile();
+        }
+    });
 
 </script>
 

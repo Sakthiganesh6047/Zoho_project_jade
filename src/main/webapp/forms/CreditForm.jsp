@@ -212,7 +212,9 @@
         <div id="credit-account-info" style="display: none;"></div>
 
         <label for="creditAmount">Amount:</label>
-        <input type="number" step="0.01" name="amount" id="creditAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
+		<input type="number" step="0.01" name="amount" id="creditAmount"
+		       required min="0.01" max="1000000"
+		       title="Amount must be between 0.01 and 10,00,000">
 
         <div class="submit-wrapper">
 		    <button type="button" onclick="openCreditPasswordModal()">Credit</button>
@@ -234,16 +236,6 @@
 </div>
 
 <script>
-
-	function validateAmount(input) {
-	    input.value = input.value
-	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
-	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
-	
-	    if (Number(input.value) > 100000) {
-	        input.value = "100000";
-	    }
-	}
 	
 	document.getElementById("creditAmount").addEventListener("keydown", function(e) {
 	    // Disallow: e, +, -, and multiple dots
@@ -293,14 +285,23 @@
         const amount = parseFloat(document.getElementById("creditAmount").value);
         const statusDiv = document.getElementById("credit-status");
 
+        const MAX_AMOUNT = 1000000; // ₹10,00,000
+
         statusDiv.textContent = ""; // Clear previous messages
 
-        if (!accountId || !amount || amount <= 0 || !creditAccountDetails) {
+        if (!accountId || isNaN(amount) || !creditAccountDetails) {
             statusDiv.textContent = "Please fill all fields and validate the account before proceeding.";
             statusDiv.style.color = "red";
             return;
         }
 
+        if (amount > MAX_AMOUNT || amount <= 0 ) {
+            statusDiv.textContent = "Amount must not be below 1 or exceed 10,00,000.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
+        // All checks passed → show modal
         document.getElementById("creditPasswordModal").style.display = "flex";
     }
 

@@ -246,7 +246,6 @@
             <label for="accountId">Account ID:</label>
             <select id="accountId" onchange="fetchTransactions(true)">
                 <option value="">-- Select Account --</option>
-                <option value="ALL">All Accounts</option>
             </select>
 
             <div id="errorMsg" class="error"></div>

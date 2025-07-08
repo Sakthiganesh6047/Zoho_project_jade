@@ -1,4 +1,10 @@
+<%@ page session="false" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -177,11 +183,12 @@
 			    		<img src="contents/login_page_clipart.png" alt="Login Page Clipart" class=login-clipart>
 			    	</div>
 			    	<div class=logindetails-container>
-			    		<h2>Login</h2>
+			    		<h2>JadeBank - Login</h2>
 						<form id="login-form" class="login-form">
 							<div class=email-container>
 								<label for="email">Email</label>
-						    	<input type="email" id="email" name="email" placeholder="Enter your email" maxlength=100 required>
+						    	<input type="email" id="email" name="email" placeholder="Enter your email" maxlength="70" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
+								title="Enter a valid email address (e.g., user@example.com)." required>
 							</div>
 							<div class="password-container">
 								<label for="password">Password</label>

@@ -117,7 +117,7 @@
                 <input type="hidden" name="branchId" id="branchId" />
 
                 <label for="branchName">Branch Name</label>
-                <input type="text" name="branchName" required />
+                <input type="text" name="branchName" maxlength="100" pattern="^[A-Za-z0-9 .'-]{3,100}$" required />
 
                 <label for="branchDistrict">District</label>
                 <select name="branchDistrict" id="branchDistrict" required>

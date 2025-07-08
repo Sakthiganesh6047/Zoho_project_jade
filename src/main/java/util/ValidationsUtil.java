@@ -45,11 +45,11 @@ public class ValidationsUtil {
 	    String gender = user.getGender();
 	    Integer userType = user.getUserType();
 		
-	    if (fullName == null || !fullName.matches("^[A-Za-z ]{2,50}$")) {
+	    if (fullName == null || !fullName.matches("[A-Za-z]+(?:[\\-' ][A-Za-z]+)*")) {
 	        throw new CustomException("Full name must contain only letters and spaces (2–50 characters).");
 	    }
 
-	    if (email == null || !email.matches("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,6}$")) {
+	    if (email == null || !email.matches("[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}")) {
 	        throw new CustomException("Invalid email format.");
 	    }
 
@@ -124,8 +124,8 @@ public class ValidationsUtil {
 		    throw new CustomException("Branch district must contain only 2–50 characters");
 		}
 
-		if (address == null || address.isBlank() || address.length() < 5 || address.length() > 250) {
-		    throw new CustomException("Address must be between 5 and 250 characters");
+		if (address == null || address.isBlank() || address.length() < 5 || address.length() > 300) {
+		    throw new CustomException("Address must be between 5 and 300 characters");
 		}
 
 	}
@@ -179,10 +179,12 @@ public class ValidationsUtil {
 		    throw new CustomException("Invalid account type");
 		}
 	    
-	    if (balance == null || balance.compareTo(BigDecimal.ZERO) < 0) {
-	        throw new CustomException("Invalid Balance");
+	    BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("1000000"); // ₹10,00,000
+
+	    if (balance == null || balance.compareTo(BigDecimal.ZERO) <= 0 || balance.compareTo(MAX_TRANSACTION_LIMIT) > 0) {
+	        throw new CustomException("Initial balance should not exceed ₹10,00,000.");
 	    }
-	    
+ 
 	}
 	
 	public static void ValidateTransactions(Transaction transaction) throws CustomException {
@@ -200,8 +202,10 @@ public class ValidationsUtil {
 		    throw new CustomException("Valid customer ID is required.");
 		}
 
-		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-		    throw new CustomException("Transaction amount must be greater than zero.");
+		BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("1000000"); // ₹10,00,000
+
+		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(MAX_TRANSACTION_LIMIT) > 0) {
+		    throw new CustomException("Transaction amount must be greater than zero and not exceed ₹10,00,000.");
 		}
 
 		if (transactionType == null || !(transactionType >= 0 || transactionType <= 4)) {

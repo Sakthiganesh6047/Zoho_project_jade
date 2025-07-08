@@ -164,7 +164,8 @@
 	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
 	
 	    if (Number(input.value) > 100000) {
-	        input.value = "100000";
+	    	statusDiv.textContent = "Amount should not exceed 100000.";
+            statusDiv.style.color = "red";
 	    }
 	}
 	

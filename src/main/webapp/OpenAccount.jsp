@@ -173,7 +173,8 @@
 	
 	                <div class="form-group">
 	                    <label for="balance">Initial Balance:</label>
-	                    <input type="number" id="balance" name="balance" required min="0">
+	                    <input type="number" id="balance" name="balance" required min="0" max="1000000" 
+       					title="Balance must be between ₹0 and ₹10,00,000">
 	                </div>
 	
 	                <input type="hidden" id="customerId" name="customerId">
