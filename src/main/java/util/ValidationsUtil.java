@@ -194,6 +194,7 @@ public class ValidationsUtil {
 		Long customerId = transaction.getCustomerId();
 		BigDecimal amount = transaction.getAmount();
 		Integer transactionType = transaction.getTransactionType();
+		String description = transaction.getDescription();
 		
 		if (accountId == null || accountId <= 0) {
 		    throw new CustomException("Valid account ID is required.");
@@ -206,12 +207,22 @@ public class ValidationsUtil {
 		BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("1000000"); // ₹10,00,000
 
 		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(MAX_TRANSACTION_LIMIT) > 0) {
-		    throw new CustomException("Transaction amount must be greater than zero and not exceed ₹10,00,000.");
+		    throw new CustomException("Transaction amount must be greater than zero and not exceed 10,00,000.");
 		}
 
-		if (transactionType == null || !(transactionType >= 0 || transactionType <= 4)) {
+		if (transactionType == null || transactionType < 0 || transactionType > 4) {
 		    throw new CustomException("Invalid transaction Type");
 		}
+		
+		// Optional description validation
+	    if (description != null && !description.trim().isEmpty()) {
+	        if (description.length() > 100) {
+	            throw new CustomException("Description must not exceed 100 characters.");
+	        }
+	        if (!description.matches("[A-Za-z0-9 ,.\\-']*")) {
+	            throw new CustomException("Description contains invalid characters.");
+	        }
+	    }
 
 	}
 	

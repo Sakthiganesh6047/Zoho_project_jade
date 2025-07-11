@@ -395,7 +395,7 @@ function fetchTransactions(resetPage) {
                 `<td class="${typeClass}">` + typeLabel + "</td>" +
                 "<td>" + txn.amount + "</td>" +
                 "<td>" + txn.closingBalance + "</td>" +
-                "<td>" + (txn.beneficiaryAccount || "-") + "</td>" +
+                "<td>" + (txn.transferReference || "-") + "</td>" +
                 "<td>" + (txn.description || "") + "</td>" +
                 `<td class="${statusClass}">` + statusText + "</td>";
 

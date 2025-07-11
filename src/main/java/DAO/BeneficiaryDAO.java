@@ -75,6 +75,21 @@ public class BeneficiaryDAO {
         return Results.getSingleResult(beneficiaries);
 	}
 	
+	public Beneficiary getUniqueBeneficiary(String ifscCode, Long accountId, Long beneficiaryAccNumber, Long creatorId) throws CustomException {
+		QueryBuilder queryBuilder = new QueryBuilder(Beneficiary.class);
+        QueryResult getQuery = queryBuilder.select("*")
+        				.where("ifsc_code", "=", ifscCode)
+        				.where("account_id", "=", accountId)
+        				.where("account_number", "=", beneficiaryAccNumber)
+        				.where("created_by", "=", creatorId)
+        				.build();
+        System.out.println("Paginated Select Query: " + getQuery);
+        QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
+        @SuppressWarnings("unchecked")
+		List<Beneficiary> beneficiaries = (List<Beneficiary>) executor.executeQuery(getQuery, Beneficiary.class);
+        return Results.getSingleResult(beneficiaries);
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Beneficiary> getBeneficiariesByAccountId(long accountId, long userId, int limit, int offset) throws CustomException {
         QueryBuilder queryBuilder = new QueryBuilder(Beneficiary.class);

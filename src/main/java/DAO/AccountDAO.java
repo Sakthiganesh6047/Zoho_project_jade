@@ -63,7 +63,12 @@ public class AccountDAO {
         QueryExecutor executor = QueryExecutor.getQueryExecutorInstance();
         @SuppressWarnings("unchecked")
 		List<Account> accounts = (List<Account>) executor.executeQuery(query, connection, Account.class);
-        return Results.getSingleResult(accounts);
+        Account account = Results.getSingleResult(accounts);
+        if (account != null) {
+        	return account;
+        } else {
+        	throw new CustomException("Account not found");
+        }
     }
 
     public List<Account> getAccountsByCustomerId(long customerId) throws CustomException {

@@ -9,12 +9,12 @@
     <style>
         body {
             font-family: "Roboto", sans-serif;
-            background-image: url("contents/background.png"); /* Replace with your actual path */
-		    background-size: cover;        /* Scales the image to cover the whole screen */
-		    background-repeat: no-repeat;  /* Prevents tiling */
-		    background-position: center;
+            background-image: url("contents/background.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
             margin: 0;
-            padding-top: 70px; /* same as header height */
+            padding-top: 70px;
         }
 
         .body-wrapper {
@@ -52,16 +52,7 @@
             margin: 12px 0 6px;
         }
 
-        select {
-        	background-color: white;
-            width: 99%;
-            padding: 10px;
-            margin-bottom: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-        
-        input {
+        select, input {
             width: 95%;
             padding: 10px;
             margin-bottom: 16px;
@@ -114,7 +105,6 @@
 <body>
 
 <div class="body-wrapper">
-
     <div class="main-wrapper">
         <div class="form-container">
             <h2>Quick Money Transfer</h2>
@@ -124,16 +114,24 @@
                     <option value="">-- Select Account --</option>
                 </select>
 
+                <label for="bankName">Bank Name:</label>
+                <select id="bankName" required>
+                    <option value="">-- Select Bank --</option>
+                    <option value="Jade Bank">Jade Bank</option>
+                    <option value="SBI">SBI</option>
+                    <option value="ICICI">ICICI</option>
+                    <option value="HDFC">HDFC</option>
+                    <option value="Axis">Axis</option>
+                    <option value="Other">Other</option>
+                </select>
+
                 <label for="beneficiaryName">Receiver Name:</label>
                 <input type="text" id="beneficiaryName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" required autofocus
-				title="Name should contain only letters, spaces, hyphens or apostrophes.">
-
-                <label for="bankName">Bank Name:</label>
-                <input type="text" id="bankName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required
-				title="Bank Name should contain only letters, spaces, hyphens or apostrophes.">
+                       title="Name should contain only letters, spaces, hyphens or apostrophes.">
 
                 <label for="beneficiaryAccountNumber">Receiver Account Number:</label>
-                <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
+                <input type="text" name="beneficiaryAccountNumber" id="beneficiaryAccountNumber" maxlength="15" inputmode="numeric"
+                       pattern="[1-9]\d{4,14}" title="Account number must be 5 to 15 digits" placeholder="Enter Receiver's Account No"  />
 
                 <label for="ifscCode">IFSC Code:</label>
                 <input type="text" id="ifscCode" maxlength="11" pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter a valid IFSC code (e.g., JADE000000)." required>
@@ -165,133 +163,123 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
-
 	function validateAmount(input) {
 	    input.value = input.value
-	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
-	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
+	        .replace(/[^\d.]/g, '')
+	        .replace(/^(\d*\.\d{0,2}).*$/, '$1');
 	}
-	
+
 	document.getElementById("amount").addEventListener("keydown", function(e) {
-	    // Disallow: e, +, -, and multiple dots
-	    if (
-	        ["e", "E", "+", "-"].includes(e.key) ||
-	        (e.key === "." && this.value.includes("."))
-	    ) {
+	    if (["e", "E", "+", "-"].includes(e.key) || (e.key === "." && this.value.includes("."))) {
 	        e.preventDefault();
 	    }
 	});
 
-    const userId = <%= userId != null ? userId : "null" %>;
+	document.getElementById("beneficiaryAccountNumber").addEventListener("input", function () {
+	    this.value = this.value.replace(/\D/g, '');
+	});
 
-    window.onload = function () {
-        if (userId) {
-            fetch(`${pageContext.request.contextPath}/jadebank/account/id`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: userId })
-            })
-            .then(res => res.ok ? res.json() : Promise.reject("Failed to load accounts"))
-            .then(accounts => {
-                const accountSelect = document.getElementById("accountId");
-                accounts.forEach(acc => {
-                    const option = document.createElement("option");
-                    option.value = acc.accountId;
-                    option.textContent = "ID: " + acc.accountId + " | Type: " + (acc.accountType === 1 ? "Savings" : "Current");
-                    accountSelect.appendChild(option);
-                });
-            })
-            .catch(err => console.error("Error loading accounts:", err));
-        }
-    };
+	const userId = <%= userId != null ? userId : "null" %>;
 
-    function showPasswordModal() {
-        const form = document.getElementById("quickTransferForm");
-        const statusDiv = document.getElementById("status");
-        statusDiv.textContent = ""; // Clear previous status
+	window.onload = function () {
+	    if (userId) {
+	        fetch("<%= request.getContextPath() %>" + "/jadebank/account/id", {
+	            method: "POST",
+	            headers: { "Content-Type": "application/json" },
+	            body: JSON.stringify({ userId: userId })
+	        })
+	        .then(res => res.ok ? res.json() : Promise.reject("Failed to load accounts"))
+	        .then(accounts => {
+	            const accountSelect = document.getElementById("accountId");
+	            accounts.forEach(acc => {
+	                const option = document.createElement("option");
+	                option.value = acc.accountId;
+	                option.textContent = "ID: " + acc.accountId + " | Type: " + (acc.accountType === 1 ? "Savings" : "Current");
+	                accountSelect.appendChild(option);
+	            });
+	        })
+	        .catch(err => console.error("Error loading accounts:", err));
+	    }
+	};
 
-        if (!form.checkValidity()) {
-            // Trigger browser to show built-in validation messages
-            form.reportValidity();
-            return;
-        }
+	function showPasswordModal() {
+	    const form = document.getElementById("quickTransferForm");
+	    const statusDiv = document.getElementById("status");
+	    statusDiv.textContent = "";
+	    if (!form.checkValidity()) {
+	        form.reportValidity();
+	        return;
+	    }
+	    document.getElementById("passwordModal").style.display = "block";
+	}
 
-        document.getElementById("passwordModal").style.display = "block";
-    }
+	function closeModal() {
+	    document.getElementById("passwordModal").style.display = "none";
+	    document.getElementById("confirmPassword").value = "";
+	}
 
-    function closeModal() {
-        document.getElementById("passwordModal").style.display = "none";
-        document.getElementById("confirmPassword").value = "";
-    }
+	function submitTransfer() {
+	    const accountId = parseInt(document.getElementById("accountId").value);
+	    const beneficiaryName = document.getElementById("beneficiaryName").value.trim();
+	    const bankName = document.getElementById("bankName").value.trim();
+	    const beneficiaryAccountNumber = parseInt(document.getElementById("beneficiaryAccountNumber").value);
+	    const ifscCode = document.getElementById("ifscCode").value.trim();
+	    const amount = parseFloat(document.getElementById("amount").value);
+	    const description = document.getElementById("description").value.trim();
+	    const password = document.getElementById("confirmPassword").value;
+	    const statusDiv = document.getElementById("status");
+	    const modal = document.getElementById("passwordModal");
 
-    function submitTransfer() {
-        const accountId = parseInt(document.getElementById("accountId").value);
-        const beneficiaryName = document.getElementById("beneficiaryName").value.trim();
-        const bankName = document.getElementById("bankName").value.trim();
-        const beneficiaryAccountNumber = parseInt(document.getElementById("beneficiaryAccountNumber").value);
-        console.log(beneficiaryAccountNumber);
-        const ifscCode = document.getElementById("ifscCode").value.trim();
-        const amount = parseFloat(document.getElementById("amount").value);
-        const description = document.getElementById("description").value.trim();
-        const password = document.getElementById("confirmPassword").value;
+	    if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || !password) {
+	        statusDiv.textContent = "All fields are required.";
+	        statusDiv.style.color = "red";
+	        return;
+	    }
 
-        const statusDiv = document.getElementById("status");
-        const modal = document.getElementById("passwordModal");
+	    const data = {
+	        transaction: {
+	            accountId: accountId,
+	            customerId: userId,
+	            amount: amount,
+	            description: description,
+	            transactionType: 4
+	        },
+	        beneficiary: {
+	        	beneficiaryId: 0,
+	            beneficiaryName: beneficiaryName,
+	            bankName: bankName,
+	            beneficiaryAccountNumber: beneficiaryAccountNumber,
+	            ifscCode: ifscCode
+	        },
+	        user: {
+	            passwordHash: password
+	        }
+	    };
 
-        if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || !password) {
-            statusDiv.textContent = "All fields are required.";
-            statusDiv.style.color = "red";
-            return;
-        }
-
-        
-        const data = {
-            transaction: {
-                accountId: accountId,
-                customerId: userId,
-                amount: amount,
-                description: description,
-                transactionType: 4
-            },
-            beneficiary: {
-            	beneficiaryId: 0,
-                beneficiaryName: beneficiaryName,
-                bankName: bankName,
-                beneficiaryAccountNumber: beneficiaryAccountNumber,
-                ifscCode: ifscCode
-            },
-            user: {
-                passwordHash: password
-            }
-        };
-
-        fetch(`${pageContext.request.contextPath}/jadebank/transaction/transfer`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        })
-        .then(async res => {
-            modal.style.display = "none";
-            document.getElementById("confirmPassword").value = "";
-
-            const result = await res.json();
-
-            if (res.ok && result.status === "success") {
-                statusDiv.textContent = "Transfer successful.";
-                statusDiv.style.color = "green";
-                document.getElementById("quickTransferForm").reset();
-            } else {
-                statusDiv.textContent = result.error || "Transfer failed.";
-                statusDiv.style.color = "red";
-            }
-        })
-        .catch(err => {
-            modal.style.display = "none";
-            statusDiv.textContent = "Network error: " + err.message;
-            statusDiv.style.color = "red";
-        });
-    }
+	    fetch("<%= request.getContextPath() %>" + "/jadebank/transaction/transfer", {
+	        method: "POST",
+	        headers: { "Content-Type": "application/json" },
+	        body: JSON.stringify(data)
+	    })
+	    .then(async res => {
+	        modal.style.display = "none";
+	        document.getElementById("confirmPassword").value = "";
+	        const result = await res.json();
+	        if (res.ok && result.status === "success") {
+	            statusDiv.textContent = "Transfer successful.";
+	            statusDiv.style.color = "green";
+	            document.getElementById("quickTransferForm").reset();
+	        } else {
+	            statusDiv.textContent = result.error || "Transfer failed.";
+	            statusDiv.style.color = "red";
+	        }
+	    })
+	    .catch(err => {
+	        modal.style.display = "none";
+	        statusDiv.textContent = "Network error: " + err.message;
+	        statusDiv.style.color = "red";
+	    });
+	}
 </script>
-
 </body>
 </html>

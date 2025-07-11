@@ -7,15 +7,11 @@
 <head>
     <title>Add Beneficiary - JadeBank</title>
     <style>
-        /* Styles remain unchanged */
         body {
             font-family: "Roboto", sans-serif;
-            background-image: url("contents/background.png"); /* Replace with your actual path */
-		    background-size: cover;        /* Scales the image to cover the whole screen */
-		    background-repeat: no-repeat;  /* Prevents tiling */
-		    background-position: center;
+            background: url("contents/background.png") center/cover no-repeat;
             margin: 0;
-            padding-top: 70px; /* same as header height */
+            padding-top: 70px;
         }
         .body-wrapper {
             display: flex;
@@ -34,10 +30,6 @@
             padding: 40px 20px;
             flex: 1;
         }
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-        }
         .form-container {
             max-width: 500px;
             margin: auto;
@@ -46,37 +38,31 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+        }
         label {
             font-weight: bold;
             display: block;
             margin: 12px 0 6px;
         }
-        select {
-        	background-color: white;
-            width: 99%;
+        select, input {
+            width: 100%;
             padding: 10px;
             margin-bottom: 16px;
             border: 1px solid #ccc;
             border-radius: 6px;
         }
-        
-        input {
-            width: 95%;
-            padding: 10px;
-            margin-bottom: 16px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-        
         button {
-            padding: 12px 20px;
+            width: 100%;
+            padding: 12px;
             border: none;
             border-radius: 6px;
             background-color: #414485;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            width: 100%;
         }
         button:hover {
             background-color: #2e2f60;
@@ -89,9 +75,7 @@
     </style>
 </head>
 <body>
-
 <div class="body-wrapper">
-
     <div class="main-wrapper">
         <div class="form-container">
             <h2>Add New Beneficiary</h2>
@@ -113,14 +97,19 @@
                 </select>
 
                 <label for="accountNumber">Account Number:</label>
-                <input type="tel" id="accountNumber" maxlength="20" required>
+                <input type="text" id="accountNumber" maxlength="15" inputmode="numeric"
+                       pattern="\d{5,15}" title="Account number must be 5 to 15 digits" required>
 
                 <label for="beneficiaryName">Beneficiary Name:</label>
-                <input type="text" id="beneficiaryName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
-				title="Name should contain only letters, spaces, hyphens or apostrophes.">
+                <input type="text" id="beneficiaryName" maxlength="50"
+                       pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"
+                       title="Name should contain only letters, spaces, hyphens or apostrophes."
+                       required>
 
                 <label for="ifscCode">IFSC Code:</label>
-                <input type="text" id="ifscCode" pattern="^[A-Z]{4}0[A-Z0-9]{6}$" title="Enter a valid IFSC code (e.g., JADE000000)." required>
+                <input type="text" id="ifscCode" maxlength="11"
+                       pattern="^[A-Z]{4}0[A-Z0-9]{6}$"
+                       title="Enter a valid IFSC code (e.g., JADE0000000)." required>
 
                 <button type="submit">Add Beneficiary</button>
                 <div id="status"></div>
@@ -128,56 +117,59 @@
         </div>
     </div>
 </div>
-
 <jsp:include page="Footer.jsp" />
-
 <script>
     const userId = <%= userId != null ? userId : "null" %>;
+    const contextPath = "<%= request.getContextPath() %>";
 
+    // Populate user's account list
     if (userId) {
-        fetch(`${pageContext.request.contextPath}/jadebank/account/id`, {
+        fetch(contextPath + "/jadebank/account/id", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ userId: userId })
         })
         .then(res => res.ok ? res.json() : Promise.reject("Failed to load accounts"))
         .then(accounts => {
-            const select = document.getElementById("accountId");
-            accounts.forEach(acc => {
+            const accountSelect = document.getElementById("accountId");
+            accounts.forEach(function(acc) {
                 const option = document.createElement("option");
                 option.value = acc.accountId;
                 option.textContent = "ID: " + acc.accountId + " | Type: " + (acc.accountType === 1 ? "Savings" : "Current");
-                select.appendChild(option);
+                accountSelect.appendChild(option);
             });
         })
-        .catch(err => console.error("Error fetching accounts:", err));
+        .catch(console.error);
     }
 
-    document.getElementById("bankName").addEventListener("change", function () {
-        const bank = this.value;
-        const accField = document.getElementById("accountNumber");
-        const nameField = document.getElementById("beneficiaryName");
-        const ifscField = document.getElementById("ifscCode");
+    const accField = document.getElementById("accountNumber");
+    const nameField = document.getElementById("beneficiaryName");
+    const ifscField = document.getElementById("ifscCode");
+    const bankSelect = document.getElementById("bankName");
+    const statusDiv = document.getElementById("status");
 
-        if (bank === "Jade Bank") {
-            accField.addEventListener("blur", () => {
-                const enteredAcc = parseInt(accField.value);
-                if (enteredAcc) {
-                    fetch(`${pageContext.request.contextPath}/jadebank/account/beneficiarydetail`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ accountId: enteredAcc })
-                    })
-                    .then(res => res.ok ? res.json() : Promise.reject("Not found"))
-                    .then(data => {
-                        if (data.fullName) nameField.value = data.fullName;
-                        if (data.ifscCode) ifscField.value = data.ifscCode;
-                    })
-                    .catch(() => {
-                        nameField.value = "";
-                        ifscField.value = "";
-                    });
-                }
+    accField.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    accField.addEventListener("blur", function () {
+        const bank = bankSelect.value;
+        const enteredAcc = parseInt(this.value);
+
+        if (bank === "Jade Bank" && enteredAcc) {
+            fetch(contextPath + "/jadebank/account/beneficiarydetail", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ accountId: enteredAcc })
+            })
+            .then(function(res) { return res.ok ? res.json() : Promise.reject("Not found"); })
+            .then(function(data) {
+                nameField.value = data.fullName || "";
+                ifscField.value = data.ifscCode || "";
+            })
+            .catch(function() {
+                nameField.value = "";
+                ifscField.value = "";
             });
         } else {
             nameField.value = "";
@@ -185,42 +177,53 @@
         }
     });
 
-    document.getElementById("beneficiaryForm").addEventListener("submit", function(e) {
+    bankSelect.addEventListener("change", function () {
+        accField.value = "";
+        nameField.value = "";
+        ifscField.value = "";
+    });
+
+    document.getElementById("beneficiaryForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
+        const selectedAccountId = parseInt(document.getElementById("accountId").value);
+        const enteredBeneficiaryAcc = parseInt(accField.value);
+
+        if (selectedAccountId === enteredBeneficiaryAcc) {
+            statusDiv.textContent = "Your account and beneficiary account cannot be the same.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
         const data = {
-            accountId: parseInt(document.getElementById("accountId").value),
-            beneficiaryName: document.getElementById("beneficiaryName").value.trim(),
-            bankName: document.getElementById("bankName").value.trim(),
-            beneficiaryAccountNumber: parseInt(document.getElementById("accountNumber").value),
-            ifscCode: document.getElementById("ifscCode").value.trim()
+            accountId: selectedAccountId,
+            bankName: bankSelect.value.trim(),
+            beneficiaryName: nameField.value.trim(),
+            beneficiaryAccountNumber: enteredBeneficiaryAcc,
+            ifscCode: ifscField.value.trim()
         };
 
-        fetch(`${pageContext.request.contextPath}/jadebank/beneficiary/add`, {
+        fetch(contextPath + "/jadebank/beneficiary/add", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         })
-        .then(async response => {
-            const result = await response.json();
-            const statusDiv = document.getElementById("status");
-
-            if (response.ok) {
+        .then(async function(res) {
+            const result = await res.json();
+            if (res.ok) {
                 statusDiv.textContent = "Beneficiary added successfully.";
                 statusDiv.style.color = "green";
                 document.getElementById("beneficiaryForm").reset();
-                document.getElementById("accountId").selectedIndex = 0;
             } else {
                 statusDiv.textContent = result.error || "Failed to add beneficiary.";
                 statusDiv.style.color = "red";
             }
         })
-        .catch(err => {
-            document.getElementById("status").textContent = "Error: " + err.message;
-            document.getElementById("status").style.color = "red";
+        .catch(function(err) {
+            statusDiv.textContent = "Error: " + err.message;
+            statusDiv.style.color = "red";
         });
     });
 </script>
-
 </body>
 </html>

@@ -31,6 +31,17 @@ public class BeneficiaryHandler {
 		beneficiary.setCreatedBy(userId);
 		beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 		beneficiary.setModifiedBy(userId);
+		if (beneficiary.getBeneficiaryAccountNumber().equals(beneficiary.getAccountId())) {
+			throw new CustomException("Both account ids are same, check beneficiary account number");
+		}
+		
+		String ifscCode =  beneficiary.getIfscCode();
+		Long accountId = beneficiary.getAccountId();
+		Long beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
+		Beneficiary existingBeneficiary = beneficiaryDAO.getUniqueBeneficiary(ifscCode, accountId, beneficiaryAccountNumber, userId);
+		if (existingBeneficiary != null) {
+			throw new CustomException("Beneficiary already exists");
+		}
 		
 		Long result = beneficiaryDAO.insertBeneficiary(beneficiary);
 		return Results.respondJson(Map.of("BeneficiaryId", result));

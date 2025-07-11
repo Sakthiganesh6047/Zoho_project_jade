@@ -155,12 +155,18 @@ public class TransactionHandler {
             	throw new CustomException("Account blocked");
             }
             
-            if(userRole.equals(0)) {
-            	if(beneficiary.getBankName().equalsIgnoreCase("jade bank")) {
-            		transaction.setTransactionType(3);
-            	} else {
-            		transaction.setTransactionType(4);
-            	}
+            if (userRole.equals(0)) {
+                String bankName = beneficiary.getBankName();
+                String ifscCode = beneficiary.getIfscCode();
+
+                if (bankName != null && ifscCode != null &&
+                    bankName.equalsIgnoreCase("jade bank") &&
+                    ifscCode.toUpperCase().startsWith("JADE")) {
+
+                    transaction.setTransactionType(3); // Inside bank
+                } else {
+                    transaction.setTransactionType(4); // Outside bank
+                }
             }
 
             int type = transaction.getTransactionType(); // "1 - credit", "2 - debit", "3 - inside bank", "4 - outside bank"
@@ -286,7 +292,20 @@ public class TransactionHandler {
     	
 	        long fromAccountId = transaction.getAccountId();
 	        toAccountId = beneficiary.getBeneficiaryAccountNumber(); //to account number
+	        
+	        if (role.equals(0)) {
+	        	if ((beneficiary.getBeneficiaryId()) == null) {
+			        BeneficiaryDAO beneficiaryDAO = BeneficiaryDAO.getBeneficiaryDAOInstance();
+			        String ifscCode = beneficiary.getIfscCode();
+			        Beneficiary existingBeneficiary = beneficiaryDAO.getUniqueBeneficiary(ifscCode, fromAccountId, toAccountId, userId);
+			        if (existingBeneficiary == null) {
+			        	beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+			        }
+	        	} 
+	        }
+	        
 	        ValidationsUtil.isNull(toAccountId, "Receiver Account Number");
+	        
 	        amount = transaction.getAmount();
 	        AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
 	
@@ -314,7 +333,7 @@ public class TransactionHandler {
 	        debitTxn.setCustomerId(fromAccount.getCustomerId());
 	        debitTxn.setAmount(amount);
 	        debitTxn.setClosingBalance(fromAccBalance);
-	        debitTxn.setTransactionType(2); //debit
+	        debitTxn.setTransactionType(3); //debit
 	        debitTxn.setTransactionDate(timestamp);
 	        debitTxn.setDescription(transaction.getDescription());
 	        debitTxn.setTransferReference(toAccountId);
@@ -366,17 +385,20 @@ public class TransactionHandler {
     		switch(userRole) {
 	    		case 0:
 	    			
-	    			if(beneficiary.getBeneficiaryId().equals(0L)) {
+	    			if (beneficiary.getBeneficiaryId() == null || beneficiary.getBeneficiaryId().equals(0L)) {
 	    				beneficiary.setAccountId(accountId);
 		    			beneficiary.setCreatedBy(userId);
 		    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 		    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
-		    			beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+		    			ValidationsUtil.isNull(beneficiaryAccountNumber, "Beneficiary Account Number");
+		    			Long createdBeneficiaryId = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+		    			transaction.setTransferReference(createdBeneficiaryId);
 	    			} else {
 	    				Beneficiary beneficiary1 = beneficiaryDAO.getBeneficiaryById(beneficiary.getBeneficiaryId());
 		    			if (beneficiary1 == null) {
 		    				throw new CustomException("Beneficiary details not found");
 		    			}
+		    			transaction.setTransferReference(beneficiary.getBeneficiaryId());
 	    			}
 	    		
 	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();

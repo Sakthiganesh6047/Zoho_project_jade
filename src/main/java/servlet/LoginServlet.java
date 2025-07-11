@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
             UserDAO userDAO = UserDAO.getUserDAOInstance();
             User user = userDAO.getUserByEmail(email);
 
-            if (user != null && user.getEmail().equals(email) && Password.verifyPassword(password, user.getPasswordHash())) {
+            if (user != null && Password.verifyPassword(password, user.getPasswordHash())) {
             	
             	if (user.getStatus() == 0) {
             		response.setContentType("application/json");
