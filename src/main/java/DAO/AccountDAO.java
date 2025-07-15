@@ -43,7 +43,7 @@ public class AccountDAO {
         return (Long) executor.executeQuery(createQuery, null);
     }
 
-    public Account getAccountById(long accountId) throws CustomException {
+    public Account getAccountById(Long accountId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
 						                .where("account_id", "=", accountId)
@@ -54,7 +54,7 @@ public class AccountDAO {
         return Results.getSingleResult(accounts);
     }
     
-    public Account getAccountForUpdate(long accountId, Connection connection) throws CustomException {
+    public Account getAccountForUpdate(Long accountId, Connection connection) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
 						                .where("account_id", "=", accountId)
@@ -71,7 +71,7 @@ public class AccountDAO {
         }
     }
 
-    public List<Account> getAccountsByCustomerId(long customerId) throws CustomException {
+    public List<Account> getAccountsByCustomerId(Long customerId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("*")
                 						.where("customer_id", "=", customerId)
@@ -80,7 +80,7 @@ public class AccountDAO {
         return castResult(executor.executeQuery(query, Account.class));
     }
     
-    public List<Account> getAccNosByCustomerId(long customerId) throws CustomException {
+    public List<Account> getAccNosByCustomerId(Long customerId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);
         QueryResult query = queryBuilder.select("account_id")
                 .where("customer_id", "=", customerId)

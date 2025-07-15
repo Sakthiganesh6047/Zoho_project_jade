@@ -187,7 +187,7 @@
                     <th>Account</th>
                     <th>Amount</th>
                     <th>Type</th>
-                    <th>Beneficiary</th>
+                    <th>Reference Acc</th>
                     <th>Description</th>
                     <th>Status</th>
                 </tr>
@@ -273,7 +273,7 @@
                     "<td>" + txn.accountId + "</td>" +
                     "<td>" + txn.amount + "</td>" +
                     "<td>" + getTypeLabel(txn.transactionType) + "</td>" +
-                    "<td>" + (txn.beneficiaryAccount || "-") + "</td>" +
+                    "<td>" + (txn.transferReference || "-") + "</td>" +
                     "<td>" + (txn.description || "") + "</td>" +
                     "<td>" + statusText + "</td>";
                 tbody.appendChild(row);

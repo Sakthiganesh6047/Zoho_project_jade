@@ -13,6 +13,8 @@ import pojos.Credential;
 import pojos.Employee;
 import pojos.User;
 import util.Password;
+import util.ValidationsUtil;
+
 import java.io.IOException;
 
 @WebServlet("/login")
@@ -25,12 +27,13 @@ public class LoginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    	ObjectMapper mapper = new ObjectMapper();
-    	Credential login = mapper.readValue(request.getReader(), Credential.class);
-    	String email = login.getEmail();
-    	String password = login.getPassword();
+    	 try {
+	    	ObjectMapper mapper = new ObjectMapper();
+	    	Credential login = mapper.readValue(request.getReader(), Credential.class);
+	    	ValidationsUtil.validateCredential(login);
+	    	String email = login.getEmail();
+	    	String password = login.getPassword();
         
-        try {
             UserDAO userDAO = UserDAO.getUserDAOInstance();
             User user = userDAO.getUserByEmail(email);
 

@@ -133,7 +133,11 @@
                 <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
                 <label for="description">Description (optional):</label>
-				<input type="text" id="description" placeholder="Reason for transfer...">
+				<input type="text" id="description" name="description"
+			       maxlength="100"
+			       pattern="[A-Za-z0-9 ,.\-']*"
+			       placeholder="Reason for transfer..."
+			       title="Only letters, numbers, spaces, comma, dot, hyphen, and apostrophe allowed. Max 100 characters.">
 
                 <button type="button" onclick="showPasswordModal()">Submit Transfer</button>
 
@@ -157,27 +161,30 @@
 <jsp:include page="Footer.jsp" />
 
 <script>
+    function validateAmount(input) {
+        input.value = input.value
+            .replace(/[^\d.]/g, '')
+            .replace(/^(\d*\.\d{0,2}).*$/, '$1');
+    }
 
-	function validateAmount(input) {
-	    input.value = input.value
-	        .replace(/[^\d.]/g, '')        // Remove anything except digits and dot
-	        .replace(/^(\d*\.\d{0,2}).*$/, '$1'); // Limit to 2 decimal places
-	
-	    if (Number(input.value) > 100000) {
-	    	statusDiv.textContent = "Amount should not exceed 100000.";
-            statusDiv.style.color = "red";
-	    }
-	}
-	
-	document.getElementById("amount").addEventListener("keydown", function(e) {
-	    // Disallow: e, +, -, and multiple dots
-	    if (
-	        ["e", "E", "+", "-"].includes(e.key) ||
-	        (e.key === "." && this.value.includes("."))
-	    ) {
-	        e.preventDefault();
-	    }
-	});
+    document.getElementById("amount").addEventListener("keydown", function(e) {
+        // Disallow: e, +, -, and multiple dots
+        if (
+            ["e", "E", "+", "-"].includes(e.key) ||
+            (e.key === "." && this.value.includes("."))
+        ) {
+            e.preventDefault();
+        }
+    });
+
+    document.getElementById("amount").addEventListener("input", function () {
+        const val = parseFloat(this.value);
+        if (isNaN(val) || val < 0.01 || val > 100000) {
+            this.setCustomValidity("Amount must be between ₹0.01 and ₹100000.");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
 
     const userId = <%= userId != null ? userId : "null" %>;
 
@@ -238,20 +245,42 @@
         const accountId = document.getElementById("accountId").value;
         const beneficiaryId = document.getElementById("beneficiaryId").value;
         const amount = document.getElementById("amount").value;
-
+        const amountVal = parseFloat(amount);
         const statusDiv = document.getElementById("status");
-        statusDiv.textContent = ""; // Reset any previous message
+        statusDiv.textContent = ""; // Reset previous message
+        
+        if (amountVal < 0.01 || amountVal > 100000) {
+            showStatusMessage("Amount must be between ₹0.01 and ₹1,00,000.", "red");
 
-        if (!accountId || !beneficiaryId || !amount || parseFloat(amount) <= 0) {
-            statusDiv.textContent = "Please fill all required fields correctly before proceeding.";
-            statusDiv.style.color = "red";
             return;
         }
 
-        // Show modal only if everything is valid
+        if (!accountId || !beneficiaryId || !amount || isNaN(amountVal)) {
+        	showStatusMessage("Please fill all required fields correctly.", "red");
+            return;
+        }
+        
+     // Validate description pattern manually only if it's not empty
+        const descPattern = /^[A-Za-z0-9 ,.\-']*$/;
+        if (description.length > 0 && (!descPattern.test(description) || description.length > 100)) {
+            showStatusMessage("Description can only contain letters, numbers, space, comma, dot, hyphen, apostrophe. Max 100 chars.", "red");
+            return;
+        }
+
+        // All checks passed
         document.getElementById("passwordModal").style.display = "block";
     }
+    
+    function showStatusMessage(message, color = "black", duration = 5000) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.textContent = message;
+        statusDiv.style.color = color;
 
+        // Clear message after `duration` ms
+        setTimeout(() => {
+            statusDiv.textContent = "";
+        }, duration);
+    }
 
     function closeModal() {
         document.getElementById("passwordModal").style.display = "none";
@@ -262,15 +291,15 @@
         const accountId = parseInt(document.getElementById("accountId").value);
         const beneficiaryJSON = document.getElementById("beneficiaryId").value;
         const amount = parseFloat(document.getElementById("amount").value);
-        const description = document.getElementById("description").value.trim();
+        const descriptionInput = document.getElementById("description");
+        const description = descriptionInput.value.trim();
         const password = document.getElementById("confirmPassword").value;
 
         const statusDiv = document.getElementById("status");
         const modal = document.getElementById("passwordModal");
 
-        if (!accountId || !beneficiaryJSON || !amount || !password) {
-            statusDiv.textContent = "All fields are required.";
-            statusDiv.style.color = "red";
+        if (!accountId || !beneficiaryJSON || isNaN(amount) || amount < 0.01 || amount > 100000 || !password) {
+            showStatusMessage("All fields are required. Amount must be between ₹0.01 and ₹100000.", "red");
             return;
         }
 
@@ -302,21 +331,19 @@
             const result = await res.json();
 
             if (res.ok && result.status === "success") {
-                statusDiv.textContent = "Transfer successful.";
-                statusDiv.style.color = "green";
+                showStatusMessage("Transfer successful.", "green");
                 document.getElementById("transferForm").reset();
                 document.getElementById("beneficiaryId").innerHTML = '<option value="">-- Select Beneficiary --</option>';
             } else {
-                statusDiv.textContent = result.error || "Transfer failed.";
-                statusDiv.style.color = "red";
+                showStatusMessage(result.error || "Transfer failed.", "red");
             }
         })
         .catch(err => {
             modal.style.display = "none";
-            statusDiv.textContent = "Network error: " + err.message;
-            statusDiv.style.color = "red";
+            showStatusMessage("Network error: " + err.message, "red");
         });
     }
+
 </script>
 
 </body>

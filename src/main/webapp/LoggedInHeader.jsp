@@ -245,7 +245,7 @@
         <img src="contents/jade_bank_logo.png" alt="Jade Bank Logo">
     </div>
     <div class="header-right">
-        <div class="profile-icon" onclick="toggleProfile()">
+        <div class="profile-icon" onclick="toggleProfile()" title="View Profile">
             <i class="fas fa-user"></i>
         </div>
     </div>

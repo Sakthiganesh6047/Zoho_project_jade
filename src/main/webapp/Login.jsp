@@ -193,7 +193,7 @@
 							<div class="password-container">
 								<label for="password">Password</label>
 								<div class="input-group">
-									<input type="password" id="password" name="password" placeholder="Enter your password" maxlength="70" required>
+									<input type="password" id="password" name="password" placeholder="Enter your password" maxlength="50" required>
 									<i class="fas fa-eye toggle-password" id="togglePassword"></i>
 								</div>
 							</div>
@@ -255,18 +255,29 @@
 		    	                    window.location.href = "DashboardShell.jsp?page=AdminDashboard.jsp";
 		    	                    break;
 		    	                default:
-		    	                    window.location.href = "DashboardShell.jsp"; // fallback
+		    	                    window.location.href = "Login.jsp"; // fallback
 		    	            }
 		    	        } else {
 		    	            const errorData = await response.json();
 		    	            const errorMsg = errorData.error || "Login Failed";
-		    	            document.getElementById("login-error").textContent = errorMsg;
+		    	            showStatusMessage(errorMsg, "red")
 		    	        }
 		    	    })
 		    	    .catch(err => {
 		    	        document.getElementById("login-error").textContent = "An error occurred: " + err.message;
 		    	    });
 		    	});
+		    	
+		    	function showStatusMessage(message, color = "black", duration = 5000) {
+		            const statusDiv = document.getElementById("login-error");
+		            statusDiv.textContent = message;
+		            statusDiv.style.color = color;
+
+		            // Clear message after `duration` ms
+		            setTimeout(() => {
+		                statusDiv.textContent = "";
+		            }, duration);
+		        }
 			</script>
 	    </div>
 	</div>

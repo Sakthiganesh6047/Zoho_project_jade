@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import pojos.Account;
 import pojos.Beneficiary;
 import pojos.Branch;
+import pojos.Credential;
 import pojos.Customer;
 import pojos.Employee;
 import pojos.Transaction;
@@ -35,6 +36,20 @@ public class ValidationsUtil {
 		}
 	}
 	
+	public static void validateCredential(Credential credential) throws CustomException {
+		
+		String email = credential.getEmail();
+		//String password = credential.getPassword();
+		
+		if (email == null || !email.matches("^(?=.{1,100}$)[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
+		    throw new CustomException("Invalid email format.");
+		}
+		
+//		if (password == null || password.matches("^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\W).{8,20}$")) {
+//	        throw new CustomException("Password must be 8-20 characters, include uppercase, lowercase, number, and a special character.");
+//	    }
+	}
+	
 	public static void validateUser(User user) throws CustomException {
 		
 	    String fullName = user.getFullName();
@@ -46,11 +61,11 @@ public class ValidationsUtil {
 	    Integer userType = user.getUserType();
 	    String password = user.getPasswordHash();
 		
-	    if (fullName == null || !fullName.matches("[A-Za-z]+(?:[\\-' ][A-Za-z]+)*")) {
+	    if (fullName == null || !fullName.matches("^(?=.{2,50}$)[A-Za-z]+(?:[\\-' ][A-Za-z]+)*$")) {
 	        throw new CustomException("Full name must contain only letters and spaces (2–50 characters).");
 	    }
 
-	    if (email == null || !email.matches("[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}")) {
+	    if (email == null || !email.matches("^(?=.{1, 70}$)[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
 	        throw new CustomException("Invalid email format.");
 	    }
 
@@ -66,7 +81,7 @@ public class ValidationsUtil {
 	        throw new CustomException("Date of birth must be in YYYY-MM-DD format.");
 	    }
 
-	    if (age == null || age < 0 || age > 120) {
+	    if (age == null || age < 18 || age > 120) {
 	        throw new CustomException("Age must be between 0 and 120.");
 	    }
 
@@ -216,7 +231,7 @@ public class ValidationsUtil {
 		
 		// Optional description validation
 	    if (description != null && !description.trim().isEmpty()) {
-	        if (description.length() > 100) {
+	        if (description.length() > 50) {
 	            throw new CustomException("Description must not exceed 100 characters.");
 	        }
 	        if (!description.matches("[A-Za-z0-9 ,.\\-']*")) {

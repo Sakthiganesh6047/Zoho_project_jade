@@ -391,14 +391,14 @@ public class TransactionHandler {
 		    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 		    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
 		    			ValidationsUtil.isNull(beneficiaryAccountNumber, "Beneficiary Account Number");
-		    			Long createdBeneficiaryId = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
-		    			transaction.setTransferReference(createdBeneficiaryId);
+		    			beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+		    			transaction.setTransferReference(beneficiaryAccountNumber);
 	    			} else {
 	    				Beneficiary beneficiary1 = beneficiaryDAO.getBeneficiaryById(beneficiary.getBeneficiaryId());
 		    			if (beneficiary1 == null) {
 		    				throw new CustomException("Beneficiary details not found");
 		    			}
-		    			transaction.setTransferReference(beneficiary.getBeneficiaryId());
+		    			transaction.setTransferReference(beneficiary.getBeneficiaryAccountNumber());
 	    			}
 	    		
 	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
@@ -423,9 +423,9 @@ public class TransactionHandler {
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
-	    			long beneficiaryId1 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+	    			beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
 	    			newBalance = account.getBalance().subtract(amount);
-	    			transaction.setTransferReference(beneficiaryId1);
+	    			transaction.setTransferReference(beneficiaryAccountNumber);
 	    			break;
 	    			
 	    		case 3:
@@ -433,9 +433,9 @@ public class TransactionHandler {
 	    			beneficiary.setCreatedBy(userId);
 	    			beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 	    			beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
-	    			long beneficiaryId2 = beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
+	    			beneficiaryDAO.addAsBeneficiary(beneficiary, connection);
 	    			newBalance = account.getBalance().subtract(amount);
-	    			transaction.setTransferReference(beneficiaryId2);
+	    			transaction.setTransferReference(beneficiaryAccountNumber);
 	    			break;
 	    	}
     		

@@ -422,7 +422,7 @@
 		            "<td>" + b.ifscCode + "</td>" +
 		            "<td>" +
 		                "<div class='action-wrapper'>" +
-		                    "<button class='icon-button del-button' onclick='deleteBeneficiary(" + b.beneficiaryId + ")'>" +
+		                    "<button class='icon-button del-button' title='Delete Beneficiary' onclick='deleteBeneficiary(" + b.beneficiaryId + ")'>" +
 		                        "<i class='fas fa-trash-alt'></i>" +
 		                    "</button>" +
 		                "</div>" +

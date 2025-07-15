@@ -367,7 +367,7 @@ public class UserHandler {
     	User fetchedUser = userDAO.getPasswordById(userId);
     	
     	if(!(Password.verifyPassword(credential.getPassword(), fetchedUser.getPasswordHash()))){
-    		throw new CustomException("Wrong Password!");
+    		throw new CustomException("Old password is Incorrect");
     	}
     	
     	if(Password.verifyPassword(credential.getNewPassword(), fetchedUser.getPasswordHash())){

@@ -73,9 +73,6 @@
 
         const iframe = document.getElementById("content-frame");
         if (iframe) iframe.src = pageUrl;
-        
-        document.querySelectorAll('.sidebar-link').forEach(link => console.log(link.getAttribute('data-page')));
-        console.log("Matching against:", pageUrl);
 
         document.querySelectorAll('.sidebar-link').forEach(link => {
             link.classList.remove('active');

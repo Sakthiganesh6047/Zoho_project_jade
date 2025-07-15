@@ -67,6 +67,10 @@
         button:hover {
             background-color: #2e2f60;
         }
+        input[readonly] {
+		    background-color: #f3f3f3;
+		}
+        
         #status {
             margin-top: 16px;
             font-weight: bold;
@@ -93,12 +97,11 @@
                     <option value="ICICI">ICICI</option>
                     <option value="HDFC">HDFC</option>
                     <option value="Axis">Axis</option>
-                    <option value="Other">Other</option>
                 </select>
 
                 <label for="accountNumber">Account Number:</label>
                 <input type="text" id="accountNumber" maxlength="15" inputmode="numeric"
-                       pattern="\d{5,15}" title="Account number must be 5 to 15 digits" required>
+                       pattern="(?!0{5,15})\d{5,15}" title="Account number must be 5 to 15 digits" required>
 
                 <label for="beneficiaryName">Beneficiary Name:</label>
                 <input type="text" id="beneficiaryName" maxlength="50"
@@ -156,6 +159,8 @@
         const bank = bankSelect.value;
         const enteredAcc = parseInt(this.value);
 
+        statusDiv.textContent = ""; // Clear previous status
+
         if (bank === "Jade Bank" && enteredAcc) {
             fetch(contextPath + "/jadebank/account/beneficiarydetail", {
                 method: "POST",
@@ -164,16 +169,38 @@
             })
             .then(function(res) { return res.ok ? res.json() : Promise.reject("Not found"); })
             .then(function(data) {
-                nameField.value = data.fullName || "";
-                ifscField.value = data.ifscCode || "";
+                if (data.fullName && data.ifscCode) {
+                    nameField.value = data.fullName;
+                    ifscField.value = data.ifscCode;
+                    statusDiv.textContent = ""; // Clear any previous error
+                } else {
+                    nameField.value = "";
+                    ifscField.value = "";
+                    statusDiv.textContent = "Invalid Jade Bank account.";
+                    statusDiv.style.color = "red";
+                }
+
+                // Always keep them readonly for Jade Bank
+                nameField.readOnly = true;
+                ifscField.readOnly = true;
             })
             .catch(function() {
                 nameField.value = "";
                 ifscField.value = "";
+                statusDiv.textContent = "Invalid Jade Bank account.";
+                statusDiv.style.color = "red";
+
+                nameField.readOnly = true;
+                ifscField.readOnly = true;
             });
         } else {
             nameField.value = "";
             ifscField.value = "";
+
+            nameField.readOnly = false;
+            ifscField.readOnly = false;
+
+            statusDiv.textContent = ""; // Clear status for non-Jade banks
         }
     });
 
@@ -181,6 +208,16 @@
         accField.value = "";
         nameField.value = "";
         ifscField.value = "";
+
+        if (this.value === "Jade Bank") {
+            accField.readOnly = false;
+            nameField.readOnly = true;
+            ifscField.readOnly = true;
+        } else {
+            accField.readOnly = false;
+            nameField.readOnly = false;
+            ifscField.readOnly = false;
+        }
     });
 
     document.getElementById("beneficiaryForm").addEventListener("submit", function (e) {
@@ -188,19 +225,37 @@
 
         const selectedAccountId = parseInt(document.getElementById("accountId").value);
         const enteredBeneficiaryAcc = parseInt(accField.value);
+        const bank = bankSelect.value.trim();
+        const name = nameField.value.trim();
+        const ifsc = ifscField.value.trim();
 
+        // Basic field validations
+        if (!selectedAccountId || !enteredBeneficiaryAcc || !bank || !name || !ifsc) {
+            statusDiv.textContent = "All fields are required.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
+        // Same account check
         if (selectedAccountId === enteredBeneficiaryAcc) {
             statusDiv.textContent = "Your account and beneficiary account cannot be the same.";
             statusDiv.style.color = "red";
             return;
         }
 
+        // For Jade Bank, do not allow manual empty values
+        if (bank === "Jade Bank" && (!name || !ifsc)) {
+            statusDiv.textContent = "Invalid beneficiary details for Jade Bank.";
+            statusDiv.style.color = "red";
+            return;
+        }
+
         const data = {
             accountId: selectedAccountId,
-            bankName: bankSelect.value.trim(),
-            beneficiaryName: nameField.value.trim(),
+            bankName: bank,
+            beneficiaryName: name,
             beneficiaryAccountNumber: enteredBeneficiaryAcc,
-            ifscCode: ifscField.value.trim()
+            ifscCode: ifsc
         };
 
         fetch(contextPath + "/jadebank/beneficiary/add", {
@@ -214,6 +269,10 @@
                 statusDiv.textContent = "Beneficiary added successfully.";
                 statusDiv.style.color = "green";
                 document.getElementById("beneficiaryForm").reset();
+
+                // Reset readonly state
+                nameField.readOnly = false;
+                ifscField.readOnly = false;
             } else {
                 statusDiv.textContent = result.error || "Failed to add beneficiary.";
                 statusDiv.style.color = "red";
@@ -224,6 +283,7 @@
             statusDiv.style.color = "red";
         });
     });
+
 </script>
 </body>
 </html>

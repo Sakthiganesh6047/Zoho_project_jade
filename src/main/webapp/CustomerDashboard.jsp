@@ -334,7 +334,7 @@
                         <p id="userPhone">Phone: -</p>
                     </div>
                 </div>
-                <i class="fas fa-pen-to-square edit-icon" onclick="redirectToEditProfile()"></i>
+                <i class="fas fa-pen-to-square edit-icon" onclick="redirectToEditProfile()" title="Edit Profile"></i>
             </div>
 
             <div class="account-summary">

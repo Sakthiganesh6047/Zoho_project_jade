@@ -122,7 +122,6 @@
                     <option value="ICICI">ICICI</option>
                     <option value="HDFC">HDFC</option>
                     <option value="Axis">Axis</option>
-                    <option value="Other">Other</option>
                 </select>
 
                 <label for="beneficiaryName">Receiver Name:</label>
@@ -140,7 +139,11 @@
                 <input type="number" step="0.01" name="amount" id="amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
                 <label for="description">Description (optional):</label>
-                <input type="text" id="description" maxlength="50" placeholder="Reason for transfer...">
+                <input type="text" id="description" name="description"
+			       maxlength="100"
+			       pattern="[A-Za-z0-9 ,.\-']*"
+			       placeholder="Reason for transfer..."
+			       title="Only letters, numbers, spaces, comma, dot, hyphen, and apostrophe allowed. Max 100 characters.">
 
                 <button type="button" onclick="showPasswordModal()">Submit Transfer</button>
                 <div id="status"></div>
@@ -217,6 +220,17 @@
 	    document.getElementById("passwordModal").style.display = "none";
 	    document.getElementById("confirmPassword").value = "";
 	}
+	
+	function showStatusMessage(message, color = "black", duration = 5000) {
+        const statusDiv = document.getElementById("status");
+        statusDiv.textContent = message;
+        statusDiv.style.color = color;
+
+        // Clear message after `duration` ms
+        setTimeout(() => {
+            statusDiv.textContent = "";
+        }, duration);
+    }
 
 	function submitTransfer() {
 	    const accountId = parseInt(document.getElementById("accountId").value);
@@ -231,8 +245,7 @@
 	    const modal = document.getElementById("passwordModal");
 
 	    if (!accountId || !beneficiaryName || !bankName || !beneficiaryAccountNumber || !ifscCode || !amount || !password) {
-	        statusDiv.textContent = "All fields are required.";
-	        statusDiv.style.color = "red";
+	        showStatusMessage("All fields are required.", "red");
 	        return;
 	    }
 
@@ -266,18 +279,15 @@
 	        document.getElementById("confirmPassword").value = "";
 	        const result = await res.json();
 	        if (res.ok && result.status === "success") {
-	            statusDiv.textContent = "Transfer successful.";
-	            statusDiv.style.color = "green";
+	            showStatusMessage("Transfer successful", "green");
 	            document.getElementById("quickTransferForm").reset();
 	        } else {
-	            statusDiv.textContent = result.error || "Transfer failed.";
-	            statusDiv.style.color = "red";
+	            showStatusMessage(result.error || "Transfer failed.", "red");
 	        }
 	    })
 	    .catch(err => {
 	        modal.style.display = "none";
-	        statusDiv.textContent = "Network error: " + err.message;
-	        statusDiv.style.color = "red";
+	        showStatusMessage("Network error: " + err.message, "red");
 	    });
 	}
 </script>
