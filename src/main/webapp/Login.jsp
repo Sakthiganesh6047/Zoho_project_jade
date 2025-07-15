@@ -8,6 +8,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" type="image/png" sizes="32x32" href="contents/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="contents/favicon-16x16.png">
+	<link rel="shortcut icon" href="contents/favicon.ico" type="image/x-icon">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>JadeBank-Login</title>
