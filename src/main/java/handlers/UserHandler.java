@@ -205,7 +205,7 @@ public class UserHandler {
             // Validate and update user
             user.setAge(TimeConversion.calculateAge(user.getDob()));
             user.setStatus(1);
-            ValidationsUtil.validateUser(user);
+            ValidationsUtil.validateUserForUpdate(user);
 
             // Check if password is being updated
             if (user.getPasswordHash() != null && !user.getPasswordHash().isEmpty()) {

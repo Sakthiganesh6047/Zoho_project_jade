@@ -2,7 +2,8 @@
 <%@ page import="java.time.LocalDate"%>
 <%
 LocalDate today = LocalDate.now();
-LocalDate minEligibleDate = today.minusYears(18);
+LocalDate minEligibleDate = today.minusYears(120); // Earliest acceptable birthdate (max 120 years old)
+LocalDate maxEligibleDate = today.minusYears(18);  // Latest acceptable birthdate (at least 18 years old)
 %>
 <!DOCTYPE html>
 <html>
@@ -247,8 +248,11 @@ LocalDate minEligibleDate = today.minusYears(18);
 					    	
 					    	<div class=field-container>
 						    	<label>Full Name:<span class="required">*</span></label>
-						        <input type="text" name="user.fullName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
-								title="Name should contain only letters, spaces, hyphens or apostrophes.">
+						        <input type="text" name="user.fullName"
+								maxlength="50"
+								pattern="^(?![\s]+$)(?=[^@]*@?[^@]*$)[A-Za-z]+(?:[ '\-@][A-Za-z]+)*$"
+								required
+								title="Only letters, spaces, apostrophes, hyphens allowed, and '@' only once. No numbers or other special characters.">
 					    	</div>
 					        
 					        <div class=field-container>
@@ -271,20 +275,27 @@ LocalDate minEligibleDate = today.minusYears(18);
 						    
 						    <div>
 						    	<label for="dob">Date of Birth:<span class="required">*</span></label>
-					        	<input type="date" id="dob" name="user.dob" max="<%=minEligibleDate%>"
-						 		title="You must be at least 18 years old." required>
+					        	<input type="date" id="dob" name="user.dob"
+						           min="<%=minEligibleDate%>"
+						           max="<%=maxEligibleDate%>"
+						           title="Age must be between 18 and 120 years." required>
 						    </div>
 						    
 						    <div class=field-container>
 								<label for="phone">Phone Number:<span class="required">*</span></label>
-								<input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
+								<input type="tel" id="phone" name="user.phone"
+						           pattern="^[6-9][0-9]{9}$"
+						           inputmode="numeric" maxlength="10"
+						           title="Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits."
+						           required>
 						    </div>
 						    
 							<div class=proof-container>
 							    <div class=field-container>
 									<label for="phone">Aadhar Card Number:<span class="required">*</span></label>
-									<input type="tel" id="aadhar" name="customerDetails.aadharNumber" pattern="[0-9]{12}" inputmode="numeric" maxlength="12" 
-									title="Aadhar number must be exactly 12 digits." required>
+									<input type="tel" id="aadhar" name="customerDetails.aadharNumber"
+							           pattern="[0-9]{12}" inputmode="numeric" maxlength="12"
+							           title="Aadhar number must be exactly 12 digits." required>
 							    </div>
 							    
 							    <div class=field-container>
@@ -300,7 +311,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 					        	<textarea id="address" name="customerDetails.address" rows="3" maxlength="50" required></textarea>
 					        </div>
 					        
-					        <div class="password-container">
+					        <div class="password-container" id="password-container">
 							    <div class="field-container" style="position: relative;">
 							        <label>Password:<span class="required">*</span></label>
 							        <input type="password" id="password" name="user.passwordHash" maxlength="50" required oncopy="return false" onpaste="return false" oncut="return false">
@@ -340,7 +351,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 		        if (submitBtn) submitBtn.textContent = "Update";
 	
 		        // Remove password section in edit mode
-		        const pwdSection = document.getElementById("password-section");
+		        const pwdSection = document.getElementById("password-container");
 		        if (pwdSection) pwdSection.remove();
 	
 		        try {
@@ -436,6 +447,11 @@ LocalDate minEligibleDate = today.minusYears(18);
 				        const successMsg = userId ? "User updated successfully." : "User created successfully.";
 				        document.getElementById("signup-error").style.color = "green";
 				        document.getElementById("signup-error").textContent = successMsg;
+				        if (userId) {
+				        	if (window.parent && typeof window.parent.loadUserProfile === "function") {
+		                        window.parent.loadUserProfile();
+				        	}
+				        }
 				    } else {
 				        const errorData = await response.json();
 				        const errorMsg = errorData.error || "Operation failed.";
@@ -457,6 +473,30 @@ LocalDate minEligibleDate = today.minusYears(18);
 	            icon.classList.toggle('fa-eye-slash');
 	        });
 	    });
+		document.querySelector('input[name="user.fullName"]').addEventListener('input', function (e) {
+			  const value = this.value;
+
+			  // Allow letters, spaces, hyphens, apostrophes, and ONE @
+			  // Remove all invalid characters
+			  let cleaned = value.replace(/[^A-Za-z\s\-@']/g, '');
+
+			  // Ensure only one @ is present
+			  const atCount = (cleaned.match(/@/g) || []).length;
+			  if (atCount > 1) {
+			    // Remove all but the first @
+			    let firstAtIndex = cleaned.indexOf('@');
+			    cleaned = cleaned.slice(0, firstAtIndex + 1) + cleaned.slice(firstAtIndex + 1).replace(/@/g, '');
+			  }
+
+			  this.value = cleaned;
+			});
+		
+		 function allowOnlyDigits(e) {
+			    e.target.value = e.target.value.replace(/\D/g, '');
+			  }
+
+			  document.getElementById('phone').addEventListener('input', allowOnlyDigits);
+			  document.getElementById('aadhar').addEventListener('input', allowOnlyDigits);
 	</script>
 </body>
 </html>

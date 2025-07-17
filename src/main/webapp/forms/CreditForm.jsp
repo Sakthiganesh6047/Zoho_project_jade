@@ -207,7 +207,11 @@
     <h2>Credit Transaction</h2>
     <form id="creditForm">
         <label for="creditAccountId">Account ID:</label>
-        <input type="number" id="creditAccountId" name="accountId" required onblur="fetchCreditAccountDetails()">
+       <input type="text" id="creditAccountId" name="accountId"
+       maxlength="10" required
+       pattern="\d{1,10}" title="Enter up to 10 digits only"
+       oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+       onblur="fetchCreditAccountDetails()">
 
         <div id="credit-account-info" style="display: none;"></div>
 
@@ -337,12 +341,22 @@
 
         fetch(`${pageContext.request.contextPath}/jadebank/transaction/transfer`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json" // Important for the filter to return 401 instead of 302
+            },
             body: JSON.stringify(data)
         })
         .then(async res => {
             modal.style.display = "none";
             document.getElementById("creditConfirmPassword").value = "";
+
+            if (res.status === 401) {
+                window.location.href = `${pageContext.request.contextPath}/Login.jsp?expired=true`;
+                return;
+            }
+
+            const result = await res.json();
 
             if (res.ok) {
                 statusDiv.textContent = "Amount credited successfully.";
@@ -352,8 +366,7 @@
                 document.getElementById("credit-account-info").textContent = "";
                 creditAccountDetails = null;
             } else {
-                const error = await res.json();
-                statusDiv.textContent = error.error || "Credit failed.";
+                statusDiv.textContent = result.error || "Credit failed.";
                 statusDiv.style.color = "red";
             }
         })

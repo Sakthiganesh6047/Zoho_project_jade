@@ -172,7 +172,9 @@
             <div class="search-row">
                 <div class="search-wrapper">
 				    <label for="accountId">Account ID:</label>
-				    <input type="number" id="accountId" placeholder="Enter Account ID" />
+				    <input type="text" id="accountId"  maxlength="10"
+            		pattern="\d{1,10}" title="Enter up to 10 digits only"
+       				oninput="this.value = this.value.replace(/[^0-9]/g, '')" placeholder="Enter Account ID" />
 				</div>
             </div>
         </div>
@@ -229,13 +231,21 @@
 
         fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"  // Important for filter to detect it's AJAX
+            },
             body: JSON.stringify({ accountId: accountId })
         })
         .then(async res => {
+            if (res.status === 401) {
+                // Session expired, redirect to login
+                window.location.href = "<%= request.getContextPath() %>/Login.jsp?expired=true";
+                return null; // prevent further processing
+            }
+
             const contentType = res.headers.get("content-type");
             const isJson = contentType && contentType.includes("application/json");
-
             const data = isJson ? await res.json() : null;
 
             if (!res.ok) {
@@ -246,6 +256,8 @@
             return data;
         })
         .then(data => {
+            if (!data) return; // exit if session expired
+
             const tbody = document.getElementById("transactionBody");
             tbody.innerHTML = "";
 
@@ -286,7 +298,6 @@
             errorMsg.textContent = "Error: " + err.message;
             console.error(err);
         });
-
     }
 
     function nextPage() {

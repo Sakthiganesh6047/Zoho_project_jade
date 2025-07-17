@@ -18,25 +18,26 @@ public class AuthenticationFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        
+
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
         String uri = httpRequest.getRequestURI();
-        HttpSession session = httpRequest.getSession(false); // do not create
+        System.out.println(uri);
 
+        HttpSession session = httpRequest.getSession(false); // do not create
         boolean isLoggedIn = session != null && session.getAttribute("userId") != null;
 
         boolean isLoginPage = uri.endsWith("/Login.jsp") || uri.endsWith("/login");
         boolean isSignUpPage = uri.endsWith("/SignUp.jsp") || uri.endsWith("/signup");
         boolean isPublic = uri.endsWith(".css") || uri.endsWith(".js") || uri.endsWith(".png") || uri.endsWith("/LandingPage.jsp");
 
-        // Redirect logged-in users away from login/signup pages
+        // If logged-in user tries to visit login/signup, redirect to dashboard
         if (isLoggedIn && (isLoginPage || isSignUpPage)) {
             Integer role = (Integer) session.getAttribute("role");
             String redirectUrl = httpRequest.getContextPath() + "/DashboardShell.jsp?page=";
 
-            switch (role) {
+            switch (role != null ? role : -1) {
                 case 0: redirectUrl += "CustomerDashboard.jsp"; break;
                 case 1: redirectUrl += "ClerkDashboard.jsp"; break;
                 case 2: redirectUrl += "ManagerDashboard.jsp"; break;
@@ -48,17 +49,28 @@ public class AuthenticationFilter implements Filter {
             return;
         }
 
-        // Let public resources and login/signup pages through
+        // Allow public resources through
         if (isLoginPage || isSignUpPage || isPublic) {
             chain.doFilter(request, response);
             return;
         }
 
-        // Protect everything else
+        // If user is logged in, proceed
         if (isLoggedIn) {
             chain.doFilter(request, response);
         } else {
-            httpResponse.sendRedirect(httpRequest.getContextPath() + "/Login.jsp");
+            // Check if it's an AJAX/API request
+            String acceptHeader = httpRequest.getHeader("Accept");
+            boolean isAjax = acceptHeader != null && acceptHeader.contains("application/json");
+
+            if (isAjax) {
+                httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                httpResponse.setContentType("application/json");
+                httpResponse.getWriter().write("{\"error\": \"SESSION_EXPIRED\"}");
+                return;
+            } else {
+            	httpResponse.sendRedirect(httpRequest.getContextPath() + "/Login.jsp?expired=true");
+            }
         }
     }
 

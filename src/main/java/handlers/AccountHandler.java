@@ -69,6 +69,51 @@ public class AccountHandler {
     	}
     }
     
+    @Route(path = "account/accountId", method = "POST")
+    public String getAccountById(@FromBody Account account, @FromSession("userId") Long sessionId, 
+    								@FromSession("role") Integer role) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(accountId, "accountId");;
+    	ValidationsUtil.isNull(sessionId, "UserId");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+    	if(role == 0) {
+    		AuthorizeUtil.isAuthorizedOwner(sessionId, accountId);
+    		return Results.respondJson(accountDAO.getAccountById(accountId));
+    	} else {
+    		return Results.respondJson(accountDAO.getAccountById(accountId));
+    	}
+    }
+    
+    @Route(path = "account/updateStatus", method = "PUT")
+    public String updateAccountStatus(@FromBody Account account, @FromSession("userId") Long modifierId, 
+    							@FromSession("role") Integer role) throws CustomException {
+    	
+    	Long accountId = account.getAccountId();
+    	
+    	ValidationsUtil.isNull(accountId, "AccountId");
+    	ValidationsUtil.isNull(modifierId, "User Id");
+    	ValidationsUtil.isNull(role, "User Role");
+    	ValidationsUtil.checkUserRole(role);
+    	
+//    	if (role.equals(0)) {
+//    		if(!(customerId.equals(modifierId))) {
+//    			throw new CustomException("Unauthorized Access, Check account Number");
+//    		}
+//    	}
+    	
+    	if (role.equals(1) || role.equals(2)) {
+    		AuthorizeUtil.isSameBranch(modifierId, accountId);
+    	}
+    	
+    	account.setModifiedBy(modifierId);
+    	account.setModifiedOn(Instant.now().toEpochMilli());
+    	return Results.respondJson(accountDAO.updateAccount(account, "accountType", "accountStatus", "modifiedBy", "modifiedOn"));
+    }
+    
     @Route(path = "account/primary", method = "GET")
     public String getPrimaryAccount(@FromSession("userId") Long sessionId) throws CustomException {
     	ValidationsUtil.isNull(sessionId, "UserId");
@@ -82,6 +127,7 @@ public class AccountHandler {
         
         Long accountId = account.getAccountId();
         ValidationsUtil.isNull(accountId, "Account Number");
+        AuthorizeUtil.checkAccountStatus(accountId);
 
         Connection conn = null;
         try {
@@ -148,6 +194,7 @@ public class AccountHandler {
     	ValidationsUtil.isNull(userId, "UserId");
     	ValidationsUtil.isNull(role, "User Role");
     	ValidationsUtil.checkUserRole(role);
+    	AuthorizeUtil.checkAccountStatus(accountId);
     	
     	Account fetchedAccount = accountDAO.getAccountById(accountId);
     	AccountProfile accountProfile = new AccountProfile();
@@ -213,7 +260,7 @@ public class AccountHandler {
     	}
     	account.setModifiedBy(modifierId);
     	account.setModifiedOn(Instant.now().toEpochMilli());
-    	return Results.respondJson(accountDAO.updateAccount(account));
+    	return Results.respondJson(accountDAO.updateAccount(account, "balance", "modifiedBy", "modifiedOn"));
     }
     
     @Route(path = "account/block", method = "POST")
@@ -235,10 +282,10 @@ public class AccountHandler {
     		}
     	}
     	
-    	fetchedAccount.setAccountStatus(0);
+    	fetchedAccount.setAccountStatus(2);
     	fetchedAccount.setModifiedBy(modifierId);
     	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-    	return Results.respondJson(accountDAO.blockAccount(fetchedAccount));
+    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount, "accountStatus", "modifiedBy", "modifiedOn"));
     }
     
     @Route(path = "account/unblock", method = "POST")
@@ -263,7 +310,7 @@ public class AccountHandler {
     	fetchedAccount.setAccountStatus(1);
     	fetchedAccount.setModifiedBy(modifierId);
     	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-    	return Results.respondJson(accountDAO.blockAccount(fetchedAccount));
+    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount, "accountStatus", "modifiedBy", "modifiedOn"));
     }
     
     @Route(path = "account/activate", method = "POST")
@@ -288,7 +335,7 @@ public class AccountHandler {
     		fetchedAccount.setAccountStatus(1);
     		fetchedAccount.setModifiedBy(modifierId);
     		fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-	    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
+	    	return Results.respondJson(accountDAO.updateAccount(fetchedAccount, "balance", "modifiedBy", "modifiedOn"));
     }
     
     @Route(path = "account/needapproval", method = "GET")
@@ -337,7 +384,7 @@ public class AccountHandler {
     			fetchedAccount.setAccountStatus(0);
     			fetchedAccount.setModifiedBy(modifierId);
     			fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-    	    	return Results.respondJson(accountDAO.updateAccount(account));
+    	    	return Results.respondJson(accountDAO.updateAccount(account, "balance", "modifiedBy", "modifiedOn"));
     		} else {
     			throw new CustomException("Unauthorized access, Contact respective branch");
     		}
@@ -345,7 +392,7 @@ public class AccountHandler {
     		fetchedAccount.setAccountStatus(0);
     		fetchedAccount.setModifiedBy(modifierId);
         	fetchedAccount.setModifiedOn(Instant.now().toEpochMilli());
-        	return Results.respondJson(accountDAO.updateAccount(fetchedAccount));
+        	return Results.respondJson(accountDAO.updateAccount(fetchedAccount, "balance", "modifiedBy", "modifiedOn"));
     	}
     }
     

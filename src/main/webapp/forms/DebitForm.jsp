@@ -150,7 +150,11 @@
     <h2>Debit Transaction</h2>
     <form id="debitForm">
         <label for="debitAccountId">Account ID:</label>
-        <input type="number" id="debitAccountId" required onblur="fetchDebitAccountDetails()">
+        <input type="text" id="debitAccountId"
+         maxlength="10" required
+       	pattern="\d{1,10}" title="Enter up to 10 digits only"
+       	oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+       	onblur="fetchDebitAccountDetails()">
 
         <div id="debit-account-info" class="info-box hidden"></div>
 
@@ -286,29 +290,38 @@
 
         fetch(`${pageContext.request.contextPath}/jadebank/transaction/transfer`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(data)
         })
-            .then(async res => {
-                modal.style.display = "none";
-                document.getElementById("debitConfirmPassword").value = "";
+        .then(async res => {
+            modal.style.display = "none";
+            document.getElementById("debitConfirmPassword").value = "";
 
-                if (res.ok) {
-                    statusDiv.textContent = "Amount debited successfully.";
-                    statusDiv.style.color = "green";
-                    document.getElementById("debitForm").reset();
-                    document.getElementById("debit-account-info").style.display = "none";
-                    debitAccountDetails = null;
-                } else {
-                    const result = await res.json();
-                    statusDiv.textContent = result.error || "Debit failed.";
-                    statusDiv.style.color = "red";
-                }
-            })
-            .catch(err => {
-                modal.style.display = "none";
-                statusDiv.textContent = "Network error: " + err.message;
+            if (res.status === 401) {
+                window.location.href = `${pageContext.request.contextPath}/Login.jsp?expired=true`;
+                return;
+            }
+
+            const result = await res.json();
+
+            if (res.ok) {
+                statusDiv.textContent = "Amount debited successfully.";
+                statusDiv.style.color = "green";
+                document.getElementById("debitForm").reset();
+                document.getElementById("debit-account-info").style.display = "none";
+                debitAccountDetails = null;
+            } else {
+                statusDiv.textContent = result.error || "Debit failed.";
                 statusDiv.style.color = "red";
-            });
+            }
+        })
+        .catch(err => {
+            modal.style.display = "none";
+            statusDiv.textContent = "Network error: " + err.message;
+            statusDiv.style.color = "red";
+        });
     }
 </script>

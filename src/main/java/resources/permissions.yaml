@@ -7,6 +7,9 @@
 #role based authorization -- yaml file
 # 0 - Customer // 1 - Clerk // 2 - Manager // 3 -- GM // 4 for open source
 
+#Account status
+# 1 - active // 2 - Blocked // 3 - Closed
+
 UserHandler:
   getAllUsers: [3]
   createAdminUser: [3]
@@ -31,6 +34,7 @@ BranchHandler:
   getBranchByIFSC: [1, 2, 3]
   getAccountsCount: [3]
   getBranchById: [1, 2, 3]
+  updateAccountStatus: [1, 2, 3]
   branchListForm: [1, 2, 3]
   getBranchWiseStats: [3]
   
@@ -44,6 +48,8 @@ TransactionHandler:
 AccountHandler:
   createAccount: [0, 1, 2, 3]
   getCustomerAccounts: [0, 1, 2, 3]
+  getAccountById: [0, 1, 2, 3]
+  updateAccountStatus: [1, 2, 3]
   getPrimaryAccount: [0]
   setPrimaryAccount: [0]
   getAccountsList: [1, 2, 3]

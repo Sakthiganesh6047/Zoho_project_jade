@@ -5,6 +5,10 @@
     response.setHeader("Pragma", "no-cache"); // HTTP 1.0
     response.setDateHeader("Expires", 0); // Proxies
 %>
+<%
+    String expired = request.getParameter("expired");
+    boolean showExpiredMessage = "true".equals(expired);
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -178,9 +182,16 @@
     
 	    <div class=main-container>
 	    	<div>
-	    		<div>
-	    			<div id="login-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
-	    		</div>
+			    <div>
+			        <% if (showExpiredMessage) { %>
+			            <div id="login-error" style="color: red; font-weight: bold; margin-bottom: 10px;">
+			                Session expired. Please login again.
+			            </div>
+			        <% } else { %>
+			            <div id="login-error" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
+			        <% } %>
+			    </div>
+
 	    		<div class="content-container">
 			    	<div class=clipart-container>
 			    		<img src="contents/login_page_clipart.png" alt="Login Page Clipart" class=login-clipart>

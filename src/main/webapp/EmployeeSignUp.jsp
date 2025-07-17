@@ -2,7 +2,8 @@
 <%@ page import="java.time.LocalDate"%>
 <%
 LocalDate today = LocalDate.now();
-LocalDate minEligibleDate = today.minusYears(18);
+LocalDate minEligibleDate = today.minusYears(120); // Earliest acceptable birthdate (max 120 years old)
+LocalDate maxEligibleDate = today.minusYears(18);  // Latest acceptable birthdate (at least 18 years old)
 %>
 <!DOCTYPE html>
 <html>
@@ -29,6 +30,9 @@ LocalDate minEligibleDate = today.minusYears(18);
         	display: flex;
             padding: 20px;
             flex: 1;
+            flex-direction: column;
+		    align-items: center;
+		    justify-content: center;
         }
         
         .body-wrapper {
@@ -39,7 +43,6 @@ LocalDate minEligibleDate = today.minusYears(18);
 
         .container-wrapper {
             max-width: 900px;
-            margin: auto;
             background: #fff;
             border-radius: 8px;
             padding: 30px;
@@ -144,14 +147,20 @@ LocalDate minEligibleDate = today.minusYears(18);
 		
 		                    <div class="field-container">
 		                        <label>Full Name:<span class="required">*</span></label>
-		                        <input type="text" name="user.fullName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
-								title="Name should contain only letters, spaces, hyphens or apostrophes.">
+		                        <input type="text" name="user.fullName"
+						       maxlength="50"
+						       pattern="^(?![\s]+$)(?=[^@]*@?[^@]*$)[A-Za-z]+(?:[ '\-@][A-Za-z]+)*$"
+						       required
+						       autofocus
+						       title="Only letters, spaces, apostrophes, hyphens allowed, and '@' only once. No numbers or other special characters.">
 		                    </div>
+		                    
 		                    <div class="field-container">
 		                        <label>Email:<span class="required">*</span></label>
 		                        <input type="email" name="user.email" maxlength="70" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
-							title="Enter a valid email address (e.g., user@example.com)." required>
+								title="Enter a valid email address (e.g., user@example.com)." required>
 		                    </div>
+		                    
 		                    <div class="gender-container">
 		                        <label>Gender:<span class="required">*</span></label>
 		                        <input type="radio" id="male" name="user.gender" value="male" required title="Select your gender.">
@@ -165,12 +174,18 @@ LocalDate minEligibleDate = today.minusYears(18);
 		                    </div>
 		                    <div class="field-container">
 		                        <label for="dob">Date of Birth:<span class="required">*</span></label>
-		                        <input type="date" id="dob" name="user.dob" max="<%=minEligibleDate%>"
-						 	title="You must be at least 18 years old." required>
+		                        <input type="date" id="dob" name="user.dob"
+						           min="<%=minEligibleDate%>"
+						           max="<%=maxEligibleDate%>"
+						           title="Age must be between 18 and 120 years." required>
 		                    </div>
 		                    <div class="field-container">
 		                        <label for="phone">Phone Number:<span class="required">*</span></label>
-		                        <input type="tel" id="phone" name="user.phone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
+		                        <input type="tel" id="phone" name="user.phone"
+						           pattern="^[6-9][0-9]{9}$"
+						           inputmode="numeric" maxlength="10"
+						           title="Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits."
+						           required>
 		                    </div>
 		                    <div class="proof-container">
 		                        <div class="field-container">
@@ -192,13 +207,16 @@ LocalDate minEligibleDate = today.minusYears(18);
 		                    <div class="password-container">
 							    <div class="field-container" style="position: relative;">
 							        <label>Password:<span class="required">*</span></label>
-							        <input type="password" id="password" name="user.passwordHash" maxlength="50" required oncopy="return false" onpaste="return false" oncut="return false">
-							        <i class="fa-solid fa-eye toggle-password" toggle="#password"></i>
+							        <input type="password" id="password" name="user.passwordHash" maxlength="20"
+									pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+							 		title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character." oncopy="return false" oncut="return false">
 							    </div>
 							
 							    <div class="field-container" style="position: relative;">
 							        <label>Confirm Password:<span class="required">*</span></label>
-							        <input type="password" id="confirmPassword" name="confirmPassword" maxlength="50" oncopy="return false" required oncopy="return false" oncut="return false" onpaste="return false">
+							        <input type="password" id="confirmPassword" name="confirmPassword" maxlength="20"
+						        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+							 	title="Must match the new password." oncopy="return false" required oncopy="return false" oncut="return false" onpaste="return false">
 							        <i class="fa-solid fa-eye toggle-password" toggle="#confirmPassword"></i>
 							    </div>
 							</div><br>
@@ -218,8 +236,7 @@ LocalDate minEligibleDate = today.minusYears(18);
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const urlParams = new URLSearchParams(window.location.search);
-    const employeeId = urlParams.get("employeeId");
-    console.log(employeeId);
+    const employeeId = urlParams.get("userId");
 
     // Load branch list
     fetch("${pageContext.request.contextPath}/jadebank/branch/list")
@@ -284,6 +301,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 // Hide password section in edit mode
                 document.querySelectorAll('.password-container').forEach(el => el.style.display = "none");
+                document.getElementById("password").removeAttribute("required");
+                document.getElementById("confirmPassword").removeAttribute("required");
             })
             .catch(err => {
                 console.error("Failed to fetch employee data:", err);
@@ -307,50 +326,73 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("signup-error").textContent = "Passwords do not match.";
             return;
         }
+        
+        const userPayload = {
+        	    userId: employeeId,
+        	    fullName: document.querySelector('input[name="user.fullName"]').value,
+        	    email: document.querySelector('input[name="user.email"]').value,
+        	    phone: document.querySelector('input[name="user.phone"]').value,
+        	    dob: document.querySelector('input[name="user.dob"]').value,
+        	    userType: 2,
+        	    gender: gender
+        	};
+
+        	if (!employeeId) {
+        	    userPayload.passwordHash = password;
+        	}
 
         const data = {
-            user: {
-                userId: employeeId,
-                fullName: document.querySelector('input[name="user.fullName"]').value,
-                email: document.querySelector('input[name="user.email"]').value,
-                phone: document.querySelector('input[name="user.phone"]').value,
-                dob: document.querySelector('input[name="user.dob"]').value,
-                userType: 2,
-                gender: gender,
-                passwordHash: password
-            },
-            employeeDetails: {
-                role: document.querySelector('select[name="employeeDetails.role"]').value,
-                branch: document.querySelector('select[name="employeeDetails.branchId"]').value
-            }
-        };
+        	    user: userPayload,
+        	    employeeDetails: {
+        	        role: document.querySelector('select[name="employeeDetails.role"]').value,
+        	        branch: document.querySelector('select[name="employeeDetails.branchId"]').value
+        	    }
+        	};
 
         const isEdit = !!employeeId;
         const endpoint = isEdit ? "update" : "new";
 
-        fetch("${pageContext.request.contextPath}/jadebank/user/" + endpoint, {
+        fetch(`${pageContext.request.contextPath}/jadebank/user/` + endpoint, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(data)
         })
         .then(async response => {
+            if (response.status === 401) {
+                window.location.href = `${pageContext.request.contextPath}/Login.jsp?expired=true`;
+                return;
+            }
+
+            const errorElement = document.getElementById("signup-error");
+
             if (response.ok) {
-                document.getElementById("signup-error").style.color = "green";
-                document.getElementById("signup-error").textContent = isEdit
+                errorElement.style.color = "green";
+                errorElement.textContent = isEdit
                     ? "Employee updated successfully."
                     : "Employee created successfully.";
+
                 if (!isEdit) {
                     document.getElementById("signup-form").reset();
                 }
+
+                if (isEdit && window.parent && typeof window.parent.loadUserProfile === "function") {
+                    window.parent.loadUserProfile();
+                }
             } else {
                 const errorData = await response.json();
-                document.getElementById("signup-error").style.color = "red";
-                document.getElementById("signup-error").textContent = errorData.error || "Operation failed.";
+                errorElement.style.color = "red";
+                errorElement.textContent = errorData.error || "Operation failed.";
             }
         })
         .catch(err => {
-            document.getElementById("signup-error").textContent = "An error occurred: " + err.message;
+            const errorElement = document.getElementById("signup-error");
+            errorElement.style.color = "red";
+            errorElement.textContent = "An error occurred: " + err.message;
         });
+
     });
 });
 document.querySelectorAll('.toggle-password').forEach(function (icon) {
@@ -362,6 +404,30 @@ document.querySelectorAll('.toggle-password').forEach(function (icon) {
         icon.classList.toggle('fa-eye-slash');
     });
 });
+document.querySelector('input[name="user.fullName"]').addEventListener('input', function (e) {
+	  const value = this.value;
+
+	  // Allow letters, spaces, hyphens, apostrophes, and ONE @
+	  // Remove all invalid characters
+	  let cleaned = value.replace(/[^A-Za-z\s\-@']/g, '');
+
+	  // Ensure only one @ is present
+	  const atCount = (cleaned.match(/@/g) || []).length;
+	  if (atCount > 1) {
+	    // Remove all but the first @
+	    let firstAtIndex = cleaned.indexOf('@');
+	    cleaned = cleaned.slice(0, firstAtIndex + 1) + cleaned.slice(firstAtIndex + 1).replace(/@/g, '');
+	  }
+
+	  this.value = cleaned;
+	});
+
+function allowOnlyDigits(e) {
+	    e.target.value = e.target.value.replace(/\D/g, '');
+	  }
+
+	  document.getElementById('phone').addEventListener('input', allowOnlyDigits);
+	  document.getElementById('aadhar').addEventListener('input', allowOnlyDigits);
 </script>
 
 </body>

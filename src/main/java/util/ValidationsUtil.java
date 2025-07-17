@@ -65,12 +65,51 @@ public class ValidationsUtil {
 	        throw new CustomException("Full name must contain only letters and spaces (2–50 characters).");
 	    }
 
-	    if (email == null || !email.matches("^(?=.{1, 70}$)[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
+	    if (email == null || !email.matches("^(?=.{1,70}$)[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
 	        throw new CustomException("Invalid email format.");
 	    }
 
 	    if (password == null || password.matches("^(?=.*\\\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\\\\W).{8,20}$")) {
 	        throw new CustomException("Password must be 8-20 characters, include uppercase, lowercase, number, and a special character.");
+	    }
+
+	    if (phone == null || !phone.matches("^[6-9]\\d{9}$")) {
+	        throw new CustomException("Phone number must be a valid 10-digit Indian number starting with 6–9.");
+	    }
+
+	    if (dob == null || !dob.matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+	        throw new CustomException("Date of birth must be in YYYY-MM-DD format.");
+	    }
+
+	    if (age == null || age < 18 || age > 120) {
+	        throw new CustomException("Age must be between 0 and 120.");
+	    }
+
+	    if (gender == null || !(gender.equalsIgnoreCase("male") || gender.equalsIgnoreCase("female") || gender.equalsIgnoreCase("other"))) {
+	        throw new CustomException("Gender must be 'male', 'female', or 'other'.");
+	    }
+
+	    if (userType == null || userType < 0 || userType > 3) {
+	        throw new CustomException("Invalid user type.");
+	    }
+	}
+	
+	public static void validateUserForUpdate(User user) throws CustomException {
+		
+	    String fullName = user.getFullName();
+	    String email = user.getEmail();
+	    String phone = user.getPhone();
+	    String dob = user.getDob();
+	    Integer age = user.getAge();
+	    String gender = user.getGender();
+	    Integer userType = user.getUserType();
+		
+	    if (fullName == null || !fullName.matches("^(?=.{2,50}$)[A-Za-z]+(?:[\\-' ][A-Za-z]+)*$")) {
+	        throw new CustomException("Full name must contain only letters and spaces (2–50 characters).");
+	    }
+
+	    if (email == null || !email.matches("^(?=.{1,70}$)[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$")) {
+	        throw new CustomException("Invalid email format.");
 	    }
 
 	    if (phone == null || !phone.matches("^[6-9]\\d{9}$")) {
@@ -108,7 +147,7 @@ public class ValidationsUtil {
 		    throw new CustomException("PAN ID must follow the format: 5 uppercase letters, 4 digits, 1 uppercase letter (e.g., ABCDE1234F).");
 		}
 
-		if (address == null || address.isBlank() || address.length() < 5 || address.length() > 250) {
+		if (address == null || address.isBlank() || address.length() < 5 || address.length() > 50) {
 		    throw new CustomException("Address must be between 5 and 250 characters.");
 		}
 		
@@ -119,11 +158,13 @@ public class ValidationsUtil {
 		Integer role = employee.getRole();
 		Long branch = employee.getBranch();
 		
-		if (role == null || role <= 1 || role >= 3) {
+		if (role == null || role < 1 || role > 3) {
 			throw new CustomException ("Invalid employee Role");
 		}
 		
-		ValidationsUtil.isNull(branch, "Branch");
+		if (branch == null || branch <= 0) {
+		    throw new CustomException("Invalid branch Id");
+		}
 	}
 	
 	public static void validateBranch(Branch branch) throws CustomException {
@@ -195,10 +236,10 @@ public class ValidationsUtil {
 		    throw new CustomException("Invalid account type");
 		}
 	    
-	    BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("1000000"); // ₹10,00,000
+	    BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("100000"); // ₹10,00,000
 
 	    if (balance == null || balance.compareTo(BigDecimal.ZERO) <= 0 || balance.compareTo(MAX_TRANSACTION_LIMIT) > 0) {
-	        throw new CustomException("Initial balance should not exceed ₹10,00,000.");
+	        throw new CustomException("Initial balance should not exceed ₹1,00,000.");
 	    }
  
 	}
@@ -219,10 +260,10 @@ public class ValidationsUtil {
 		    throw new CustomException("Valid customer ID is required.");
 		}
 
-		BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("1000000"); // ₹10,00,000
+		BigDecimal MAX_TRANSACTION_LIMIT = new BigDecimal("100000"); // ₹1,00,000
 
 		if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0 || amount.compareTo(MAX_TRANSACTION_LIMIT) > 0) {
-		    throw new CustomException("Transaction amount must be greater than zero and not exceed 10,00,000.");
+		    throw new CustomException("Transaction amount must be greater than zero and not exceed 1,00,000.");
 		}
 
 		if (transactionType == null || transactionType < 0 || transactionType > 4) {

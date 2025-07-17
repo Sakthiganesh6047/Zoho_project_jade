@@ -375,7 +375,7 @@
                         <p id="userPhone">Phone: -</p>
                     </div>
                 </div>
-                <i class="fas fa-pen-to-square edit-icon" onclick="redirectToEditProfile()"></i>
+                <i class="fas fa-pen-to-square edit-icon" title="Edit Profile" onclick="redirectToEditProfile()"></i>
             </div>
 
 			<div class="stat-section">

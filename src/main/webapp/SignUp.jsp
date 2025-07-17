@@ -256,9 +256,9 @@ LocalDate maxEligibleDate = today.minusYears(18);  // Latest acceptable birthdat
 					    <div>
 						    <label for="dob">Date of Birth:<span class="required">*</span></label>
 						    <input type="date" id="dob" name="user.dob"
-						           min="<%=minEligibleDate%>"
-						           max="<%=maxEligibleDate%>"
-						           title="Age must be between 18 and 120 years." required>
+								min="<%=minEligibleDate%>"
+								max="<%=maxEligibleDate%>"
+								title="Age must be between 18 and 120 years." required>
 						</div>
 					    
 					   <div class="field-container">
@@ -296,7 +296,7 @@ LocalDate maxEligibleDate = today.minusYears(18);  // Latest acceptable birthdat
 						        <label>Password:<span class="required">*</span></label>
 						        <input type="password" id="password" name="user.passwordHash" maxlength="20"
 								pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
-							 	title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character." oncopy="return false" onpaste="return false" oncut="return false">
+							 	title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character." oncopy="return false" oncut="return false">
 						        <i class="fa-solid fa-eye toggle-password" toggle="#password"></i>
 						    </div>
 						
@@ -304,7 +304,7 @@ LocalDate maxEligibleDate = today.minusYears(18);  // Latest acceptable birthdat
 						        <label>Confirm Password:<span class="required">*</span></label>
 						        <input type="password" id="confirmPassword" name="confirmPassword" maxlength="20"
 						        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
-							 	title="Must match the new password." oncopy="return false" required oncopy="return false" oncut="return false" onpaste="return false">
+							 	title="Must match the new password." oncopy="return false" required oncopy="return false" oncut="return false">
 						        <i class="fa-solid fa-eye toggle-password" toggle="#confirmPassword"></i>
 						    </div>
 						</div><br>

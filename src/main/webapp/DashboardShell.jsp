@@ -28,6 +28,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<link rel="icon" type="image/png" sizes="32x32" href="contents/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="contents/favicon-16x16.png">
+	<link rel="shortcut icon" href="contents/favicon.ico" type="image/x-icon">
     <title>JadeBank Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
     <style>
@@ -87,6 +90,25 @@
         	history.pushState({ page: pageUrl }, "", base + "?page=" + pageUrl);
         }
     }
+    
+    function loadUserProfile() {
+        fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
+            .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch profile"))
+            .then(profile => {
+                document.getElementById("profileName").textContent = profile.fullName || "Unknown";
+                document.getElementById("profileRole").textContent = profile.userType === 1 ? "Customer" : "Employee";
+                document.getElementById("profileEmail").textContent = "Email: " + (profile.email || "N/A");
+                document.getElementById("profilePhone").textContent = "Phone No.: " + (profile.phone || "N/A");
+                document.getElementById("genderImage").src =
+                    profile.gender?.toLowerCase() === "female"
+                        ? "contents/woman_6997664.png"
+                        : "contents/man_6997551.png";
+            })
+            .catch(err => console.error("Error loading profile:", err));
+    }
+
+    // Initial call on page load
+    loadUserProfile();
 
     window.addEventListener("DOMContentLoaded", () => {
         const params = new URLSearchParams(window.location.search);

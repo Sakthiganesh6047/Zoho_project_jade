@@ -54,6 +54,17 @@ public class AuthorizeUtil {
 	    return false;
 	}
 	
+	public static void checkAccountStatus(Long accountId) throws CustomException {
+		AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
+		Account account = accountDAO.getAccountById(accountId);
+		if (account.getAccountStatus().equals(2)) {
+			throw new CustomException("Account Blocked");
+		}
+		if (account.getAccountStatus().equals(3)) {
+			throw new CustomException("Account Closed");
+		}
+	}
+	
 	public static Object[] resolveParameters(HttpServletRequest request, Method method, Map<String, String> pathParams) throws CustomException {
 		try {
 	        Parameter[] parameters = method.getParameters();
@@ -77,8 +88,12 @@ public class AuthorizeUtil {
 	                args[i] = convertToType(val, type);
 	
 	            } else if (param.isAnnotationPresent(FromBody.class)) {
+	                String contentType = request.getContentType();
+	                if (contentType == null || !contentType.contains("application/json")) {
+	                    throw new CustomException("Invalid Content-Type. Expected application/json.");
+	                }
 	                args[i] = mapper.readValue(request.getReader(), type);
-	
+	                
 	            } else if (param.isAnnotationPresent(FromSession.class)) {
 	                Object value = null;
 	                if (session != null) {

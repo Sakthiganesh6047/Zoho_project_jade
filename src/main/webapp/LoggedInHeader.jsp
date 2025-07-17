@@ -236,6 +236,35 @@
 	.cancel-btn:hover {
 	    background-color: #bbb;
 	}
+	
+	.toggle-password {
+	    position: absolute;
+	    top: 41px;
+	    right: 14px;
+	    cursor: pointer;
+	    color: #666;
+	    font-size: 16px;
+	}
+	
+	.password-field-wrapper {
+	    position: relative;
+	    width: 100%;
+	    margin-bottom: 12px;
+	}
+	.password-field-wrapper input {
+	    width: 87%;
+	    padding-right: 40px; /* space for eye icon */
+	}
+	.password-field-wrapper .toggle-password {
+	    position: absolute;
+	    top: 50%;
+	    right: 12px;
+	    transform: translateY(-50%);
+	    cursor: pointer;
+	    color: #666;
+	    font-size: 16px;
+	}
+	
     
 </style>
 
@@ -269,12 +298,36 @@
     <div id="changePasswordModal" class="modal">
         <div class="modal-content">
             <h3 style="text-align:center;">Change Password</h3>
+            
             <label for="oldPassword">Old Password:</label>
-            <input type="password" id="oldPassword" required />
-            <label for="newPassword">New Password:</label>
-            <input type="password" id="newPassword" required />
+            <div class="password-field-wrapper">
+			    <input type="password" id="oldPassword" maxlength=20 required />
+			    <i class="fa-solid fa-eye toggle-password" toggle="#oldPassword"></i>
+			</div>
+
+            
+            <label for="newPassword">New Password:</label>      
+            <div class="password-field-wrapper">
+				<input type="password" id="newPassword"
+		        maxlength="20"
+		        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+		        title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character." 
+		        oncopy="return false" 
+		        oncut="return false" />
+		    	<i class="fa-solid fa-eye toggle-password" toggle="#newPassword"></i>
+			</div>
+			
             <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmNewPassword" required />
+            <div class="password-field-wrapper">
+			    <input type="password" id="confirmNewPassword"
+			        maxlength="20"
+			        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}" required
+			        title="Password must be 8-20 characters, include uppercase, lowercase, number, and a special character." 
+			        oncopy="return false" 
+			        oncut="return false" />
+			    <i class="fa-solid fa-eye toggle-password" toggle="#confirmNewPassword"></i>
+			</div>
+
             <button onclick="submitPasswordChange()">Submit</button>
             <button onclick="closePasswordChangeModal()" style="margin-top: 10px;">Cancel</button>
             <div id="passwordStatus" style="margin-top: 10px; text-align: center; font-weight: bold;"></div>
@@ -311,6 +364,16 @@
 	    }
 	});
 	
+	document.querySelectorAll('.toggle-password').forEach(function (icon) {
+        icon.addEventListener('click', function () {
+            const input = document.querySelector(icon.getAttribute('toggle'));
+            const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+            input.setAttribute('type', type);
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        });
+    });
+	
 	// === New logic to detect iframe interaction ===
 	const iframe = document.getElementById("content-frame"); // Change ID if needed
 	
@@ -330,14 +393,6 @@
 	        profileBox.classList.remove("active");
 	    }
 	});
-	
-	window.onclick = function(event) {
-	    const logoutModal = document.getElementById("logoutConfirmModal");
-	    const passwordModal = document.getElementById("changePasswordModal");
-
-	    if (event.target === logoutModal) logoutModal.style.display = "none";
-	    if (event.target === passwordModal) passwordModal.style.display = "none";
-	}
 
     fetch(`${pageContext.request.contextPath}/jadebank/user/profile`)
         .then(res => res.ok ? res.json() : Promise.reject("Failed to fetch profile"))
@@ -356,6 +411,7 @@
     function showPasswordChangeModal() {
         document.getElementById("changePasswordModal").style.display = "block";
         document.getElementById("passwordStatus").textContent = "";
+        profileBox.classList.remove("active");
     }
 
     function closePasswordChangeModal() {
@@ -376,9 +432,9 @@
     }
 
     function submitPasswordChange() {
-        const oldPassword = document.getElementById("oldPassword").value.trim();
-        const newPassword = document.getElementById("newPassword").value.trim();
-        const confirmNewPassword = document.getElementById("confirmNewPassword").value.trim();
+        const oldPassword = document.getElementById("oldPassword").value;
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmNewPassword = document.getElementById("confirmNewPassword").value;
         const statusDiv = document.getElementById("passwordStatus");
 
         if (!oldPassword || !newPassword || !confirmNewPassword) {
@@ -386,29 +442,59 @@
             statusDiv.style.color = "red";
             return;
         }
+        
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,20}$/;
+        
+        if (newPassword === oldPassword) {
+            statusDiv.textContent = "Both the entered old and new passwords are same!";
+            statusDiv.style.color = "red";
+            return;
+        }
+        
+        if (!passwordRegex.test(newPassword)) {
+            statusDiv.textContent = "Password must be 8-20 characters, include uppercase, lowercase, number, and a special character.";
+            statusDiv.style.color = "red";
+            return;
+        }
 
         if (newPassword !== confirmNewPassword) {
-            statusDiv.textContent = "Passwords do not match.";
+            statusDiv.textContent = "New and Confirm Passwords do not match!";
             statusDiv.style.color = "red";
             return;
         }
 
         fetch(`${pageContext.request.contextPath}/jadebank/user/password`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify({ password: oldPassword, newPassword })
         })
-        .then(res => res.json())
-        .then(data => {
+        .then(async res => {
+            if (res.status === 401) {
+                statusDiv.textContent = "Session expired. Redirecting to login...";
+                statusDiv.style.color = "red";
+                setTimeout(() => {
+                    window.location.href = `${pageContext.request.contextPath}/Login.jsp?expired=true`;
+                }, 2000);
+                return;
+            }
+
+            const data = await res.json();
             statusDiv.textContent = data.status === "success"
                 ? "Password changed successfully."
                 : (data.error || "Failed to change password.");
             statusDiv.style.color = data.status === "success" ? "green" : "red";
-            if (data.status === "success") setTimeout(closePasswordChangeModal, 2000);
+
+            if (data.status === "success") {
+                setTimeout(closePasswordChangeModal, 2000);
+            }
         })
         .catch(err => {
             statusDiv.textContent = "Network error: " + err.message;
             statusDiv.style.color = "red";
         });
+
     }
 </script>

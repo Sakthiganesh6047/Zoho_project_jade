@@ -258,7 +258,7 @@
     }
 
     function editBranch(branchId) {
-        window.location.href = "AddNewBranch.jsp?branchId=" + encodeURIComponent(branchId);
+        window.location.href = "AddNewBranch.jsp?branchId=" + (branchId);
     }
 
     function toggleSidebar() {

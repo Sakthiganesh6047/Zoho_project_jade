@@ -7,21 +7,34 @@
         <fieldset>
             <legend>Sender Details</legend>
             <label for="insideSenderAccountId">Sender Account ID:</label>
-            <input type="number" id="insideSenderAccountId" name="transaction.accountId" required onblur="fetchInsideSenderDetails()" />
+            <input type="text" id="insideSenderAccountId" name="transaction.accountId" 
+            maxlength="10" 
+            required 
+            pattern="\d{1,10}" title="Enter up to 10 digits only"
+       		oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            onblur="fetchInsideSenderDetails()" />
             <div id="insideInfoDiv" class="info-box hidden"></div>
 
             <label for="insideAmount">Amount:</label>
             <input type="number" step="0.01" id="insideAmount" name="transaction.amount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
             <label for="insideDescription">Description:</label>
-            <input type="text" id="insideDescription" name="transaction.description" />
+            <input type="text" id="insideDescription" name="transaction.description"
+			       maxlength="100"
+			       pattern="[A-Za-z0-9 ,.\-']*"
+			       placeholder="Reason for transfer..."
+			       title="Only letters, numbers, spaces, comma, dot, hyphen, and apostrophe allowed. Max 100 characters."/>
         </fieldset>
 
         <!-- Receiver Section -->
         <fieldset>
             <legend>Receiver Details</legend>
             <label for="insideReceiverAccount2">Receiver Account Number:</label>
-            <input type="number" id="insideReceiverAccount2" required onblur="checkInsideReceiverDetails()" />
+            <input type="text" id="insideReceiverAccount2" required
+            maxlength="10"
+            pattern="\d{1,10}" title="Enter up to 10 digits only"
+       		oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            onblur="checkInsideReceiverDetails()" />
             <div id="insideReceiverDetails" class="info-box hidden"></div>
         </fieldset>
 
@@ -120,6 +133,7 @@
         const receiverAcc = document.getElementById("insideReceiverAccount2").value.trim();
         const amount = parseFloat(document.getElementById("insideAmount").value);
         const statusDiv = document.getElementById("insideTransferStatus");
+        const description = document.getElementById("insideDescription");
 
         statusDiv.classList.remove("hidden");
         statusDiv.style.color = "red";
@@ -135,6 +149,13 @@
         }
         if (!amount || isNaN(amount) || amount <= 0) {
             statusDiv.textContent = "Please enter a valid amount.";
+            return;
+        }
+        
+     // Validate description pattern manually only if it's not empty
+        const descPattern = /^[A-Za-z0-9 ,.\-']*$/;
+        if (description.length > 0 && (!descPattern.test(description) || description.length > 100)) {
+            showStatusMessage("Description can only contain letters, numbers, space, comma, dot, hyphen, apostrophe. Max 100 chars.", "red");
             return;
         }
 
@@ -179,12 +200,22 @@
 
         fetch(contextPath + "/jadebank/transaction/transfer", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(data)
         })
         .then(async res => {
             closeInsidePasswordModal();
+
+            if (res.status === 401) {
+                window.location.href = contextPath + "/Login.jsp?expired=true";
+                return;
+            }
+
             const result = await res.json();
+
             if (res.ok && result.status === "success") {
                 statusDiv.textContent = "Transfer completed successfully.";
                 statusDiv.style.color = "green";
@@ -198,6 +229,7 @@
                 statusDiv.textContent = result.error || "Transfer failed.";
                 statusDiv.style.color = "red";
             }
+
             statusDiv.classList.remove("hidden");
         })
         .catch(err => {

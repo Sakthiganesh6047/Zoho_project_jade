@@ -337,45 +337,63 @@
         if (branchId) url += "&branchId=" + encodeURIComponent(branchId);
         if (roleType) url += "&roleType=" + encodeURIComponent(roleType);
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.querySelector("#employee-table tbody");
-                tbody.innerHTML = "";
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => {
+            if (res.status === 401) {
+                window.location.href = "<%= request.getContextPath() %>/Login.jsp?expired=true";
+                return; // Stop further processing
+            }
 
-                if (Array.isArray(data) && data.length > 0) {
-                    lastPageReached = data.length < limit;
+            if (!res.ok) {
+                return Promise.reject("Fetch error: " + res.status);
+            }
 
-                    data.forEach(emp => {
-                        const row = document.createElement("tr");
-                        row.innerHTML =
-                            "<td>" + emp.employeeId + "</td>" +
-                            "<td>" + (emp.employeeName || "N/A") + "</td>" +
-                            "<td>" + (emp.employeeEmail || "N/A") + "</td>" +
-                            "<td>" + getRoleName(emp.employeeRole) + "</td>" +
-                            "<td>" + (emp.employeeBranch || "N/A") + "</td>" +
-                            "<td>" + (emp.employeeBranchName || "N/A") + "</td>" +
-                            "<td><button class='edit-button' onclick='editEmployee(" + emp.employeeId + ")'><i class='fas fa-edit'></i></button></td>";
-                        tbody.appendChild(row);
-                    });
+            return res.json();
+        })
+        .then(data => {
+            if (!data) return;
 
+            const tbody = document.querySelector("#employee-table tbody");
+            tbody.innerHTML = "";
+
+            if (Array.isArray(data) && data.length > 0) {
+                lastPageReached = data.length < limit;
+
+                data.forEach(emp => {
+                    const row = document.createElement("tr");
+                    row.innerHTML =
+                        "<td>" + emp.employeeId + "</td>" +
+                        "<td>" + (emp.employeeName || "N/A") + "</td>" +
+                        "<td>" + (emp.employeeEmail || "N/A") + "</td>" +
+                        "<td>" + getRoleName(emp.employeeRole) + "</td>" +
+                        "<td>" + (emp.employeeBranch || "N/A") + "</td>" +
+                        "<td>" + (emp.employeeBranchName || "N/A") + "</td>" +
+                        "<td><button class='edit-button' onclick='editEmployee(" + emp.employeeId + ")'><i class='fas fa-edit'></i></button></td>";
+                    tbody.appendChild(row);
+                });
+
+            } else {
+                if (currentPage > 0) {
+                    currentPage--;
+                    lastPageReached = true;
+                    fetchEmployees();
                 } else {
-                    if (currentPage > 0) {
-                        currentPage--;
-                        lastPageReached = true;
-                        fetchEmployees();
-                    } else {
-                        const row = document.createElement("tr");
-                        row.innerHTML = "<td colspan='7' style='text-align:center;'>No employees found.</td>";
-                        tbody.appendChild(row);
-                    }
+                    const row = document.createElement("tr");
+                    row.innerHTML = "<td colspan='7' style='text-align:center;'>No employees found.</td>";
+                    tbody.appendChild(row);
                 }
+            }
 
-                updatePageInfo();
-            })
-            .catch(err => {
-                console.error("Failed to fetch employee list:", err);
-            });
+            updatePageInfo();
+        })
+        .catch(err => {
+            console.error("Failed to fetch employee list:", err);
+        });
     }
 
     function applyFilters() {
@@ -385,7 +403,7 @@
     }
 
     function editEmployee(employeeId) {
-        window.location.href = "EmployeeSignUp.jsp?employeeId=" + (employeeId);
+        window.location.href = "EmployeeSignUp.jsp?userId=" + (employeeId);
     }
 
     function updatePageInfo() {

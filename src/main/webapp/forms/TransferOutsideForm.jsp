@@ -129,7 +129,11 @@
             <legend>Sender Details</legend>
 
             <label for="outsideSenderAccountId">Sender Account ID:</label>
-            <input type="number" name="transaction.accountId" id="outsideSenderAccountId" required onblur="fetchOutsideSenderDetails()">
+            <input type="text" name="transaction.accountId" id="outsideSenderAccountId" 
+            required maxlength="10"
+            pattern="\d{1,10}" title="Enter up to 10 digits only"
+       		oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+            onblur="fetchOutsideSenderDetails()">
 
             <div id="outsideInfoDiv" class="info-box hidden"></div>
 
@@ -137,7 +141,11 @@
             <input type="number" step="0.01" name="transaction.amount" id="outsideAmount" required min="0.01" max="100000" oninput="validateAmount(this)" />
 
             <label for="outsideDescription">Description:</label>
-            <input type="text" name="transaction.description" id="outsideDescription">
+            <input type="text" name="transaction.description" id="outsideDescription"
+            maxlength="100"
+			pattern="[A-Za-z0-9 ,.\-']*"
+			placeholder="Reason for transfer..."
+			title="Only letters, numbers, spaces, comma, dot, hyphen, and apostrophe allowed. Max 100 characters."/>
         </fieldset>
 
         <!-- Receiver Section -->
@@ -145,16 +153,26 @@
             <legend>Receiver Details</legend>
 
             <label for="outsideBeneficiaryAccountNumber">Account Number:</label>
-            <input type="number" name="beneficiary.accountNumber" id="outsideBeneficiaryAccountNumber" required>
+            <input type="text" name="beneficiary.accountNumber" id="outsideBeneficiaryAccountNumber" 
+            required maxlength="20"
+            pattern="\d{1,10}" title="Enter up to 10 digits only"
+       		oninput="this.value = this.value.replace(/[^0-9]/g, '')">
 
             <label for="outsideBeneficiaryName">Account Holder Name:</label>
-            <input type="text" name="beneficiary.accountHolderName" id="outsideBeneficiaryName" required>
-
+            <input type="text" name="beneficiary.accountHolderName" id="outsideBeneficiaryName" maxlength="50"
+				pattern="^(?![\s]+$)(?=[^@]*@?[^@]*$)[A-Za-z]+(?:[ '\-@][A-Za-z]+)*$"
+				required
+				title="Only letters, spaces, apostrophes, hyphens allowed, and '@' only once. No numbers or other special characters.">
             <label for="outsideBankName">Bank Name:</label>
-            <input type="text" name="beneficiary.bankName" id="outsideBankName" required>
+            <input type="text" name="beneficiary.bankName" id="outsideBankName" maxlength="50"
+				pattern="^(?![\s]+$)(?=[^@]*@?[^@]*$)[A-Za-z]+(?:[ '\-@][A-Za-z]+)*$"
+				required
+				title="Only letters, spaces, apostrophes, hyphens allowed, and '@' only once. No numbers or other special characters.">
 
             <label for="outsideIfscCode">IFSC Code:</label>
-            <input type="text" name="beneficiary.ifscCode" id="outsideIfscCode" required>
+            <input type="text" name="beneficiary.ifscCode" id="outsideIfscCode" maxlength="50"
+				pattern="^(?![\s]+$)(?=[^@]*@?[^@]*$)[A-Za-z]+(?:[ '\-@][A-Za-z]+)*$"
+				title="Only letters, spaces, apostrophes, hyphens allowed, and '@' only once. No numbers or other special characters." required>
         </fieldset>
 
         <div id="outsideTransferStatus" class="info-box hidden"></div>
@@ -226,6 +244,7 @@
         const amount = parseFloat(document.getElementById("outsideAmount").value);
         const beneficiaryAccount = document.getElementById("outsideBeneficiaryAccountNumber").value.trim();
         const statusDiv = document.getElementById("outsideTransferStatus");
+        const description = document.getElementById("outsideDescription");
 
         statusDiv.textContent = "";
         statusDiv.style.color = "red";
@@ -241,6 +260,13 @@
         }
         if (!amount || isNaN(amount) || amount <= 0) {
             statusDiv.textContent = "Please enter a valid amount.";
+            return;
+        }
+        
+     // Validate description pattern manually only if it's not empty
+        const descPattern = /^[A-Za-z0-9 ,.\-']*$/;
+        if (description.length > 0 && (!descPattern.test(description) || description.length > 100)) {
+            showStatusMessage("Description can only contain letters, numbers, space, comma, dot, hyphen, apostrophe. Max 100 chars.", "red");
             return;
         }
 
@@ -292,12 +318,29 @@
 
         fetch(contextPath + "/jadebank/transaction/transfer", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify(data)
         })
         .then(async res => {
             closeOutsidePasswordModal();
-            const result = await res.json();
+            if (res.status === 401) {
+                window.location.href = contextPath + "/Login.jsp?expired=true";
+                return;
+            }
+
+            let result;
+            try {
+                result = await res.json();
+            } catch (e) {
+                statusDiv.textContent = "Invalid server response.";
+                statusDiv.style.color = "red";
+                statusDiv.classList.remove("hidden");
+                return;
+            }
+
             statusDiv.classList.remove("hidden");
 
             if (res.ok && result.status === "success") {

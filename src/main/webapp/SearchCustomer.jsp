@@ -2,7 +2,8 @@
 <%@ page import="java.time.LocalDate"%>
 <%
 LocalDate today = LocalDate.now();
-LocalDate minEligibleDate = today.minusYears(18);
+LocalDate minEligibleDate = today.minusYears(120); // Earliest acceptable birthdate (max 120 years old)
+LocalDate maxEligibleDate = today.minusYears(18);  // Latest acceptable birthdate (at least 18 years old)
 %>
 <!DOCTYPE html>
 <html>
@@ -357,8 +358,10 @@ LocalDate minEligibleDate = today.minusYears(18);
       <input type="hidden" name="user.userId" id="editUserId">
 
       <label>Full Name</label>
-      <input type="text" name="user.fullName" id="editFullName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*"	required autofocus
-		title="Name should contain only letters, spaces, hyphens or apostrophes.">
+      <input type="text" name="user.fullName" id="editFullName" maxlength="50"
+		pattern="^(?![\s]+$)(?=[^@]*@?[^@]*$)[A-Za-z]+(?:[ '\-@][A-Za-z]+)*$"
+		required
+		title="Only letters, spaces, apostrophes, hyphens allowed, and '@' only once. No numbers or other special characters.">
 
       <label>Email</label>
       <input type="email" name="user.email" id="editEmail" maxlength="70" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" 
@@ -372,14 +375,19 @@ LocalDate minEligibleDate = today.minusYears(18);
       </select>
 
       <label>Date of Birth</label>
-      <input type="date" name="user.dob" id="editDob" max="<%=minEligibleDate%>"
-		title="You must be at least 18 years old." required>
+      <input type="date" name="user.dob" id="editDob"
+      	min="<%=minEligibleDate%>"
+		max="<%=maxEligibleDate%>"
+		title="Age must be between 18 and 120 years." required>
 
       <label>Phone</label>
-      <input type="tel" name="user.phone" id="editPhone" pattern="[0-9]{10}" inputmode="numeric" maxlength="10" required>
+      <input type="tel" name="user.phone" id="editPhone" pattern="^[6-9][0-9]{9}$"
+		inputmode="numeric" maxlength="10"
+		title="Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits."
+		required>
 
       <label>Aadhar Number</label>
-      <input type="text" name="customerDetails.aadharNumber" id="editAadhar" pattern="[0-9]{12}" inputmode="numeric" maxlength="12" 
+      <input type="text" name="customerDetails.aadharNumber" id="editAadhar" pattern="[0-9]{12}" inputmode="numeric" maxlength="12"
 		title="Aadhar number must be exactly 12 digits." required>
 
       <label>PAN ID</label>
@@ -413,10 +421,25 @@ LocalDate minEligibleDate = today.minusYears(18);
 
         fetch("<%= request.getContextPath() %>/jadebank/user/details", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify({ phone })
         })
-        .then(res => res.ok ? res.json() : Promise.reject("User not found"))
+        .then(async res => {
+            if (res.status === 401) {
+                window.location.href = "<%= request.getContextPath() %>/Login.jsp?expired=true";
+                return;
+            }
+
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text || "User not found");
+            }
+
+            return res.json();
+        })
         .then(data => {
             currentProfileData = data;
             const user = data.user;
@@ -430,9 +453,11 @@ LocalDate minEligibleDate = today.minusYears(18);
             document.getElementById("userId").textContent = user.userId || "-";
 
             document.getElementById("profilePic").src =
-                user.gender === "Male" ? "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" :
-                user.gender === "Female" ? "https://cdn-icons-png.flaticon.com/512/3135/3135789.png" :
-                "https://cdn-icons-png.flaticon.com/512/747/747376.png";
+                user.gender === "Male"
+                    ? "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                    : user.gender === "Female"
+                    ? "https://cdn-icons-png.flaticon.com/512/3135/3135789.png"
+                    : "https://cdn-icons-png.flaticon.com/512/747/747376.png";
 
             document.getElementById("customerId").textContent = customer?.customerId || "-";
             document.getElementById("aadhar").textContent = customer?.aadharNumber || "-";
@@ -525,15 +550,34 @@ LocalDate minEligibleDate = today.minusYears(18);
         }, 4000); // Message disappears after 4 seconds
     }
     
-    document.getElementById("phone").addEventListener("input", function () {
-        const phone = this.value;
-        const onlyDigits = /^\d+$/;
+    document.querySelector('input[name="user.fullName"]').addEventListener('input', function (e) {
+		  const value = this.value;
+		  let cleaned = value.replace(/[^A-Za-z\s\-@']/g, '');
+		  const atCount = (cleaned.match(/@/g) || []).length;
+		  if (atCount > 1) {
+		    let firstAtIndex = cleaned.indexOf('@');
+		    cleaned = cleaned.slice(0, firstAtIndex + 1) + cleaned.slice(firstAtIndex + 1).replace(/@/g, '');
+		  }
 
-        // Trigger fetch only if it's exactly 10 digits and only numbers
-        if (phone.length === 10 && onlyDigits.test(phone)) {
-            fetchUserProfile();
-        }
-    });
+		  this.value = cleaned;
+		});
+	
+	 function allowOnlyDigits(e) {
+		    e.target.value = e.target.value.replace(/\D/g, '');
+		  }
+
+		  document.getElementById('phone').addEventListener('input', allowOnlyDigits);
+		  document.getElementById('aadhar').addEventListener('input', allowOnlyDigits);
+		  
+		  document.getElementById("phone").addEventListener("input", function () {
+		        const phone = this.value;
+		        const onlyDigits = /^\d+$/;
+
+		        // Trigger fetch only if it's exactly 10 digits and only numbers
+		        if (phone.length === 10 && onlyDigits.test(phone)) {
+		            fetchUserProfile();
+		        }
+		    });
 
 </script>
 

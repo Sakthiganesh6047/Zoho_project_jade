@@ -150,10 +150,7 @@ public class TransactionHandler {
             Beneficiary beneficiary = transferWrapper.getBeneficiary();
             ValidationsUtil.ValidateTransactions(transaction);
             
-            Account account = AuthorizeUtil.getAccountDetails(transaction.getAccountId());
-            if (account.getAccountStatus().equals(0)) {
-            	throw new CustomException("Account blocked");
-            }
+            AuthorizeUtil.checkAccountStatus(transaction.getAccountId());
             
             if (userRole.equals(0)) {
                 String bankName = beneficiary.getBankName();

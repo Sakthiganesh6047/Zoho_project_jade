@@ -125,7 +125,7 @@
                 </select>
 
                 <label for="beneficiaryName">Receiver Name:</label>
-                <input type="text" id="beneficiaryName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" required autofocus
+                <input type="text" id="beneficiaryName" maxlength="50" pattern="[A-Za-z]+(?:[\-' ][A-Za-z]+)*" required
                        title="Name should contain only letters, spaces, hyphens or apostrophes.">
 
                 <label for="beneficiaryAccountNumber">Receiver Account Number:</label>

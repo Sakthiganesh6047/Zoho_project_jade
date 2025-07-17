@@ -418,11 +418,20 @@
     function loadAccounts() {
         fetch(`${pageContext.request.contextPath}/jadebank/account/id`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify({ userId })
         })
-        .then(res => res.json())
-        .then(accounts => {
+        .then(async res => {
+            if (res.status === 401) {
+                //alert("Session expired. Redirecting to login...");
+                window.location.href = `${pageContext.request.contextPath}/Login.jsp?expired=true`;
+                return;
+            }
+
+            const accounts = await res.json();
             const list = document.getElementById("accountList");
             const toggleList = document.getElementById("accountToggleList");
             list.innerHTML = "";
@@ -463,7 +472,8 @@
                         "border-radius: 6px;" +
                         "box-sizing: border-box;";
 
-                    // Button version
+                    let setPrimaryButton = "";
+
                     if (acc.accountId !== primaryAccountId) {
                         setPrimaryButton = "<button onclick=\"setAsPrimary(" + acc.accountId + ")\" " +
                             "style=\"" + commonPrimaryStyle + 
@@ -481,21 +491,22 @@
                         "<div class=\"account-meta\" style=\"display: flex; align-items: center; gap: 30px; font-size: 14px;\">" +
                             "<span><strong>" + accType + " #" + acc.accountId + "</strong></span>" +
                             "<span>Created: " + new Date(acc.createdAt).toLocaleDateString() + "</span>" +
-                            (acc.accountId !== primaryAccountId
-                                ? "<button onclick=\"setAsPrimary(" + acc.accountId + ")\"" +
-                                  " style=\"background-color:#414485; color:white; border:none; border-radius:6px; padding:6px 12px; cursor:pointer;\">" +
-                                  "Set as Primary</button>"
-                                : "<span style=\"color: green; font-weight: bold;\">Primary</span>") +
+                            setPrimaryButton +
                         "</div>" +
-                        "<label class=\"toggle\">" +
+                        "<label class=\"toggle\" title=\"" + (acc.accountStatus === 1 ? "Block Account" : "Unblock Account") + "\">" +
                             "<input type=\"checkbox\" " + (acc.accountStatus === 1 ? "checked" : "") +
-                            " onchange=\"handleToggle(this, " + acc.accountId + ", this.checked)\">" +
+                            " onchange=\"handleToggle(this, " + acc.accountId + ", this.checked)\"" +
+                            " title=\"" + (acc.accountStatus === 1 ? "Block Account" : "Unblock Account") + "\">" +
                             "<span class=\"slider\"></span>" +
                         "</label>";
 
                     toggleList.appendChild(toggleRow);
                 }
             });
+        })
+        .catch(err => {
+            console.error("Network error:", err);
+            alert("Network error. Please try again later.");
         });
     }
 
@@ -530,12 +541,28 @@
     function handleToggle(inputEl, accountId, isActive) {
         const url = isActive ? "/jadebank/account/unblock" : "/jadebank/account/block";
         const message = isActive ? "Account unblocked." : "Account blocked.";
+
+        // Update tooltip dynamically
+        const newTitle = isActive ? "Block Account" : "Unblock Account";
+        inputEl.setAttribute("title", newTitle); // Update input tooltip
+        if (inputEl.parentElement && inputEl.parentElement.classList.contains("toggle")) {
+            inputEl.parentElement.setAttribute("title", newTitle); // Update label tooltip
+        }
+
         fetch(contextPath + url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
             body: JSON.stringify({ accountId })
         })
-        .then(res => {
+        .then(async res => {
+            if (res.status === 401) {
+                window.location.href = contextPath + "/Login.jsp?expired=true";
+                return;
+            }
+
             if (res.ok) {
                 showPopup(message);
             } else {
@@ -545,7 +572,7 @@
         })
         .catch(() => {
             inputEl.checked = !isActive;
-            showPopup("Operation failed.");
+            showPopup("Network error. Operation failed.");
         });
     }
     
@@ -557,9 +584,24 @@
             },
             body: JSON.stringify({ accountId })
         })
-        .then(res => {
-            if (!res.ok) throw new Error("Failed to update primary account.");
-            return res.text();
+        .then(async res => {
+            if (res.status === 401) {
+                // Session expired — redirect to login
+                window.location.href = contextPath + "/Login.jsp?expired=true";
+                return;
+            }
+
+            const contentType = res.headers.get("content-type");
+
+            if (!res.ok) {
+                const errorMessage = contentType && contentType.includes("application/json")
+                    ? (await res.json()).error || "Server returned an error."
+                    : await res.text(); // fallback if not JSON
+
+                throw new Error(errorMessage);
+            }
+
+            return res.text(); // On success
         })
         .then(message => {
             showPopup("Primary account updated.");
@@ -567,11 +609,10 @@
             loadAccounts(); // Refresh cards and status
         })
         .catch(err => {
-            console.error(err);
-            showPopup("Failed to update primary.");
+            console.error("Error setting primary:", err);
+            showPopup("Failed to update primary: " + err.message);
         });
     }
-
 
     function formatDate(timestamp) {
         const date = new Date(Number(timestamp));

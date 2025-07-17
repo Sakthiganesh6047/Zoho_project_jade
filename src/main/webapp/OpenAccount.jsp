@@ -142,7 +142,8 @@
 	                <div class="form-group phone-search-group">
 	                    <div style="flex: 1;">
 	                        <label for="phone">Customer Phone Number:</label>
-	                        <input type="text" id="phone" name="phone" pattern="[0-9]{10}" required>
+	                        <input type="text" id="phone" name="phone" pattern="\d{1,10}" title="Enter up to 10 digits only"
+       							oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength=10 required>
 	                    </div>
 	                    <div>
 	                        <label>&nbsp;</label>
@@ -173,8 +174,8 @@
 	
 	                <div class="form-group">
 	                    <label for="balance">Initial Balance:</label>
-	                    <input type="number" id="balance" name="balance" required min="0" max="1000000" 
-       					title="Balance must be between ₹0 and ₹10,00,000">
+	                    <input type="number" id="balance" name="balance" required min="0" max="100000" 
+       					title="Balance must be between ₹0 and ₹1,00,000">
 	                </div>
 	
 	                <input type="hidden" id="customerId" name="customerId">
@@ -264,27 +265,43 @@
                 balance: parseFloat(balance)
             };
 
-            fetch("${pageContext.request.contextPath}/jadebank/account/new", {
+            fetch(`${pageContext.request.contextPath}/jadebank/account/new`, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json"
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
                 },
                 body: JSON.stringify(accountData)
             })
             .then(async res => {
+                if (res.status === 401) {
+                    // Session expired
+                    window.location.href = `${pageContext.request.contextPath}/Login.jsp?expired=true`;
+                    return;
+                }
+
+                let error = {};
+                try {
+                    error = await res.json();
+                } catch (e) {
+                    error.error = "Invalid server response.";
+                }
+
+                const msgDiv = document.getElementById("form-message");
+
                 if (res.ok) {
-                    document.getElementById("form-message").className = "success";
-                    document.getElementById("form-message").textContent = "Account successfully created.";
+                    msgDiv.className = "success";
+                    msgDiv.textContent = "Account successfully created.";
                     document.getElementById("open-account-form").reset();
                 } else {
-                    const error = await res.json();
-                    document.getElementById("form-message").className = "error";
-                    document.getElementById("form-message").textContent = error.error || "Failed to open account.";
+                    msgDiv.className = "error";
+                    msgDiv.textContent = error.error || "Failed to open account.";
                 }
             })
             .catch(err => {
-                document.getElementById("form-message").className = "error";
-                document.getElementById("form-message").textContent = "Server error occurred.";
+                const msgDiv = document.getElementById("form-message");
+                msgDiv.className = "error";
+                msgDiv.textContent = "Server error occurred: " + err.message;
             });
         });
     </script>

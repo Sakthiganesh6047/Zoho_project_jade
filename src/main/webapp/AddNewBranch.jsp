@@ -117,7 +117,11 @@
                 <input type="hidden" name="branchId" id="branchId" />
 
                 <label for="branchName">Branch Name</label>
-                <input type="text" name="branchName" maxlength="100" pattern="^[A-Za-z0-9 .'-]{3,100}$" required />
+                <input type="text" name="branchName"
+			       maxlength="100"
+			       pattern="^[A-Za-z0-9 .'\-]{3,100}$"
+			       title="Branch name must be 3–100 characters, using letters, numbers, spaces, periods, apostrophes, or hyphens only."
+			       required />
 
                 <label for="branchDistrict">District</label>
                 <select name="branchDistrict" id="branchDistrict" required>
@@ -135,7 +139,7 @@
                 </select><br>
 
                 <label for="address">Address</label>
-                <textarea name="address" rows="4" maxlength="300" required></textarea>
+                <textarea name="address" rows="4" minlength="5" maxlength="300" required></textarea>
 
                 <button type="submit">Create Branch</button>
 
@@ -163,7 +167,7 @@
 
         if (branchId) {
             document.getElementById("form-title").innerText = "Edit Branch";
-            document.querySelector('button[type="submit"]').innerText = "Update Branch"; // <-- Add this line
+            document.querySelector('button[type="submit"]').innerText = "Update Branch";
 
             fetch('${pageContext.request.contextPath}/jadebank/branch/id/' + branchId)
                 .then(res => res.json())
@@ -197,12 +201,25 @@
 
             fetch(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json" ,
+                			"Accept" : "application/json"
+                	},
                 body: JSON.stringify(data)
             })
-                .then(res => res.json().then(data => ({ ok: res.ok, data })))
-                .then(({ ok, data }) => {
+                .then(async res => {
+                    if (res.status === 401) {
+                    	window.location.href = "<%= request.getContextPath() %>/Login.jsp?expired=true";
+                        return;
+                    }
+                    const data = await res.json();
+                    return { ok: res.ok, data };
+                })
+                .then(result => {
+                    if (!result) return;
+
+                    const { ok, data } = result;
                     const resp = document.getElementById("response");
+
                     if (!ok) {
                         resp.innerText = data.error || "Error saving branch.";
                         resp.style.color = "red";
