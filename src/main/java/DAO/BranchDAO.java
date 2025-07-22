@@ -1,6 +1,5 @@
 package DAO;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -127,19 +126,18 @@ public class BranchDAO {
     
     public Map<String, Integer> getAccountCountPerBranch() throws CustomException {
 	     try(Connection connection = DBConnection.getConnection()){   
-    		String sql = """
-	            SELECT
-	                b.branch_name,
-	                COUNT(a.account_id) AS account_count
-	            FROM
-	                Branch b
-	            LEFT JOIN
-	                Account a ON b.branch_id = a.branch_id
-	            GROUP BY
-	                b.branch_name
-	            ORDER BY
-	                b.branch_name
-	            """;
+	    	 String sql =
+	    			    "SELECT\n" +
+	    			    "    b.branch_name,\n" +
+	    			    "    COUNT(a.account_id) AS account_count\n" +
+	    			    "FROM\n" +
+	    			    "    Branch b\n" +
+	    			    "LEFT JOIN\n" +
+	    			    "    Account a ON b.branch_id = a.branch_id\n" +
+	    			    "GROUP BY\n" +
+	    			    "    b.branch_name\n" +
+	    			    "ORDER BY\n" +
+	    			    "    b.branch_name";
 	
 	        Map<String, Integer> branchAccountMap = new LinkedHashMap<>();
 	
@@ -158,51 +156,50 @@ public class BranchDAO {
 	     }
     }
     
-    public Map<String, BigDecimal> getTotalBalancePerBranch() throws CustomException {
-    	try(Connection connection = DBConnection.getConnection()) {
-    		String sql = """
-	            SELECT
-	                b.branch_name,
-	                SUM(a.balance) AS total_balance
-	            FROM
-	                Branch b
-	            JOIN
-	                Account a ON b.branch_id = a.branch_id
-	            GROUP BY
-	                b.branch_id, b.branch_name
-	            ORDER BY
-	                b.branch_name
-	            """;
-	
-	        Map<String, BigDecimal> branchBalanceMap = new LinkedHashMap<>();
-	
-	        try (PreparedStatement ps = connection.prepareStatement(sql);
-	             ResultSet rs = ps.executeQuery()) {
-	            while (rs.next()) {
-	                String branchName = rs.getString("branch_name");
-	                BigDecimal totalBalance = rs.getBigDecimal("total_balance");
-	                branchBalanceMap.put(branchName, totalBalance);
-	            }
-	        }
-	
-	        return branchBalanceMap;
-    	} catch(Exception e) {
-    		throw new CustomException(e.getMessage());
-    	}
-    }
+//    public Map<String, BigDecimal> getTotalBalancePerBranch() throws CustomException {
+//    	try(Connection connection = DBConnection.getConnection()) {
+//    		String sql = """
+//	            SELECT
+//	                b.branch_name,
+//	                SUM(a.balance) AS total_balance
+//	            FROM
+//	                Branch b
+//	            JOIN
+//	                Account a ON b.branch_id = a.branch_id
+//	            GROUP BY
+//	                b.branch_id, b.branch_name
+//	            ORDER BY
+//	                b.branch_name
+//	            """;
+//	
+//	        Map<String, BigDecimal> branchBalanceMap = new LinkedHashMap<>();
+//	
+//	        try (PreparedStatement ps = connection.prepareStatement(sql);
+//	             ResultSet rs = ps.executeQuery()) {
+//	            while (rs.next()) {
+//	                String branchName = rs.getString("branch_name");
+//	                BigDecimal totalBalance = rs.getBigDecimal("total_balance");
+//	                branchBalanceMap.put(branchName, totalBalance);
+//	            }
+//	        }
+//	
+//	        return branchBalanceMap;
+//    	} catch(Exception e) {
+//    		throw new CustomException(e.getMessage());
+//    	}
+//    }
     
     public Map<String, Map<String, Integer>> getBranchEmployeeAndAccountStats() throws CustomException {
     	try (Connection connection = DBConnection.getConnection()) {
-    		String query = """
-	            SELECT 
-	                b.branch_name,
-	                COUNT(DISTINCT e.employee_id) AS employee_count,
-	                COUNT(DISTINCT a.account_id) AS account_count
-	            FROM Branch b
-	            LEFT JOIN Employee e ON e.branch = b.branch_id
-	            LEFT JOIN Account a ON a.branch_id = b.branch_id
-	            GROUP BY b.branch_name
-	        """;
+    		String query = 
+    			    "SELECT \n" +
+    			    "    b.branch_name, \n" +
+    			    "    COUNT(DISTINCT e.employee_id) AS employee_count, \n" +
+    			    "    COUNT(DISTINCT a.account_id) AS account_count \n" +
+    			    "FROM Branch b \n" +
+    			    "LEFT JOIN Employee e ON e.branch = b.branch_id \n" +
+    			    "LEFT JOIN Account a ON a.branch_id = b.branch_id \n" +
+    			    "GROUP BY b.branch_name";
 	
 	        Map<String, Map<String, Integer>> result = new HashMap<>();
 	

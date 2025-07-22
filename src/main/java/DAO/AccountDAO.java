@@ -2,16 +2,8 @@ package DAO;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
 import pojos.Account;
 import querybuilder.QueryBuilder;
 import querybuilder.QueryExecutor;
@@ -241,103 +233,103 @@ public class AccountDAO {
         }
     }
     
-    public Map<String, Integer> getCurrentWeekTransactionSplitByDayName() throws CustomException  {
-	    try(Connection connection = DBConnection.getConnection()){    
-	    	String sql = """
-	    	        SELECT
-	    	            DATE(FROM_UNIXTIME(transaction_date / 1000)) AS txn_date,
-	    	            COUNT(*) AS transaction_count
-	    	        FROM `Transaction`
-	    	        WHERE FROM_UNIXTIME(transaction_date / 1000) BETWEEN
-	    	              DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
-	    	          AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)
-	    	        GROUP BY txn_date
-	    	        ORDER BY txn_date
-	    	        """;
-
-	    	    Map<String, Integer> result = new LinkedHashMap<>();
-
-	    	    // Step 1: Get current week's Monday to Sunday
-	    	    LocalDate today = LocalDate.now();
-	    	    LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1);
-	    	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH);
-
-	    	    Map<LocalDate, String> dateToDayName = new HashMap<>();
-	    	    for (int i = 0; i < 7; i++) {
-	    	        LocalDate date = monday.plusDays(i);
-	    	        String dayName = date.format(formatter);
-	    	        result.put(dayName, 0); // initialize with 0
-	    	        dateToDayName.put(date, dayName);
-	    	    }
-
-	    	    try (PreparedStatement ps = connection.prepareStatement(sql);
-	    	         ResultSet rs = ps.executeQuery()) {
-	    	        while (rs.next()) {
-	    	            LocalDate txnDate = rs.getDate("txn_date").toLocalDate();
-	    	            int count = rs.getInt("transaction_count");
-	    	            String dayName = dateToDayName.get(txnDate);
-	    	            if (dayName != null) {
-	    	                result.put(dayName, count);
-	    	            }
-	    	        }
-	    	    }
-	    	    return result;
-	    } catch(Exception e) {
-	    	throw new CustomException(e.getMessage());
-	    }
-    }
+//    public Map<String, Integer> getCurrentWeekTransactionSplitByDayName() throws CustomException  {
+//	    try(Connection connection = DBConnection.getConnection()){    
+//	    	String sql = """
+//	    	        SELECT
+//	    	            DATE(FROM_UNIXTIME(transaction_date / 1000)) AS txn_date,
+//	    	            COUNT(*) AS transaction_count
+//	    	        FROM `Transaction`
+//	    	        WHERE FROM_UNIXTIME(transaction_date / 1000) BETWEEN
+//	    	              DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
+//	    	          AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)
+//	    	        GROUP BY txn_date
+//	    	        ORDER BY txn_date
+//	    	        """;
+//
+//	    	    Map<String, Integer> result = new LinkedHashMap<>();
+//
+//	    	    // Step 1: Get current week's Monday to Sunday
+//	    	    LocalDate today = LocalDate.now();
+//	    	    LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1);
+//	    	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH);
+//
+//	    	    Map<LocalDate, String> dateToDayName = new HashMap<>();
+//	    	    for (int i = 0; i < 7; i++) {
+//	    	        LocalDate date = monday.plusDays(i);
+//	    	        String dayName = date.format(formatter);
+//	    	        result.put(dayName, 0); // initialize with 0
+//	    	        dateToDayName.put(date, dayName);
+//	    	    }
+//
+//	    	    try (PreparedStatement ps = connection.prepareStatement(sql);
+//	    	         ResultSet rs = ps.executeQuery()) {
+//	    	        while (rs.next()) {
+//	    	            LocalDate txnDate = rs.getDate("txn_date").toLocalDate();
+//	    	            int count = rs.getInt("transaction_count");
+//	    	            String dayName = dateToDayName.get(txnDate);
+//	    	            if (dayName != null) {
+//	    	                result.put(dayName, count);
+//	    	            }
+//	    	        }
+//	    	    }
+//	    	    return result;
+//	    } catch(Exception e) {
+//	    	throw new CustomException(e.getMessage());
+//	    }
+//    }
     
-    public Map<String, Integer> getCurrentWeekTransactionSplitByBranch(long branchId) throws CustomException {
-    	try(Connection connection = DBConnection.getConnection()) {
-
-		    String sql = """
-		        SELECT
-		            DATE(FROM_UNIXTIME(t.transaction_date / 1000)) AS txn_date,
-		            COUNT(*) AS transaction_count
-		        FROM `Transaction` t
-		        JOIN `Account` a ON t.account_id = a.account_id
-		        WHERE a.branch_id = ? AND FROM_UNIXTIME(t.transaction_date / 1000) BETWEEN
-		              DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
-		          AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)
-		        GROUP BY txn_date
-		        ORDER BY txn_date
-		        """;
-
-		    Map<String, Integer> result = new LinkedHashMap<>();
-
-		    // Get current week's Monday
-		    LocalDate today = LocalDate.now();
-		    LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1);
-		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH); // Mon, Tue, ...
-
-		    Map<LocalDate, String> dateToDayName = new HashMap<>();
-		    for (int i = 0; i < 7; i++) {
-		        LocalDate date = monday.plusDays(i);
-		        String dayName = date.format(formatter);
-		        result.put(dayName, 0);  // Initialize with 0
-		        dateToDayName.put(date, dayName);
-		    }
-
-		    try (PreparedStatement ps = connection.prepareStatement(sql)) {
-		        ps.setLong(1, branchId);
-		        try (ResultSet rs = ps.executeQuery()) {
-		            while (rs.next()) {
-		                LocalDate txnDate = rs.getDate("txn_date").toLocalDate();
-		                int count = rs.getInt("transaction_count");
-		                String dayName = dateToDayName.get(txnDate);
-		                if (dayName != null) {
-		                    result.put(dayName, count);
-		                }
-		            }
-		        }
-		    }
-
-		    return result;
-
-    	} catch(Exception e) {
-    		throw new CustomException(e.getMessage());
-    	}
-    }
+//    public Map<String, Integer> getCurrentWeekTransactionSplitByBranch(long branchId) throws CustomException {
+//    	try(Connection connection = DBConnection.getConnection()) {
+//
+//		    String sql = """
+//		        SELECT
+//		            DATE(FROM_UNIXTIME(t.transaction_date / 1000)) AS txn_date,
+//		            COUNT(*) AS transaction_count
+//		        FROM `Transaction` t
+//		        JOIN `Account` a ON t.account_id = a.account_id
+//		        WHERE a.branch_id = ? AND FROM_UNIXTIME(t.transaction_date / 1000) BETWEEN
+//		              DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
+//		          AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 6 DAY)
+//		        GROUP BY txn_date
+//		        ORDER BY txn_date
+//		        """;
+//
+//		    Map<String, Integer> result = new LinkedHashMap<>();
+//
+//		    // Get current week's Monday
+//		    LocalDate today = LocalDate.now();
+//		    LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1);
+//		    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH); // Mon, Tue, ...
+//
+//		    Map<LocalDate, String> dateToDayName = new HashMap<>();
+//		    for (int i = 0; i < 7; i++) {
+//		        LocalDate date = monday.plusDays(i);
+//		        String dayName = date.format(formatter);
+//		        result.put(dayName, 0);  // Initialize with 0
+//		        dateToDayName.put(date, dayName);
+//		    }
+//
+//		    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+//		        ps.setLong(1, branchId);
+//		        try (ResultSet rs = ps.executeQuery()) {
+//		            while (rs.next()) {
+//		                LocalDate txnDate = rs.getDate("txn_date").toLocalDate();
+//		                int count = rs.getInt("transaction_count");
+//		                String dayName = dateToDayName.get(txnDate);
+//		                if (dayName != null) {
+//		                    result.put(dayName, count);
+//		                }
+//		            }
+//		        }
+//		    }
+//
+//		    return result;
+//
+//    	} catch(Exception e) {
+//    		throw new CustomException(e.getMessage());
+//    	}
+//    }
 
     public int deleteAccount(long accountId) throws CustomException {
     	QueryBuilder queryBuilder = new QueryBuilder(Account.class);

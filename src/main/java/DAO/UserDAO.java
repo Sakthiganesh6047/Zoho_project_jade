@@ -275,13 +275,12 @@ public class UserDAO {
     
     public Map<String, Integer> getDashboardCounts() throws CustomException {
     	try(Connection connection = DBConnection.getConnection()){
-	        String sql = """
-	            SELECT
-	                (SELECT COUNT(*) FROM Branch) AS branch_count,
-	                (SELECT COUNT(*) FROM Employee) AS employee_count,
-	                (SELECT COUNT(*) FROM User WHERE user_type = 1) AS user_count,
-	                (SELECT COUNT(*) FROM Account) AS account_count
-	            """;
+    		String sql =
+    			    "SELECT\n" +
+    			    "    (SELECT COUNT(*) FROM Branch) AS branch_count,\n" +
+    			    "    (SELECT COUNT(*) FROM Employee) AS employee_count,\n" +
+    			    "    (SELECT COUNT(*) FROM User WHERE user_type = 1) AS user_count,\n" +
+    			    "    (SELECT COUNT(*) FROM Account) AS account_count";
 	
 	        Map<String, Integer> counts = new HashMap<>();
 	
@@ -304,11 +303,10 @@ public class UserDAO {
     public Map<String, Integer> getBranchStats(long branchId) throws CustomException {
     	
     	try(Connection connection = DBConnection.getConnection()){
-	        String sql = """
-	            SELECT
-	                (SELECT COUNT(*) FROM Employee WHERE branch = ?) AS employee_count,
-	                (SELECT COUNT(*) FROM Account WHERE branch_id = ?) AS account_count
-	            """;
+    		String sql =
+    			    "SELECT\n" +
+    			    "    (SELECT COUNT(*) FROM Employee WHERE branch = ?) AS employee_count,\n" +
+    			    "    (SELECT COUNT(*) FROM Account WHERE branch_id = ?) AS account_count";
 	
 	        Map<String, Integer> counts = new HashMap<>();
 	

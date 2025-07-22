@@ -353,18 +353,18 @@ public class AccountHandler {
     	}
     }
     
-    @Route(path = "account/transactionchart", method = "GET")
-    public String getTransactionCount(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
- 
-    	ValidationsUtil.isNull(role, "User Role");
-    	ValidationsUtil.isNull(role, "User Role");
-    	
-    	if(role ==  2) {
-    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
-    		return Results.respondJson(accountDAO.getCurrentWeekTransactionSplitByBranch(employee.getBranch()));
-    	}
-    	return Results.respondJson(accountDAO.getCurrentWeekTransactionSplitByDayName());
-    }
+//    @Route(path = "account/transactionchart", method = "GET")
+//    public String getTransactionCount(@FromSession("userId") Long userId, @FromSession("role") Integer role) throws CustomException {
+// 
+//    	ValidationsUtil.isNull(role, "User Role");
+//    	ValidationsUtil.isNull(role, "User Role");
+//    	
+//    	if(role ==  2) {
+//    		Employee employee = AuthorizeUtil.getEmployeeDetails(userId);
+//    		return Results.respondJson(accountDAO.getCurrentWeekTransactionSplitByBranch(employee.getBranch()));
+//    	}
+//    	return Results.respondJson(accountDAO.getCurrentWeekTransactionSplitByDayName());
+//    }
     
     @Route(path = "account/close", method = "PUT")
     public String closeAccount(@FromBody Account account, @FromSession("userId") Long modifierId, 
