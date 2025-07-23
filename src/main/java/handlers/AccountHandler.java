@@ -21,6 +21,7 @@ import util.AuthorizeUtil;
 import util.CustomException;
 import util.DBConnection;
 import util.Results;
+import util.UnauthorizedAccessException;
 import util.ValidationsUtil;
 
 public class AccountHandler {
@@ -81,7 +82,9 @@ public class AccountHandler {
     	ValidationsUtil.checkUserRole(role);
     	
     	if(role == 0) {
-    		AuthorizeUtil.isAuthorizedOwner(sessionId, accountId);
+    		if(!(AuthorizeUtil.isAuthorizedOwner(sessionId, accountId))) {
+    			throw new UnauthorizedAccessException("Unauthorized access, Check account number");
+    		}
     		return Results.respondJson(accountDAO.getAccountById(accountId));
     	} else {
     		return Results.respondJson(accountDAO.getAccountById(accountId));
@@ -101,12 +104,14 @@ public class AccountHandler {
     	
 //    	if (role.equals(0)) {
 //    		if(!(customerId.equals(modifierId))) {
-//    			throw new CustomException("Unauthorized Access, Check account Number");
+//    			throw new UnauthorizedAccessException("Unauthorized Access, Check account Number");
 //    		}
 //    	}
     	
     	if (role.equals(1) || role.equals(2)) {
-    		AuthorizeUtil.isSameBranch(modifierId, accountId);
+    		if(!(AuthorizeUtil.isSameBranch(modifierId, accountId))) {
+    			throw new UnauthorizedAccessException("Unauthorized access, Contact respective branch");
+    		}
     	}
     	
     	account.setModifiedBy(modifierId);
@@ -228,7 +233,7 @@ public class AccountHandler {
     	
     	if(role == 0) {
     		if (!(customerId.equals(sessionId))) {
-    			throw new CustomException("Unauthorized access, check Account Number");
+    			throw new UnauthorizedAccessException("Unauthorized access, check Account Number");
     		} 
     	}
     	
@@ -255,7 +260,7 @@ public class AccountHandler {
     	
     	if (role.equals(0)) {
     		if(!(customerId.equals(modifierId))) {
-    			throw new CustomException("Unauthorized Access, Check account Number");
+    			throw new UnauthorizedAccessException("Unauthorized Access, Check account Number");
     		}
     	}
     	account.setModifiedBy(modifierId);
@@ -278,7 +283,7 @@ public class AccountHandler {
     	
     	if (role.equals(0)) {
     		if(!(fetchedAccount.getCustomerId().equals(modifierId))) {
-    			throw new CustomException("Unauthorized Access, Check account Number");
+    			throw new UnauthorizedAccessException("Unauthorized Access, Check account Number");
     		}
     	}
     	
@@ -303,7 +308,7 @@ public class AccountHandler {
     	
     	if (role.equals(0)) {
     		if(!(fetchedAccount.getCustomerId().equals(modifierId))) {
-    			throw new CustomException("Unauthorized Access, Check account Number");
+    			throw new UnauthorizedAccessException("Unauthorized Access, Check account Number");
     		}
     	}
     	
@@ -329,7 +334,7 @@ public class AccountHandler {
     	if(role <= 2) {
     		Employee employee = AuthorizeUtil.getEmployeeDetails(modifierId);
     		if(!(employee.getBranch() == account.getBranchId())) {
-    			throw new CustomException("Unauthorized Access, Cannot activate account of different branch");
+    			throw new UnauthorizedAccessException("Unauthorized Access, Cannot activate account of different branch");
     		} 
     	}
     		fetchedAccount.setAccountStatus(1);

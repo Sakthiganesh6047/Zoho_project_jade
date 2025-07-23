@@ -17,11 +17,13 @@ import pojos.Employee;
 import pojos.User;
 import pojos.UserProfile;
 import util.AuthorizeUtil;
+import util.BadRequestException;
 import util.CustomException;
 import util.DBConnection;
 import util.Password;
 import util.Results;
 import util.TimeConversion;
+import util.UnauthorizedAccessException;
 import util.ValidationsUtil;
 
 public class UserHandler {
@@ -93,7 +95,7 @@ public class UserHandler {
 				createCustomer(profile.getCustomerDetails(), user, connection);
 				break;
 			default:
-				throw new CustomException("Invalid user type: " + userType);
+				throw new BadRequestException("Invalid user type: " + userType);
 			}
 		
 		connection.commit();
@@ -166,18 +168,18 @@ public class UserHandler {
         switch (newEmployeeRole) {
             case 2: // Manager
                 if (!(creatorRole.equals(3))) { // Only GM can add Manager
-                    throw new CustomException("Only GM can create a Manager.");
+                    throw new UnauthorizedAccessException("Only GM can create a Manager.");
                 }
                 break;
             case 1: // Clerk
                 if ( !(creatorRole.equals(2)) && !(creatorRole.equals(3))) {
-                    throw new CustomException("Only Managers and GM can create a Clerk.");
+                    throw new UnauthorizedAccessException("Only Managers and GM can create a Clerk.");
                 }
                 // Check branch match
                 if (creatorRole.equals(2)) {
 	                Employee manager = employeeHandler.getEmployeeDetails(creatorId);
 	                if (manager.getBranch() != employee.getBranch()) {
-	                    throw new CustomException("Manager can only create Clerks in their own branch.");
+	                    throw new UnauthorizedAccessException("Manager can only create Clerks in their own branch.");
 	                }
                 }
                 break;
@@ -195,7 +197,7 @@ public class UserHandler {
         user.setModifiedOn(Instant.now().toEpochMilli());
 
         if (user.getUserId() == null) {
-            throw new CustomException("User ID is required for update.");
+            throw new BadRequestException("User ID is required for update.");
         }
 
         try {
@@ -237,7 +239,7 @@ public class UserHandler {
                 // Optional: validate update authority for roles
                 Employee updater = employeeHandler.getEmployeeDetails(updaterId);
                 if (!hasPermissionToUpdate(updater, employee)) {
-                    throw new CustomException("Insufficient permission to update this employee.");
+                    throw new UnauthorizedAccessException("Insufficient permission to update this employee.");
                 }
 
                 ValidationsUtil.validateEmployee(employee);
@@ -298,7 +300,7 @@ public class UserHandler {
     	
     	User fetchedUser = userDAO.getUserByPhone(phone);
     	if (fetchedUser.getUserType() == 2) {
-    		throw new CustomException("Invalid User Type, check Phone Number");
+    		throw new BadRequestException("Invalid User Type, check Phone Number");
     	}
     	return Results.respondJson(fetchedUser);
     }
@@ -367,11 +369,11 @@ public class UserHandler {
     	User fetchedUser = userDAO.getPasswordById(userId);
     	
     	if(!(Password.verifyPassword(credential.getPassword(), fetchedUser.getPasswordHash()))){
-    		throw new CustomException("Old password is Incorrect");
+    		throw new BadRequestException("Old password is Incorrect");
     	}
     	
     	if(Password.verifyPassword(credential.getNewPassword(), fetchedUser.getPasswordHash())){
-    		throw new CustomException("Your Old password cannot be your New password!");
+    		throw new BadRequestException("Your Old password cannot be your New password!");
     	}
     	
     	fetchedUser.setModifiedBy(userId);

@@ -10,8 +10,10 @@ import annotations.FromSession;
 import annotations.Route;
 import pojos.Beneficiary;
 import util.AuthorizeUtil;
+import util.BadRequestException;
 import util.CustomException;
 import util.Results;
+import util.UnauthorizedAccessException;
 import util.ValidationsUtil;
 
 public class BeneficiaryHandler {
@@ -32,7 +34,7 @@ public class BeneficiaryHandler {
 		beneficiary.setModifiedOn(Instant.now().toEpochMilli());
 		beneficiary.setModifiedBy(userId);
 		if (beneficiary.getBeneficiaryAccountNumber().equals(beneficiary.getAccountId())) {
-			throw new CustomException("Both account ids are same, check beneficiary account number");
+			throw new BadRequestException("Both account ids are same, check beneficiary account number");
 		}
 		
 		String ifscCode =  beneficiary.getIfscCode();
@@ -40,7 +42,7 @@ public class BeneficiaryHandler {
 		Long beneficiaryAccountNumber = beneficiary.getBeneficiaryAccountNumber();
 		Beneficiary existingBeneficiary = beneficiaryDAO.getUniqueBeneficiary(ifscCode, accountId, beneficiaryAccountNumber, userId);
 		if (existingBeneficiary != null) {
-			throw new CustomException("Beneficiary already exists");
+			throw new BadRequestException("Beneficiary already exists");
 		}
 		
 		Long result = beneficiaryDAO.insertBeneficiary(beneficiary);
@@ -58,7 +60,7 @@ public class BeneficiaryHandler {
 		
 		if (role == 0) {
 			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId())) {
-				throw new CustomException("Unauthorized Access, Updation failed");
+				throw new UnauthorizedAccessException("Unauthorized Access, Updation failed");
 			}
 		}
 		beneficiary.setModifiedBy(userId);
@@ -78,7 +80,7 @@ public class BeneficiaryHandler {
 		
 		if (role == 0) {
 			if(!(AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId()))) {
-				throw new CustomException("You can't access this account's beneficiary list");
+				throw new UnauthorizedAccessException("You can't access this account's beneficiary list");
 			}
 		}
 		return Results.respondJson(beneficiaryDAO.getBeneficiariesByAccountId(beneficiary.getAccountId(), userId, limit, offset));	
@@ -97,7 +99,7 @@ public class BeneficiaryHandler {
 		
 		if (role == 0) {
 			if(!AuthorizeUtil.isAuthorizedOwner(userId, beneficiary.getAccountId())) {
-				throw new CustomException("Unauthorized Access, Deletion Failed");
+				throw new UnauthorizedAccessException("Unauthorized Access, Deletion Failed");
 			}
 		}
 		beneficiary.setCreatedBy((long) 1);

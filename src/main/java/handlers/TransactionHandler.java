@@ -21,10 +21,12 @@ import pojos.Transaction;
 import pojos.TransferWrapper;
 import pojos.User;
 import util.AuthorizeUtil;
+import util.BadRequestException;
 import util.CustomException;
 import util.DBConnection;
 import util.Password;
 import util.Results;
+import util.UnauthorizedAccessException;
 import util.ValidationsUtil;
 
 public class TransactionHandler {
@@ -47,12 +49,12 @@ public class TransactionHandler {
     	
     	if (userRole.equals(0)) {
     		if(!AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
-    			throw new CustomException("Unauthorized Access, check account number");
+    			throw new UnauthorizedAccessException("Unauthorized Access, check account number");
     		}
     	} 
     	if (userRole.equals(1) || userRole.equals(2)){
     		if(!AuthorizeUtil.isSameBranch(userId, accountId)) {
-    			throw new CustomException("Unauthorized Access, contact specific branch");
+    			throw new UnauthorizedAccessException("Unauthorized Access, contact specific branch");
     		}
     	}
     	return Results.respondJson(transactionDAO.getTransactionsByAccountId(accountId, limit, offset));
@@ -70,7 +72,7 @@ public class TransactionHandler {
     	
     	if (userRole == 0) {
     		if(!(userId.equals(customerId))) {
-    			throw new CustomException("Unauthoried Access, check customer Id");
+    			throw new UnauthorizedAccessException("Unauthoried Access, check customer Id");
     		}
     	}
     	return Results.respondJson(transactionDAO.getTransactionsByCustomerId(customerId, limit, offset));
@@ -88,12 +90,12 @@ public class TransactionHandler {
     	Transaction transaction = transactionDAO.getTransactionById(transactionId);
     	if (userRole == 0) {
     		if(transaction.getCustomerId() != userId) {
-    			throw new CustomException("Unauthorized Access, check transaction Number");
+    			throw new UnauthorizedAccessException("Unauthorized Access, check transaction Number");
     		}
     	}
     	if (userRole < 3 || userRole > 0) {
     		if(!AuthorizeUtil.isSameBranch(userId, transaction.getAccountId())) {
-    			throw new CustomException("Unauthorized Access, contact specific branch");
+    			throw new UnauthorizedAccessException("Unauthorized Access, contact specific branch");
     		}
     	}
     	return Results.respondJson(transaction);
@@ -115,11 +117,11 @@ public class TransactionHandler {
     	
     	if (userRole == 0) {
     		if(!AuthorizeUtil.isAuthorizedOwner(userId, accountId)) {
-    			throw new CustomException("Unauthorized Access, check account number");
+    			throw new UnauthorizedAccessException("Unauthorized Access, check account number");
     		}
     	} if(userRole < 3 || userRole > 0) {
     		if(!AuthorizeUtil.isSameBranch(userId, accountId)) {
-    			throw new CustomException("Unauthorized Access, contact specific branch");
+    			throw new UnauthorizedAccessException("Unauthorized Access, contact specific branch");
     		}
     	}
     	return Results.respondJson(transactionDAO.getTransactionsBasedOnTime(accountId, fromDate, toDate, limit, offset));
@@ -137,7 +139,7 @@ public class TransactionHandler {
     	UserDAO userDAO = UserDAO.getUserDAOInstance();
     	User fetchedUser = userDAO.getUserPassword(userId);
     	if (!Password.verifyPassword(inputUser.getPasswordHash(), fetchedUser.getPasswordHash())) {
-    		throw new CustomException("Password Wrong, Transaction Aborted");
+    		throw new BadRequestException("Password Wrong, Transaction Aborted");
     	}
     	
     	Connection connection = null;
@@ -307,7 +309,7 @@ public class TransactionHandler {
 	        AccountDAO accountDAO = AccountDAO.getAccountDAOInstance();
 	
 	        if (fromAccountId == toAccountId) {
-	            throw new CustomException("Cannot transfer to the same account.");
+	            throw new BadRequestException("Cannot transfer to the same account.");
 	        }
 	
 	        fromAccount = accountDAO.getAccountForUpdate(fromAccountId, connection);

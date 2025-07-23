@@ -5,12 +5,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import DAO.AccountDAO;
 import DAO.EmployeeDAO;
 import annotations.FromBody;
@@ -47,7 +44,6 @@ public class AuthorizeUtil {
 	    List<Account> accounts = accountDAO.getAccNosByCustomerId(customerId);
 	    for (Account account : accounts) {
 	        if (account.getAccountId().equals(accountId)) {
-	        	System.out.print(account.getAccountId());
 	            return true;
 	        }
 	    }

@@ -13,6 +13,7 @@ import pojos.Employee;
 import util.AuthorizeUtil;
 import util.CustomException;
 import util.Results;
+import util.UnauthorizedAccessException;
 import util.ValidationsUtil;
 
 public class BranchHandler {
@@ -72,7 +73,7 @@ public class BranchHandler {
 		if (modifierRole == 2) {
 			Employee manager = AuthorizeUtil.getEmployeeDetails(modifierId);
 			if(manager.getBranch() != branch.getBranchId()) {
-				throw new CustomException("You are not allowed to change this branch details");
+				throw new UnauthorizedAccessException("You are not allowed to change this branch details");
 			}
 		}
 		branch.setModifiedBy(modifierId);

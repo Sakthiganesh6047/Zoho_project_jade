@@ -13,9 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import annotations.Route;
 import util.AuthorizeUtil;
+import util.BadRequestException;
 import util.CustomException;
 import util.Results;
 import util.RouteInfo;
+import util.UnauthorizedAccessException;
 
 import java.lang.reflect.*;
 
@@ -94,8 +96,14 @@ public class HandlersRegistry {
                     	 Results.respondError(response, 500, root.getMessage());
                     	 e.printStackTrace();
                     } catch(CustomException e) {
-                    	Results.respondError(response, 500, e.getMessage());
-                    	e.printStackTrace();
+                        if (e instanceof UnauthorizedAccessException) {
+                            Results.respondError(response, 403, e.getMessage());
+                        } else if (e instanceof BadRequestException) {
+                            Results.respondError(response, 400, e.getMessage());
+                        } else {
+                            Results.respondError(response, 400, e.getMessage());
+                        }
+                        e.printStackTrace();
                     } catch (Exception e) {
                         Results.respondError(response, 400, e.getMessage());
                         e.printStackTrace();
